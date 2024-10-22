@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "64952298432",
+    "project_id": "mohgggdraw",
+    "storage_bucket": "mohgggdraw.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64952298432:android:d5e0590f2df4a4694ff625",
+        "android_client_info": {
+          "package_name": "com.example.mohgggdraw"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbAVoLc2H1xb3edxNB52Q4mKRKzMzzkxU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
