@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Image to display when the state is pressed -->
+    <item android:drawable="@drawable/img" android:state_pressed="true" />
+
+    <!-- Default image (when not pressed) -->
+    <item android:drawable="@drawable/img" />
+</selector>
