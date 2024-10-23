@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -17,17 +18,24 @@ import com.example.mohgggdraw.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
-    private ActivityMainBinding binding;
+
+    private StorageReference storageReference;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        storageReference = FirebaseStorage.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
+        com.example.mohgggdraw.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
@@ -36,13 +44,16 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAnchorView(R.id.fab)
-                        .setAction("Action", null).show();
-            }
+        binding.toolbar.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAnchorView(R.id.toolbar)
+                .setAction("Action", null).show());
+
+        // Adding the click listener for Edit Organizer button
+        Button editOrganizerButton = findViewById(R.id.button_edit_organizer);
+        editOrganizerButton.setOnClickListener(v -> {
+            // Navigate to Organizer edit page
+            Intent intent = new Intent(MainActivity.this, Organizer.class);
+            startActivity(intent);
         });
     }
 
