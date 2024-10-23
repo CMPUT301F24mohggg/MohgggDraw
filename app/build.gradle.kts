@@ -36,9 +36,9 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
-    implementation("com.google.firebase:firebase-firestore")
 
+    implementation ("com.google.firebase:firebase-auth:23.1.0")
+    implementation ("com.google.firebase:firebase-firestore:25.1.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -49,3 +49,4 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
+

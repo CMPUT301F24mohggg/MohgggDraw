@@ -12,17 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MohgggDraw"
         tools:targetApi="31">
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MohgggDraw">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Organizer Activity (Existing Activity in your App) -->
         <activity android:name=".Organizer" />
+
+        <!-- Signup Step 1 Activity -->
+        <activity android:name=".SignupStep1Activity" />
+
+        <!-- Signup Step 2 Activity -->
+        <activity android:name=".SignupStep2Activity" />
+
     </application>
 
 </manifest>
