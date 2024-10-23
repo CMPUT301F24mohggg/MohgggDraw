@@ -116,17 +116,17 @@
     <EditText
         android:id="@+id/event_detail"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:hint="Enter your event detail!"
+        android:layout_height="150dp"
         android:layout_below="@id/label_event_detail"
-        android:layout_marginTop="8dp"
-        android:padding="12dp"
-        android:background="@android:color/white"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/white"
         android:elevation="2dp"
-        android:textColorHint="#BDBDBD"
+        android:hint="Enter your event detail!"
+        android:minHeight="200dp"
+        android:padding="12dp"
         android:textColor="#000000"
-        android:minHeight="200dp" />
+        android:textColorHint="#BDBDBD" />
 
     <!-- Navigation Bar (Optional, if required) -->
     <LinearLayout
@@ -139,37 +139,45 @@
         android:padding="8dp"
         android:elevation="8dp">
 
-        <Button
-            android:id="@+id/button_home"
+        <!-- Home ImageView with img_1.png -->
+        <ImageView
+            android:id="@+id/image_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Home"
-            android:background="@android:color/transparent" />
+            android:src="@drawable/img_1"
+            android:contentDescription="Home"
+            android:scaleType="fitCenter" />
 
-        <Button
-            android:id="@+id/button_create"
+        <!-- Create ImageView with img_2.png -->
+        <ImageView
+            android:id="@+id/image_create"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Create"
-            android:background="@android:color/transparent" />
+            android:src="@drawable/img_2"
+            android:contentDescription="Create"
+            android:scaleType="fitCenter" />
 
-        <Button
-            android:id="@+id/button_notifications"
+        <!-- Notifications ImageView with img_3.png -->
+        <ImageView
+            android:id="@+id/image_notifications"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Notification"
-            android:background="@android:color/transparent" />
+            android:src="@drawable/img_3"
+            android:contentDescription="Notification"
+            android:scaleType="fitCenter" />
 
-        <Button
-            android:id="@+id/button_profile"
+        <!-- Profile ImageView with img_4.png -->
+        <ImageView
+            android:id="@+id/image_profile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Profile"
-            android:background="@android:color/transparent" />
+            android:src="@drawable/img_4"
+            android:contentDescription="Profile"
+            android:scaleType="fitCenter" />
 
     </LinearLayout>
 </RelativeLayout>
