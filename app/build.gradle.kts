@@ -38,6 +38,8 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.github.bumptech.glide:glide:4.12.0") // Updated Glide version
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Keep if using annotation processor
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -45,6 +47,7 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

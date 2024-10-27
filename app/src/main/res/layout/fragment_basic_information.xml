@@ -1,0 +1,111 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Image Upload Placeholder, acts as the Upload Button -->
+        <ImageView
+            android:id="@+id/organizer_event_poster"
+            android:layout_width="380dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/img"
+            android:contentDescription="Event Poster"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Event Title Label -->
+        <TextView
+            android:id="@+id/label_event_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Title"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_below="@id/organizer_event_poster"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            android:textColor="#000000" />
+
+        <!-- Event Title Text Box -->
+        <EditText
+            android:id="@+id/event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your event name!"
+            android:layout_below="@id/label_event_title"
+            android:layout_marginTop="4dp"
+            android:padding="4dp"
+            android:background="@drawable/rounded_edittext"
+            android:layout_marginHorizontal="8dp"
+            android:elevation="4dp"
+            android:textColorHint="#BDBDBD"
+            android:textColor="#000000" />
+
+        <!-- Event Location Label -->
+        <TextView
+            android:id="@+id/label_event_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Location"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_below="@id/event_title"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:textColor="#000000" />
+
+        <!-- Event Location Text Box -->
+        <EditText
+            android:id="@+id/event_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your event location!"
+            android:layout_below="@id/label_event_location"
+            android:layout_marginTop="4dp"
+            android:padding="4dp"
+            android:background="@drawable/rounded_edittext"
+            android:layout_marginHorizontal="8dp"
+            android:elevation="2dp"
+            android:textColorHint="#BDBDBD"
+            android:textColor="#000000" />
+
+        <!-- Event Detail Label -->
+        <TextView
+            android:id="@+id/label_event_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Detail"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_below="@id/event_location"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:textColor="#000000" />
+
+        <!-- Event Detail Text Box -->
+        <EditText
+            android:id="@+id/event_detail"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@id/label_event_detail"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:elevation="2dp"
+            android:hint="Enter your event detail!"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#BDBDBD" />
+
+    </RelativeLayout>
+</ScrollView>

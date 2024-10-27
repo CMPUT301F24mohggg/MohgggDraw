@@ -1,0 +1,206 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+
+    <!-- Header with Back Button -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true">
+
+
+    </LinearLayout>
+
+    <!-- Event Image Placeholder with increased size -->
+    <ImageView
+        android:id="@+id/organizer_event_poster"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/header_layout"
+        android:background="@drawable/img_8"
+        android:scaleType="centerCrop" />
+
+    <!-- Event Title -->
+    <TextView
+        android:id="@+id/label_event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/organizer_event_poster"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Title:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_event_title"
+        android:layout_marginStart="8dp"
+        android:text="Event Title"
+        android:textSize="16sp" />
+
+    <!-- Event Location -->
+    <TextView
+        android:id="@+id/label_event_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_event_title"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Location:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_event_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_event_location"
+        android:layout_marginStart="8dp"
+        android:text="Event Location"
+        android:textSize="16sp" />
+
+    <!-- Registration Open Date -->
+    <TextView
+        android:id="@+id/label_registration_open"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_event_location"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Registration Open Date:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_registration_open"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_registration_open"
+        android:layout_marginStart="8dp"
+        android:text="Date Open"
+        android:textSize="16sp" />
+
+    <!-- Registration Deadline -->
+    <TextView
+        android:id="@+id/label_registration_deadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_registration_open"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Registration Deadline:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_registration_deadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_registration_deadline"
+        android:layout_marginStart="8dp"
+        android:text="Date Deadline"
+        android:textSize="16sp" />
+
+    <!-- Event Start Date -->
+    <TextView
+        android:id="@+id/label_event_start_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_registration_deadline"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Event Start Date:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_event_start_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_event_start_date"
+        android:layout_marginStart="8dp"
+        android:text="Event Start"
+        android:textSize="16sp" />
+
+    <!-- Maximum Pooling Sample -->
+    <TextView
+        android:id="@+id/label_max_pooling_sample"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_event_start_date"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Max Pooling Sample:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_max_pooling_sample"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_max_pooling_sample"
+        android:layout_marginStart="8dp"
+        android:text="Max Sample"
+        android:textSize="16sp" />
+
+    <!-- Maximum Entrants -->
+    <TextView
+        android:id="@+id/label_max_entrants"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_max_pooling_sample"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Max Entrants:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_max_entrants"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_max_entrants"
+        android:layout_marginStart="8dp"
+        android:text="Max Entrants"
+        android:textSize="16sp" />
+
+    <!-- Geolocation Enabled -->
+    <TextView
+        android:id="@+id/label_geolocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_max_entrants"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:text="Enable Geolocation:"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/review_geolocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_geolocation"
+        android:layout_marginStart="8dp"
+        android:text="Yes/No"
+        android:textSize="16sp" />
+
+    <!-- Create Event Button -->
+    <Button
+        android:id="@+id/button_create_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/review_geolocation"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Create Event"
+        android:textAllCaps="false" />
+</RelativeLayout>

@@ -31,7 +31,7 @@ public class SecondFragment extends Fragment {
         // This button now starts the Organizer activity
         binding.buttonSecond.setOnClickListener(v -> {
             // Start Organizer Activity
-            Intent intent = new Intent(getActivity(), Organizer.class);
+            Intent intent = new Intent(getActivity(), BasicInformationFragment.class);
             startActivity(intent);
         });
     }
