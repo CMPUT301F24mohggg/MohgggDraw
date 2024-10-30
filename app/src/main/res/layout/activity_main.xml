@@ -1,19 +1,76 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
-    <!-- Start Signup Button -->
-    <Button
-        android:id="@+id/start_signup_button"
-        android:layout_width="wrap_content"
+    <!-- Toggle Buttons to switch between User and Facility -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Signup"
-        android:backgroundTint="@android:color/holo_blue_dark"
-        android:textColor="@android:color/white"
-        android:padding="12dp" />
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/toggleUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign up as User"
+            android:backgroundTint="#6A1B9A"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/toggleFacility"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign up as Facility"
+            android:backgroundTint="#6A1B9A"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- User fields -->
+    <EditText
+        android:id="@+id/nameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:visibility="visible" />
+
+    <!-- Facility-specific field -->
+    <EditText
+        android:id="@+id/facilityNameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Facility Name"
+        android:visibility="gone" />
+
+    <!-- Common fields for both user and facility -->
+    <EditText
+        android:id="@+id/emailField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email" />
+
+    <EditText
+        android:id="@+id/phoneNumberField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone Number" />
+
+    <EditText
+        android:id="@+id/locationField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location" />
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="16dp" />
 </LinearLayout>
 

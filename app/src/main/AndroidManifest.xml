@@ -28,10 +28,9 @@
         <activity android:name=".Organizer" />
 
         <!-- Signup Step 1 Activity -->
-        <activity android:name=".SignupStep1Activity" />
+        <activity android:name=".SignupActivity" />
 
-        <!-- Signup Step 2 Activity -->
-        <activity android:name=".SignupStep2Activity" />
+
 
     </application>
 

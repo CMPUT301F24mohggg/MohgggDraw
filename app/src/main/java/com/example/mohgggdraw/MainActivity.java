@@ -2,25 +2,29 @@ package com.example.mohgggdraw;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Button startSignupButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Reference the "Start Signup" button
-        startSignupButton = findViewById(R.id.start_signup_button);
+        Button userSignupButton = findViewById(R.id.userSignupButton);
+        Button facilitySignupButton = findViewById(R.id.facilitySignupButton);
 
-        // Set click listener to navigate to SignupStep1Activity
-        startSignupButton.setOnClickListener(v -> {
-            // Start SignupStep1Activity
-            Intent intent = new Intent(MainActivity.this, SignupStep1Activity.class);
+        userSignupButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+            intent.putExtra("role", 1); // 1 for User
+            startActivity(intent);
+        });
+
+        facilitySignupButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+            intent.putExtra("role", 2); // 2 for Facility
             startActivity(intent);
         });
     }
