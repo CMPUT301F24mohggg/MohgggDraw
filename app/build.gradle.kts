@@ -7,6 +7,10 @@ android {
     namespace = "com.example.mohgggdraw"
     compileSdk = 34
 
+    viewBinding{
+        enable = true
+    }
+
     defaultConfig {
         applicationId = "com.example.mohgggdraw"
         minSdk = 24
@@ -38,6 +42,7 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation ("com.google.firebase:firebase-firestore:24.9.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)
