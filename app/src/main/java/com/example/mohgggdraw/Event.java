@@ -1,14 +1,15 @@
 package com.example.mohgggdraw;
 
 
-import android.content.ServiceConnection;
-import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-import android.view.View;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
 
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class Event implements Serializable {
     //Placeholder
@@ -16,8 +17,17 @@ public class Event implements Serializable {
     String date = "Jan 1";
     String time = "1";
     String location = "placeholder";
+    String path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/Untitled.png?alt=media&token=26c6ac6d-12af-423d-af51-a176ae50abb7";
+    Bitmap bmp;
+    int id=1;
 
+    public int getId() {
+        return id;
+    }
 
+    public String getPath() {
+        return path;
+    }
 
     public String getName() {
         return name;

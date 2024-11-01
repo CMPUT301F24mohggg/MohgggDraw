@@ -9,7 +9,7 @@ public class WaitinglistController {
     public WaitinglistController(User user, Event event) {
 
         this.event = event;
-        db = new WaitinglistDB(event.getName());
+        db = new WaitinglistDB(event);
     }
 
     public void addUser(User user){

@@ -1,26 +1,28 @@
 package com.example.mohgggdraw;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
 
 public class WaitinglistDB {
     private FirebaseFirestore db;
     private CollectionReference waitlistRef;
     private String name;
+    private DocumentReference myDoc;
 
-    public WaitinglistDB(String name) {
+    public WaitinglistDB(Event event) {
         this.name = name;
         db = FirebaseFirestore.getInstance();
-         waitlistRef= db.collection(name);
+         waitlistRef= db.collection("Event");
+         myDoc = waitlistRef.document((String.valueOf(event.getId())));
     }
 
-    public CollectionReference getCitiesRef() {
+    public CollectionReference getWaitlistRef() {
         return waitlistRef;
     }
 
-    public void setCitiesRef(CollectionReference citiesRef) {
+    public void setWaitlistRef(CollectionReference citiesRef) {
         this.waitlistRef = citiesRef;
     }
 
@@ -35,12 +37,9 @@ public class WaitinglistDB {
     public String getName() {
         return name;
     }
+
     public void addToDB(User user){
-        HashMap<String, String> data = new HashMap<>();
-        data.put("email", user.getEmail());
-        waitlistRef.document(user.getEmail()).set(data);
-
-
+        myDoc.update("waitingList", FieldValue.arrayUnion(user.getEmail()));
 
 
     }
