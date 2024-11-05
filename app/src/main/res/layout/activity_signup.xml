@@ -5,60 +5,25 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <RadioGroup
-        android:id="@+id/roleRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RadioButton
-            android:id="@+id/userRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign up as User"
-            android:checked="true"/>
-        <RadioButton
-            android:id="@+id/facilityRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign up as Facility"/>
-    </RadioGroup>
-
-    <EditText
-        android:id="@+id/nameEditText"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Name"/>
-
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"/>
-
-    <EditText
-        android:id="@+id/phoneEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Phone Number"/>
-
-    <EditText
-        android:id="@+id/locationEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Location"/>
-
-    <!-- Facility-specific field -->
-    <EditText
-        android:id="@+id/facilityNameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Facility Name"
-        android:visibility="gone"/>
+        android:text="Select User Type"
+        android:textSize="18sp"
+        android:layout_gravity="center"/>
 
     <Button
-        android:id="@+id/signupButton"
+        android:id="@+id/buttonEntrant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign Up"/>
+        android:text="Entrant" />
+
+    <Button
+        android:id="@+id/buttonFacility"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Facility" />
 
 </LinearLayout>
+
 

@@ -39,6 +39,9 @@ dependencies {
 
     implementation ("com.google.firebase:firebase-auth:23.1.0")
     implementation ("com.google.firebase:firebase-firestore:25.1.1")
+    implementation ("com.google.firebase:firebase-database")
+    implementation ("com.google.firebase:firebase-auth")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -46,6 +49,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.inappmessaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

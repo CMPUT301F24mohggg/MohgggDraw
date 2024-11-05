@@ -1,60 +1,34 @@
 package com.example.mohgggdraw;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private Button toggleUserButton, toggleFacilityButton, signUpButton;
-    private EditText nameField, facilityNameField, emailField, phoneNumberField, locationField;
+    private Button buttonEntrant, buttonFacility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        toggleUserButton = findViewById(R.id.toggleUser);
-        toggleFacilityButton = findViewById(R.id.toggleFacility);
-        signUpButton = findViewById(R.id.signUpButton);
-        nameField = findViewById(R.id.nameField);
-        facilityNameField = findViewById(R.id.facilityNameField);
-        emailField = findViewById(R.id.emailField);
-        phoneNumberField = findViewById(R.id.phoneNumberField);
-        locationField = findViewById(R.id.locationField);
+        buttonEntrant = findViewById(R.id.buttonEntrant);
+        buttonFacility = findViewById(R.id.buttonFacility);
 
-        // Set up button listeners
-        toggleUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showUserFields();
-            }
+        buttonEntrant.setOnClickListener(view -> {
+            navigateToFormScreen("entrant");
         });
 
-        toggleFacilityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFacilityFields();
-            }
+        buttonFacility.setOnClickListener(view -> {
+            navigateToFormScreen("facility");
         });
-
-        // Default to user signup fields
-        showUserFields();
     }
 
-    private void showUserFields() {
-        nameField.setVisibility(View.VISIBLE);
-        facilityNameField.setVisibility(View.GONE);
-        toggleUserButton.setBackgroundTintList(getResources().getColorStateList(R.color.purple_700));
-        toggleFacilityButton.setBackgroundTintList(getResources().getColorStateList(R.color.purple_200));
-    }
-
-    private void showFacilityFields() {
-        nameField.setVisibility(View.GONE);
-        facilityNameField.setVisibility(View.VISIBLE);
-        toggleFacilityButton.setBackgroundTintList(getResources().getColorStateList(R.color.purple_700));
-        toggleUserButton.setBackgroundTintList(getResources().getColorStateList(R.color.purple_200));
+    private void navigateToFormScreen(String userType) {
+        Intent intent = new Intent(SignupActivity.this, UserFormActivity.class);
+        intent.putExtra("userType", userType);
+        startActivity(intent);
     }
 }
