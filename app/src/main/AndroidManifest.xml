@@ -36,6 +36,7 @@
         <activity android:name=".SignupActivity" />
         <activity android:name=".UserFormActivity" />
 
+        <activity android:name=".Organizer_CreateEventFragment" />
     </application>
 
 </manifest>
