@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,8 +17,9 @@ public class ReviewActivity extends AppCompatActivity {
         setContentView(R.layout.fragment_review);
 
         // Back button logic
-        Button backButton = findViewById(R.id.back_button);
+        ImageView backButton = findViewById(R.id.back_button); // Updated to ImageView if it’s an icon
         backButton.setOnClickListener(v -> finish()); // Goes back to the previous activity
+
         // Get data from the intent
         Intent intent = getIntent();
         String eventTitle = intent.getStringExtra("eventTitle");
@@ -30,31 +32,32 @@ public class ReviewActivity extends AppCompatActivity {
         boolean enableGeolocation = intent.getBooleanExtra("enableGeolocation", false);
 
         // Set the values in the view
-        TextView titleTextView = findViewById(R.id.review_event_title);
+        TextView titleTextView = findViewById(R.id.text_event_title);
         titleTextView.setText(eventTitle);
 
-        TextView locationTextView = findViewById(R.id.review_event_location);
+        TextView locationTextView = findViewById(R.id.text_event_location);
         locationTextView.setText(eventLocation);
 
-        TextView registrationOpenTextView = findViewById(R.id.review_registration_open);
+        TextView registrationOpenTextView = findViewById(R.id.text_event_open_date);
         registrationOpenTextView.setText(registrationOpen);
 
-        TextView registrationDeadlineTextView = findViewById(R.id.review_registration_deadline);
+        TextView registrationDeadlineTextView = findViewById(R.id.text_event_close_date);
         registrationDeadlineTextView.setText(registrationDeadline);
 
-        TextView eventStartDateTextView = findViewById(R.id.review_event_start_date);
+        TextView eventStartDateTextView = findViewById(R.id.text_event_start_date);
         eventStartDateTextView.setText(eventStartDate);
 
-        TextView maxPoolingSampleTextView = findViewById(R.id.review_max_pooling_sample);
+        TextView maxPoolingSampleTextView = findViewById(R.id.text_max_pooling_sample); // Updated to match XML
         maxPoolingSampleTextView.setText(maxPoolingSample);
 
-        TextView maxEntrantsTextView = findViewById(R.id.review_max_entrants);
+        TextView maxEntrantsTextView = findViewById(R.id.text_max_entrants); // Updated to match XML
         maxEntrantsTextView.setText(maxEntrants);
 
-        TextView geolocationTextView = findViewById(R.id.review_geolocation);
-        geolocationTextView.setText(enableGeolocation ? "✔" : "X");
+        // Update the checkbox based on geolocation setting
+        CheckBox geolocationCheckbox = findViewById(R.id.checkbox_enable_geolocation);
+        geolocationCheckbox.setChecked(enableGeolocation);
 
-        // Set up button
+        // Set up create event button
         Button createEventButton = findViewById(R.id.button_create_event);
         createEventButton.setOnClickListener(v -> {
             // Add logic for creating the event, like sending data to a server or saving in a database

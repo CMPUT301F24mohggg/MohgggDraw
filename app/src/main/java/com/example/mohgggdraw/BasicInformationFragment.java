@@ -1,7 +1,5 @@
-// BasicInformationFragment.java
 package com.example.mohgggdraw;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,68 +11,44 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
+import com.bumptech.glide.Glide;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.UUID;
 
 public class BasicInformationFragment extends Fragment {
 
-    private ImageView organizerEventPoster;
-    private StorageReference storageReference;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private ImageView eventPosterImageView;
+    private EditText titleInput, locationInput, detailInput;
+    private Uri imageUri;
     private SharedViewModel sharedViewModel;
-    private EditText eventTitleEditText, eventLocationEditText, eventDetailEditText;
-
-    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri selectedImage = result.getData().getData();
-                    if (selectedImage != null) {
-                        organizerEventPoster.setImageURI(selectedImage);  // Display selected image
-                        uploadImageToStorage(selectedImage);  // Upload image to Firebase
-                    }
-                } else {
-                    Toast.makeText(getContext(), "Image selection canceled or failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-    );
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        storageReference = FirebaseStorage.getInstance().getReference();
-    }
+    private StorageReference storageReference;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_basic_information, container, false);
 
-        organizerEventPoster = view.findViewById(R.id.organizer_event_poster);
-        eventTitleEditText = view.findViewById(R.id.event_title);
-        eventLocationEditText = view.findViewById(R.id.event_location);
-        eventDetailEditText = view.findViewById(R.id.event_detail);
+        // Initialize UI components
+        eventPosterImageView = view.findViewById(R.id.organizer_event_poster);
+        titleInput = view.findViewById(R.id.event_title);
+        locationInput = view.findViewById(R.id.event_location);
+        detailInput = view.findViewById(R.id.event_detail); // Ensure this ID matches your layout
 
-        // Set click listener to open image picker
-        organizerEventPoster.setOnClickListener(v -> openImagePicker());
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        storageReference = FirebaseStorage.getInstance().getReference("event_images");
 
-        // Update SharedViewModel with text fields
-        eventTitleEditText.addTextChangedListener(new TextWatcher() {
+        // Set click listener on ImageView to select image
+        eventPosterImageView.setOnClickListener(v -> selectImage());
+
+        // Automatically save data to ViewModel when text changes
+        titleInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -82,16 +56,12 @@ public class BasicInformationFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
-        eventLocationEditText.addTextChangedListener(new TextWatcher() {
+        locationInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -99,16 +69,13 @@ public class BasicInformationFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
-        eventDetailEditText.addTextChangedListener(new TextWatcher() {
+        // Add TextWatcher for detailInput to save event details
+        detailInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -116,33 +83,40 @@ public class BasicInformationFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         return view;
     }
 
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        imagePickerLauncher.launch(intent);
+    private void selectImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private void uploadImageToStorage(Uri selectedImage) {
-        String imageName = "images/" + UUID.randomUUID().toString();
-        StorageReference imageRef = storageReference.child(imageName);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            Glide.with(this).load(imageUri).into(eventPosterImageView);
+            uploadImageToFirebase();
+        }
+    }
 
-        UploadTask uploadTask = imageRef.putFile(selectedImage);
-        uploadTask.addOnSuccessListener(taskSnapshot ->
-                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    sharedViewModel.setImageUrl(uri.toString());  // Update ViewModel with URL
-                    Toast.makeText(getContext(), "Image uploaded successfully!", Toast.LENGTH_SHORT).show();
-                })
-        ).addOnFailureListener(e ->
-                Toast.makeText(getContext(), "Image upload failed.", Toast.LENGTH_SHORT).show()
-        );
+    private void uploadImageToFirebase() {
+        if (imageUri != null) {
+            StorageReference fileRef = storageReference.child(System.currentTimeMillis() + ".jpg");
+            fileRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imageUrl = uri.toString();
+                        sharedViewModel.setImageUrl(imageUrl); // Save URL in SharedViewModel
+                        Toast.makeText(getContext(), "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                    }))
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Image Upload Failed", Toast.LENGTH_SHORT).show());
+        } else {
+            Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void saveData() {

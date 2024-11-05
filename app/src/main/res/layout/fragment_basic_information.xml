@@ -11,16 +11,16 @@
 
         <!-- Image Upload Placeholder, acts as the Upload Button -->
         <ImageView
-            android:id="@+id/organizer_event_poster"
-            android:layout_width="380dp"
-            android:layout_height="200dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/img"
-            android:contentDescription="Event Poster"
-            android:clickable="true"
-            android:focusable="true" />
+        android:id="@+id/organizer_event_poster"
+        android:layout_width="380dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/img"
+        android:contentDescription="Event Poster"
+        android:clickable="true"
+        android:focusable="true" />
 
         <!-- Event Title Label -->
         <TextView

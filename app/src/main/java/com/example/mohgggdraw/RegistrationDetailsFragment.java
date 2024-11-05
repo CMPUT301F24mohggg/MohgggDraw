@@ -70,4 +70,8 @@ public class RegistrationDetailsFragment extends Fragment {
 
         datePickerDialog.show();
     }
+
+    public void saveData() {
+
+    }
 }

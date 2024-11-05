@@ -65,4 +65,7 @@ public class ParticipationSettingsFragment extends Fragment {
 
         return view;
     }
+
+    public void saveData() {
+    }
 }

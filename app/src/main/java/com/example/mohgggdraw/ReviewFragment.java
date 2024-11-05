@@ -5,77 +5,114 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.CheckBox;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.bumptech.glide.Glide; // Import Glide for image loading
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReviewFragment extends Fragment {
-
     private SharedViewModel sharedViewModel;
-    private TextView reviewEventTitle, reviewEventLocation;
-    private TextView reviewRegistrationOpen, reviewRegistrationDeadline, reviewEventStartTime;
-    private TextView reviewMaxPoolingSample, reviewMaxEntrants, reviewGeolocationEnabled;
-    private ImageView reviewEventBanner; // Add this line
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_review, container, false);
-
-        // Initialize TextViews
-        reviewEventTitle = view.findViewById(R.id.review_event_title);
-        reviewEventLocation = view.findViewById(R.id.review_event_location);
-        reviewRegistrationOpen = view.findViewById(R.id.review_registration_open);
-        reviewRegistrationDeadline = view.findViewById(R.id.review_registration_deadline);
-        reviewMaxPoolingSample = view.findViewById(R.id.review_max_pooling_sample);
-        reviewMaxEntrants = view.findViewById(R.id.review_max_entrants);
-        reviewGeolocationEnabled = view.findViewById(R.id.review_geolocation);
-        reviewEventBanner = view.findViewById(R.id.organizer_event_poster); // Initialize the ImageView
-
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        // Observe LiveData from ViewModel
+        // Display selected data on the review page
+        observeAndDisplaySelectedData(view);
+
+        // Set up "Create Event" button to save data to Firebase and navigate to success page
+        view.findViewById(R.id.button_create_event).setOnClickListener(v -> createEventInFirebase());
+
+        return view;
+    }
+
+    private void observeAndDisplaySelectedData(View view) {
+        // Observing selected fields from SharedViewModel for the review page
+
         sharedViewModel.getEventTitle().observe(getViewLifecycleOwner(), title -> {
-            if (reviewEventTitle != null) {
-                reviewEventTitle.setText(title);
-            } else {
-                Log.e("ReviewFragment", "reviewEventTitle is null");
-            }
+            TextView titleView = view.findViewById(R.id.text_event_title);
+            if (title != null) titleView.setText(title);
         });
 
         sharedViewModel.getEventLocation().observe(getViewLifecycleOwner(), location -> {
-            if (reviewEventLocation != null) {
-                reviewEventLocation.setText(location);
-            } else {
-                Log.e("ReviewFragment", "reviewEventLocation is null");
-            }
+            TextView locationView = view.findViewById(R.id.text_event_location);
+            if (location != null) locationView.setText(location);
         });
 
-        // Observe the geolocation status and update TextView
-        sharedViewModel.getEnableGeolocation().observe(getViewLifecycleOwner(), enabled -> {
-            if (reviewGeolocationEnabled != null) {
-                reviewGeolocationEnabled.setText(enabled ? "Yes" : "No");
-            } else {
-                Log.e("ReviewFragment", "reviewGeolocationEnabled is null");
-            }
+        sharedViewModel.getRegistrationOpen().observe(getViewLifecycleOwner(), openDate -> {
+            TextView openDateView = view.findViewById(R.id.text_event_open_date);
+            if (openDate != null) openDateView.setText(openDate);
         });
 
-        // Observe the image URL and set it in the ImageView
-        sharedViewModel.getImageUrl().observe(getViewLifecycleOwner(), url -> {
-            if (reviewEventBanner != null && url != null) { // Check if URL is not null
-                Glide.with(requireContext()) // Use requireContext() for valid context
-                        .load(url) // Load the image from the URL
-                        .into(reviewEventBanner); // Set the image in the ImageView
-            } else {
-                Log.e("ReviewFragment", "reviewEventBanner is null or URL is null");
-            }
+        sharedViewModel.getRegistrationDeadline().observe(getViewLifecycleOwner(), deadline -> {
+            TextView deadlineView = view.findViewById(R.id.text_event_close_date);
+            if (deadline != null) deadlineView.setText(deadline);
         });
 
+        sharedViewModel.getEventStartTime().observe(getViewLifecycleOwner(), startTime -> {
+            TextView startTimeView = view.findViewById(R.id.text_event_start_date);
+            if (startTime != null) startTimeView.setText(startTime);
+        });
 
-        return view;
+        // Max Pooling Sample
+        sharedViewModel.getMaxPoolingSample().observe(getViewLifecycleOwner(), maxSample -> {
+            TextView maxSampleTextView = view.findViewById(R.id.text_max_pooling_sample);
+            if (maxSample != null) maxSampleTextView.setText(maxSample + " Pooling Sample");  // Adjust label as needed
+        });
+
+        // Max Entrants
+        sharedViewModel.getMaxEntrants().observe(getViewLifecycleOwner(), maxEntrants -> {
+            TextView maxEntrantsTextView = view.findViewById(R.id.text_max_entrants);
+            if (maxEntrants != null) maxEntrantsTextView.setText(maxEntrants + " Entrants");
+        });
+
+        // Set the checkbox state based on geolocation status
+        sharedViewModel.getEnableGeolocation().observe(getViewLifecycleOwner(), isEnabled -> {
+            CheckBox geolocationCheckbox = view.findViewById(R.id.checkbox_enable_geolocation);
+            geolocationCheckbox.setChecked(Boolean.TRUE.equals(isEnabled));
+        });
+    }
+
+    private void createEventInFirebase() {
+        Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
+        Log.d("ReviewFragment", "Create Event button clicked");
+
+        // Reference to Firestore's "Events" collection
+        CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
+
+        // Prepare all event data to save to Firestore
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("organizerId", "actualOrganizerId");  // Replace with actual organizer ID if available
+        eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
+        eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
+        eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
+        eventData.put("registrationOpen", sharedViewModel.getRegistrationOpen().getValue());
+        eventData.put("registrationDeadline", sharedViewModel.getRegistrationDeadline().getValue());
+        eventData.put("startTime", sharedViewModel.getEventStartTime().getValue());
+        eventData.put("maxPoolingSample", sharedViewModel.getMaxPoolingSample().getValue());
+        eventData.put("maxEntrants", sharedViewModel.getMaxEntrants().getValue());
+        eventData.put("createDate", System.currentTimeMillis());
+        eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
+        eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
+        eventData.put("status", "active");
+        eventData.put("QRhash", "generatedQRHash"); // replace with qr when available
+
+        // Add the new event data to Firestore, creating a new document in "Events" collection
+        eventsRef.add(eventData)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(getContext(), "Event successfully created and uploaded to Firestore!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
+                    Log.e("ReviewFragment", "Error uploading event: ", e);
+                });
     }
 }
