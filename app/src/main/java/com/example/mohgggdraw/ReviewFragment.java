@@ -6,11 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -28,8 +31,14 @@ public class ReviewFragment extends Fragment {
         // Display selected data on the review page
         observeAndDisplaySelectedData(view);
 
+        ImageView eventPoster = view.findViewById(R.id.image_event_banner);
         // Set up "Create Event" button to save data to Firebase and navigate to success page
         view.findViewById(R.id.button_create_event).setOnClickListener(v -> createEventInFirebase());
+        sharedViewModel.getImageUrl().observe(getViewLifecycleOwner(), url -> {
+            if (url != null) {
+                Glide.with(this).load(url).into(eventPoster);
+            }
+        });
 
         return view;
     }
