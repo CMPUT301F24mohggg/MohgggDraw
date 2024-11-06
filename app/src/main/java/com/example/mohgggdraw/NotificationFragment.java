@@ -11,6 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -24,7 +26,7 @@ public class NotificationFragment extends Fragment {
     private NotificationAdapter adapter;
     private List<NotificationModel> notificationList;
     private FirebaseFirestore db;
-    private String deviceId = "c7dc1ae4a545d5a2"; // Replace with your actual device ID logic
+    private String deviceId = "c7dc1ae4a545d5a2"; // Replace with actual device ID logic
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class NotificationFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         notificationList = new ArrayList<>();
-        adapter = new NotificationAdapter(notificationList);
+        adapter = new NotificationAdapter(notificationList, this::handleDeclineAction); // Passing the decline handler
         recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
@@ -66,5 +68,50 @@ public class NotificationFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    private void handleDeclineAction(NotificationModel notification) {
+        String eventId = notification.getEventId();
+        // Implement how to fetch own device id
+        String userId = notification.getEventId(); // Assuming NotificationModel has userId
+
+        DocumentReference eventRef = db.collection("Events").document(eventId);
+        db.runTransaction(transaction -> {
+            // Fetch the current data of the event
+            List<String> selectedList = (List<String>) transaction.get(eventRef).get("selectedList");
+            List<String> declinedList = (List<String>) transaction.get(eventRef).get("declinedList");
+
+            if (selectedList != null && declinedList != null) {
+                selectedList.remove(userId); // Remove user from selectedList
+                declinedList.add(userId);    // Add user to declinedList
+
+                // Update Firestore with new lists
+                transaction.update(eventRef, "selectedList", selectedList);
+                transaction.update(eventRef, "declinedList", declinedList);
+            }
+            return null;
+        }).addOnSuccessListener(aVoid -> {
+            Log.d("NotificationFragment", "Decline action recorded successfully.");
+        }).addOnFailureListener(e -> {
+            Log.w("NotificationFragment", "Error recording decline action", e);
+        });
+
+        db.collection("user").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Device ID exists, let user enter the app
+                Toast.makeText(MainActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
+                navigateToHomeScreen();
+            } else {
+                // Device ID does not exist, show signup option
+                signupLayout.setVisibility(View.VISIBLE);
+                buttonSignup.setOnClickListener(view -> {
+                    Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+                    startActivity(intent);
+                });
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(MainActivity.this, "Failed to check device ID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", "Failed to check device ID: " + e.getMessage());
+        });
     }
 }

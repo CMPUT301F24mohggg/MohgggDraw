@@ -20,8 +20,29 @@
         android:text="Notification Message" />
 
     <TextView
+        android:id="@+id/eventId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EventId" />
+
+    <TextView
         android:id="@+id/notificationStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Status" />
+
+    <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accept"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/declineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decline"
+        android:visibility="gone" />
+
 </LinearLayout>
