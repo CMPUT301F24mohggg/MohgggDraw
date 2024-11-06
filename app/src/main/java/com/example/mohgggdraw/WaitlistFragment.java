@@ -1,32 +1,21 @@
 package com.example.mohgggdraw;
 
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 
-import org.w3c.dom.Text;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 
 public class WaitlistFragment extends AppCompatActivity {
     Event event;
@@ -34,6 +23,7 @@ public class WaitlistFragment extends AppCompatActivity {
     String path;
     Bitmap bmp;
     ImageView iv;
+    StorageReference storageReference;
 
     public WaitlistFragment() {
         super();
@@ -41,24 +31,6 @@ public class WaitlistFragment extends AppCompatActivity {
 
     }
 
-
-    /*
-    @NonNull
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.view_event, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        Button confirm = view.findViewById(R.id.join_button);
-
-        return builder
-                .setView(view)
-                .setTitle("")
-                .setPositiveButton("Allow Access", (dialog, which)->{
-                  enroll(event);
-                })
-                .create();
-}
-*/
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -67,62 +39,59 @@ public class WaitlistFragment extends AppCompatActivity {
         Intent intent = getIntent();
         event = (Event) intent.getExtras().getSerializable("event");
         user = (User) intent.getExtras().getSerializable("user");
-        TextView name = (TextView) findViewById(R.id.textView);
+
+        TextView name = (TextView) findViewById(R.id.eventInfoTime);
         name.setText(event.getName());
         path = event.getPath();
         iv = (ImageView) findViewById(R.id.eventimage);
-        new imageconvert().execute();
-        iv.setColorFilter(R.drawable.ic_launcher_background);
+        StorageReference myimage = new WaitinglistDB(event).getImage();
+        try{
+            File eventImage = File.createTempFile(event.getName(),".png");
+            myimage.getFile(eventImage)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
+                            iv.setImageBitmap(bitmap);
+
+                        }
+                    });{
+
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
 
-        Button joinButton = findViewById(R.id.join_button);
-        joinButton.setOnClickListener(v -> {
-            new JoinWaitlistButton(event, user).show(getSupportFragmentManager(), "join");
-        });
+        TextView joinButton = findViewById(R.id.eventInfoButton);
+
+        if (event.getWaitingList().contains(user.getEmail())){
+            joinButton.setText("leaveaf");
+            joinButton.setOnClickListener(v->{
+                        new leaveEventButton(event, user,this).show(getSupportFragmentManager(),"join");
+                    }
+                    );
 
 
-    }
-
-    public void enroll(Event event) {
-
-    }
-
-    public class imageconvert extends AsyncTask {
-
-        @Override
-        protected Bitmap doInBackground(Object[] objects) {
-            InputStream in = null;
-            System.out.println("IM HERERREEE");
-            int responseCode = -1;
-            try {
-
-                URL url = new URL(path);//"http://192.xx.xx.xx/mypath/img1.jpg
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setDoInput(true);
-                con.connect();
-                responseCode = con.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    //download
-                    in = con.getInputStream();
-                    bmp = BitmapFactory.decodeStream(in);
-                    in.close();
+        }else {
+            joinButton.setOnClickListener(v -> {
+                if (event.hasGeolocation()) {
+                    new JoinWaitlistButton(event, user,this).show(getSupportFragmentManager(), "join");
+                } else {
+                    new WaitinglistDB(event).addToDB(user);
 
                 }
-
-            } catch (Exception ex) {
-                Log.e("Exception", ex.toString());
-            }
-            return bmp;
-        }
-
-        protected void onPostExcecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            iv.setImageBitmap(bmp);
-
+            });
         }
 
 
+    }
+
+
+    public void onDialogueFinished(Event event, User user){
+        finish();
+        startActivity(getIntent());
     }
 }

@@ -3,28 +3,18 @@ package com.example.mohgggdraw;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 import com.example.mohgggdraw.databinding.ActivityMainBinding;
 
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class EventListDisplayFragment extends AppCompatActivity {
 
     private ArrayList<Event> dataList;
     private ListView eventList;
@@ -36,12 +26,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.event_adapter_layout);
 
 
         dataList = new ArrayList<Event>();
         for(int i=0;i<10;i++){
-            dataList.add(new Event());
+            Event event = new Event();
+            dataList.add(event);
+            new WaitinglistDB(event).updateWaitlist();
+
         }
 
         eventAdapter = new EventAdapter(this, dataList);
@@ -57,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Event event = (Event) list.getItemAtPosition(i);
 
-                Intent intent = new Intent(MainActivity.this,WaitlistFragment.class);
+
+                Intent intent = new Intent(EventListDisplayFragment.this,WaitlistFragment.class);
                 intent.putExtra("event",event);
                 intent.putExtra("user",user);
                 startActivity(intent);

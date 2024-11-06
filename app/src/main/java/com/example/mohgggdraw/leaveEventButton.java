@@ -11,36 +11,36 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class JoinWaitlistButton extends DialogFragment {
+public class leaveEventButton extends DialogFragment {
     Event event;
     User user;
     WaitlistFragment waitlistFragment;
-    public JoinWaitlistButton(Event event, User user,WaitlistFragment waitlistFragment){
+    public leaveEventButton(Event event, User user, WaitlistFragment waitlistFragment){
         super();
         this.event = event;
         this.user = user;
-        this.waitlistFragment=waitlistFragment;
+        this.waitlistFragment = waitlistFragment;
 
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.join_activity,null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.leave_activity,null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        Button button = view.findViewById(R.id.accept_terms_button);
+        Button button = view.findViewById(R.id.leaveButton);
         button.setOnClickListener(v ->{
-            new WaitinglistController(user, event).addUser(user);
+            new WaitinglistController(user, event).removeUser(user);
             waitlistFragment.onDialogueFinished();
             dismiss();
         });
         return builder
                 .setView(view)
-                .setTitle("warningskull")
+                .setTitle("Warning: you are leaving the event")
                 .create();
 
 
     }
-
 }
+
