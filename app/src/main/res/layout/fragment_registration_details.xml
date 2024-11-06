@@ -1,25 +1,108 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3">
+    android:padding="8dp">
 
+    <!-- Header with "Registration Details" and Back Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true">
+
+
+
+
+    </LinearLayout>
+
+    <!-- Registration Open Label -->
     <TextView
-        android:id="@+id/HomeFragmentSample"
+        android:id="@+id/label_registration_open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10sp"
-        android:text="THIS IS WHERE UR REGISTRATION DETAIL PAGE IS"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:text="Registration Open"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="60dp"
+        android:layout_marginStart="8dp"
+        android:textColor="#000000" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Registration Open Date (Date Picker) -->
+    <EditText
+        android:id="@+id/registration_open"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter registration open date"
+        android:layout_below="@id/label_registration_open"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="4dp"
+        android:textColorHint="#BDBDBD"
+        android:textColor="#000000"
+        android:focusable="false"
+        android:clickable="true" />
 
+    <!-- Registration Deadline Label -->
+    <TextView
+        android:id="@+id/label_registration_deadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registration Deadline"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_below="@id/registration_open"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:textColor="#000000" />
+
+    <!-- Registration Deadline Date (Date Picker) -->
+    <EditText
+        android:id="@+id/registration_deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter registration deadline date"
+        android:layout_below="@id/label_registration_deadline"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="2dp"
+        android:textColorHint="#BDBDBD"
+        android:textColor="#000000"
+        android:focusable="false"
+        android:clickable="true" />
+
+    <!-- Event Start Time Label -->
+    <TextView
+        android:id="@+id/label_event_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Start Time"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_below="@id/registration_deadline"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:textColor="#000000" />
+
+    <!-- Event Start Time Date (Date Picker) -->
+    <EditText
+        android:id="@+id/event_start_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter event start time"
+        android:layout_below="@id/label_event_start_time"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="2dp"
+        android:textColorHint="#BDBDBD"
+        android:textColor="#000000"
+        android:focusable="false"
+        android:clickable="true" />
+</RelativeLayout>

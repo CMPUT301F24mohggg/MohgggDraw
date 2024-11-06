@@ -1,25 +1,91 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3">
+    android:padding="8dp">
 
+    <!-- Header with "Participation Settings" and Back Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+
+
+
+    </LinearLayout>
+
+    <!-- Maximum Pooling Sample Label -->
     <TextView
-        android:id="@+id/HomeFragmentSample"
+        android:id="@+id/label_maximum_pooling_sample"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10sp"
-        android:text="THIS IS WHERE UR EVENT PARTICIPATION SETTING IS"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:text="Maximum Pooling Sample"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="80dp"
+        android:layout_marginStart="8dp"
+        android:textColor="#000000" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Maximum Pooling Sample Text Box (Only Numbers) -->
+    <EditText
+        android:id="@+id/maximum_pooling_sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter maximum pooling sample"
+        android:layout_below="@id/label_maximum_pooling_sample"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="4dp"
+        android:textColorHint="#BDBDBD"
+        android:textColor="#000000"
+        android:inputType="number" /> <!-- Ensures only numeric input -->
 
+    <!-- Max Entrants (Optional) Label -->
+    <TextView
+        android:id="@+id/label_max_entrants_optional"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Max Entrants (Optional)"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_below="@id/maximum_pooling_sample"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:textColor="#000000" />
+
+    <!-- Max Entrants (Optional) Text Box (Only Numbers) -->
+    <EditText
+        android:id="@+id/max_entrants_optional"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter max entrants (optional)"
+        android:layout_below="@id/label_max_entrants_optional"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_edittext"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="4dp"
+        android:textColorHint="#BDBDBD"
+        android:textColor="#000000"
+        android:inputType="number" /> <!-- Ensures only numeric input -->
+
+    <!-- Enable Geolocation Slider -->
+    <Switch
+        android:id="@+id/switch_enable_geolocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_below="@id/max_entrants_optional"
+        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Enable Geolocation?"
+        android:checked="false"
+        android:trackTint="@color/design_default_color_primary" />
+
+</RelativeLayout>
