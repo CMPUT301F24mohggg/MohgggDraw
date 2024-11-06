@@ -44,6 +44,7 @@
         <!-- Review Activity -->
         <activity android:name=".ReviewActivity" />
 
+        <!-- Organizer Create Event Fragment -->
+        <activity android:name=".Organizer_CreateEventFragment" />
     </application>
-
 </manifest>

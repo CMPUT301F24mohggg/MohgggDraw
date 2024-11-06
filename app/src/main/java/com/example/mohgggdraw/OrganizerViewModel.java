@@ -1,8 +1,6 @@
-
 package com.example.mohgggdraw;
 
 import android.net.Uri;
-
 import androidx.lifecycle.ViewModel;
 
 public class OrganizerViewModel extends ViewModel {

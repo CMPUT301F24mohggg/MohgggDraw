@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Organizer extends AppCompatActivity {
+public class Organizer_CreateEventFragment extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 1;
     private ImageView organizerEventPoster;
@@ -30,7 +29,7 @@ public class Organizer extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.organizer_basic_information);
+        setContentView(R.layout.fragment_organize);
 
         organizerEventPoster = findViewById(R.id.organizer_event_poster);
 
@@ -75,8 +74,8 @@ public class Organizer extends AppCompatActivity {
                     // Add to the "users" collection (replace 'userId' with actual user identifier)
                     db.collection("users").document("userId")
                             .set(user)
-                            .addOnSuccessListener(aVoid -> Toast.makeText(Organizer.this, "Image uploaded successfully!", Toast.LENGTH_SHORT).show())
-                            .addOnFailureListener(e -> Toast.makeText(Organizer.this, "Failed to upload image.", Toast.LENGTH_SHORT).show());
+                            .addOnSuccessListener(aVoid -> Toast.makeText(Organizer_CreateEventFragment.this, "Image uploaded successfully!", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(Organizer_CreateEventFragment.this, "Failed to upload image.", Toast.LENGTH_SHORT).show());
                 }));
             }
         }

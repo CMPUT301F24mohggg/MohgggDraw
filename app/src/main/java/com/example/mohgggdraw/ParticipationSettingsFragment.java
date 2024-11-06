@@ -1,4 +1,3 @@
-// ParticipationSettingsFragment.java
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 public class ParticipationSettingsFragment extends Fragment {
+
     private SharedViewModel sharedViewModel;
     private EditText maxPoolingSampleEditText, maxEntrantsEditText;
     private Switch enableGeolocationSwitch;
@@ -67,5 +67,6 @@ public class ParticipationSettingsFragment extends Fragment {
     }
 
     public void saveData() {
+        // This method can be used to save additional data if necessary
     }
 }

@@ -11,10 +11,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.bumptech.glide.Glide;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -120,5 +122,8 @@ public class BasicInformationFragment extends Fragment {
     }
 
     public void saveData() {
+        sharedViewModel.setEventTitle(titleInput.getText().toString());
+        sharedViewModel.setEventLocation(locationInput.getText().toString());
+        sharedViewModel.setEventDetail(detailInput.getText().toString());
     }
 }

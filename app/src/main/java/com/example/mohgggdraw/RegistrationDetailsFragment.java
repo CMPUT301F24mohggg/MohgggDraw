@@ -1,10 +1,7 @@
-// RegistrationDetailsFragment.java
 package com.example.mohgggdraw;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.Calendar;
 
 public class RegistrationDetailsFragment extends Fragment {
+
     private SharedViewModel sharedViewModel;
     private EditText registrationOpenEditText, registrationDeadlineEditText, eventStartTimeEditText;
 
@@ -72,6 +70,5 @@ public class RegistrationDetailsFragment extends Fragment {
     }
 
     public void saveData() {
-
     }
 }
