@@ -36,27 +36,29 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.database)
-    implementation(libs.glide)
-    annotationProcessor(libs.compiler)
+    implementation(platform("com.google.firebase:firebase-bom:31.0.2"))
+    implementation("com.google.firebase:firebase-firestore:24.1.2")
+    implementation("com.google.firebase:firebase-storage:20.0.0")
+    implementation("com.google.firebase:firebase-database:20.1.0")
+    implementation("com.github.bumptech.glide:glide:4.13.2")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // Navigation dependencies
-    implementation(libs.navigation.fragment.v283)
-    implementation(libs.navigation.ui.v283)
+    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
 
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.constraintlayout)
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("com.google.android.material:material:1.4.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
+    implementation("com.google.android.material:material:1.7.0") // Check for latest version
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 
-    // Firebase
-    implementation(libs.firebase.database)
 
     // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
+
 

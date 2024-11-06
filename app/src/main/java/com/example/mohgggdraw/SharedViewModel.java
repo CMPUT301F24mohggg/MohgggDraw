@@ -1,8 +1,6 @@
 package com.example.mohgggdraw;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.*;
 
 public class SharedViewModel extends ViewModel {
     private final MutableLiveData<String> eventTitle = new MutableLiveData<>();
