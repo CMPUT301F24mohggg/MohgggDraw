@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -57,13 +58,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Failed to check device ID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e("MainActivity", "Failed to check device ID: " + e.getMessage());
         });
-    }
 
-    private void navigateToHomeScreen() {
-        // Navigate to the main/home screen of the app
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        startActivity(intent);
-        finish();
 
         // Initialize fragments
         fragmentMap.put(R.id.nav_home, new HomeFragment());
@@ -95,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
         // Display notification badge (if needed)
         bottomNavigationView.getOrCreateBadge(R.id.nav_notifications).setVisible(true);
     }
+    private void navigateToHomeScreen() {
+        // Navigate to the main/home screen of the app
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(intent);
+        finish();}
 
     private void switchFragment(@NonNull Fragment fragment, int fragmentTagId) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -112,4 +112,5 @@ public class MainActivity extends AppCompatActivity {
         // Set the new active fragment
         activeFragment = fragment;
     }
+
 }
