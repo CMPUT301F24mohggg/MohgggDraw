@@ -43,6 +43,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation ("com.google.firebase:firebase-firestore:24.9.0")
+    implementation (libs.recyclerview)
+    implementation (libs.firebase.messaging)
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -50,6 +52,7 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

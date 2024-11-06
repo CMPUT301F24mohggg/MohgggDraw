@@ -1,0 +1,23 @@
+package com.example.mohgggdraw;
+
+public class NotificationModel {
+    private String title;
+    private String message;
+    private String status;
+    private String eventId;
+
+    // Empty constructor required for Firestore serialization
+    public NotificationModel() {}
+
+    public NotificationModel(String title, String message, String status, String eventId) {
+        this.title = title;
+        this.message = message;
+        this.status = status;
+        this.eventId = eventId;
+    }
+
+    public String getTitle() { return title; }
+    public String getMessage() { return message; }
+    public String getStatus() { return status; }
+    public String getEventId() { return eventId; }
+}
