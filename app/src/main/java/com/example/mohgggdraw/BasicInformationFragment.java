@@ -1,9 +1,10 @@
 package com.example.mohgggdraw;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,74 +17,113 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 public class BasicInformationFragment extends Fragment {
 
-    private static final int PICK_IMAGE = 1;
-    private ImageView organizerEventPoster;
-    private EditText eventTitle, eventLocation, eventDetail;
-    private OrganizerViewModel organizerViewModel;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private ImageView eventPosterImageView;
+    private EditText titleInput, locationInput, detailInput;
+    private Uri imageUri;
+    private SharedViewModel sharedViewModel;
+    private StorageReference storageReference;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_basic_information, container, false);
 
-        // Initialize UI elements
-        organizerEventPoster = view.findViewById(R.id.organizer_event_poster);
-        eventTitle = view.findViewById(R.id.event_title);
-        eventLocation = view.findViewById(R.id.event_location);
-        eventDetail = view.findViewById(R.id.event_detail);
+        // Initialize UI components
+        eventPosterImageView = view.findViewById(R.id.organizer_event_poster);
+        titleInput = view.findViewById(R.id.event_title);
+        locationInput = view.findViewById(R.id.event_location);
+        detailInput = view.findViewById(R.id.event_detail); // Ensure this ID matches your layout
 
-        // Initialize ViewModel
-        organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        storageReference = FirebaseStorage.getInstance().getReference("event_images");
 
-        // Restore data if it exists
-        Uri savedImageUri = organizerViewModel.getEventImageUri();
-        if (savedImageUri != null) {
-            organizerEventPoster.setImageURI(savedImageUri);
-        }
-        eventTitle.setText(organizerViewModel.getEventTitle());
-        eventLocation.setText(organizerViewModel.getEventLocation());
-        eventDetail.setText(organizerViewModel.getEventDetail());
+        // Set click listener on ImageView to select image
+        eventPosterImageView.setOnClickListener(v -> selectImage());
 
-        // Set up the image picker
-        organizerEventPoster.setOnClickListener(v -> openGallery());
+        // Automatically save data to ViewModel when text changes
+        titleInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                sharedViewModel.setEventTitle(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        locationInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                sharedViewModel.setEventLocation(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        // Add TextWatcher for detailInput to save event details
+        detailInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                sharedViewModel.setEventDetail(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         return view;
     }
 
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE);
+    private void selectImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
-            Uri selectedImage = data.getData();
-            if (selectedImage != null) {
-                organizerEventPoster.setImageURI(selectedImage);
-                organizerViewModel.setEventImageUri(selectedImage);
-            }
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            Glide.with(this).load(imageUri).into(eventPosterImageView);
+            uploadImageToFirebase();
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Save event details in ViewModel
-        organizerViewModel.setEventTitle(eventTitle.getText().toString());
-        organizerViewModel.setEventLocation(eventLocation.getText().toString());
-        organizerViewModel.setEventDetail(eventDetail.getText().toString());
+    private void uploadImageToFirebase() {
+        if (imageUri != null) {
+            StorageReference fileRef = storageReference.child(System.currentTimeMillis() + ".jpg");
+            fileRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imageUrl = uri.toString();
+                        sharedViewModel.setImageUrl(imageUrl); // Save URL in SharedViewModel
+                        Toast.makeText(getContext(), "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                    }))
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Image Upload Failed", Toast.LENGTH_SHORT).show());
+        } else {
+            Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void saveData() {
-        // Save the current state of the registration details into the ViewModel
-        String title = eventTitle.getText().toString();
-
-
-        organizerViewModel.setEventTitle(title);
+        sharedViewModel.setEventTitle(titleInput.getText().toString());
+        sharedViewModel.setEventLocation(locationInput.getText().toString());
+        sharedViewModel.setEventDetail(detailInput.getText().toString());
     }
 }

@@ -24,7 +24,6 @@ public class CreateFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         OrganizerViewModel createViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
         return inflater.inflate(R.layout.fragment_create, container, false);
     }
@@ -39,10 +38,9 @@ public class CreateFragment extends Fragment {
         nextButton = view.findViewById(R.id.next_button);
         progressBar = view.findViewById(R.id.progress_bar);
 
-        // Title TextView
         TextView pageTitle = view.findViewById(R.id.title_text);
 
-        // Set up the adapter for ViewPager2
+        // Set up adapter for ViewPager2
         CreatePagerAdapter adapter = new CreatePagerAdapter(this);
         viewPager2.setAdapter(adapter);
 
@@ -57,16 +55,16 @@ public class CreateFragment extends Fragment {
             }
         });
 
-        // Implement back button click listener
+        // Back button click listener
         backButton.setOnClickListener(v -> {
             if (viewPager2.getCurrentItem() > 0) {
                 viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 1);
             }
         });
 
-        // Implement next button click listener to move to the next page
+        // Next button click listener
         nextButton.setOnClickListener(v -> {
-            saveCurrentPageData();
+            saveCurrentPageData(); // Save data for the current page
             if (viewPager2.getCurrentItem() < adapter.getItemCount() - 1) {
                 viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
             }
@@ -82,7 +80,7 @@ public class CreateFragment extends Fragment {
         switch (position) {
             case 0:
                 title = "Basic Information";
-                isBackButtonVisible = false;  // Hide back button on first page
+                isBackButtonVisible = false;
                 break;
             case 1:
                 title = "Registration Details";
@@ -92,10 +90,10 @@ public class CreateFragment extends Fragment {
                 break;
             case 3:
                 title = "Review";
-                isNextButtonVisible = false;  // Hide next button on last page
+                isNextButtonVisible = false;
                 break;
             default:
-                title = ""; // Fallback title if necessary
+                title = "";
                 break;
         }
 
@@ -105,26 +103,18 @@ public class CreateFragment extends Fragment {
         progressBar.setVisibility(isProgressBarVisible ? View.VISIBLE : View.INVISIBLE);
     }
 
-
     private void saveCurrentPageData() {
         // Get the current fragment in the ViewPager2
         Fragment currentFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager2.getCurrentItem());
 
-        // Check the type of current fragment and call their respective save methods
+        // Check the type of the current fragment and call their respective save methods
         if (currentFragment instanceof BasicInformationFragment) {
-            // Call saveData method for BasicInformationFragment
             ((BasicInformationFragment) currentFragment).saveData();
+        } else if (currentFragment instanceof RegistrationDetailsFragment) {
+            ((RegistrationDetailsFragment) currentFragment).saveData();
+        } else if (currentFragment instanceof ParticipationSettingsFragment) {
+            ((ParticipationSettingsFragment) currentFragment).saveData();
         }
-// TODO: ADD THESE FRAGMENT LATER TO MAKE SURE ALL THE DATA FROM EACH FRAGMENTS ARE BEING SAVE FOR THE REVIEW PAGE
-//        } else if (currentFragment instanceof RegistrationDetailsFragment) {
-//            // Call saveData method for RegistrationDetailsFragment
-//            ((RegistrationDetailsFragment) currentFragment).saveData();
-//        } else if (currentFragment instanceof ParticipationSettingsFragment) {
-//            // Call saveData method for ParticipationSettingsFragment
-//            ((ParticipationSettingsFragment) currentFragment).saveData();
-//        }
         // Add other fragments as needed
     }
-
-
 }

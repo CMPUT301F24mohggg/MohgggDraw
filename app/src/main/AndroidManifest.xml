@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permission to read external storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- For Android 13 and above, optional additional permission -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,17 +18,33 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MohgggDraw"
         tools:targetApi="31">
+
+        <!-- MainActivity (launcher activity) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MohgggDraw">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Organizer Activity with windowSoftInputMode set to adjustResize -->
+        <activity
+            android:name=".BasicInformationFragment"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Registration Details Activity -->
+        <activity android:name=".RegistrationDetailsActivity" />
+
+        <!-- Participation Settings Activity -->
+        <activity android:name=".ParticipationSettingsActivity" />
+
+        <!-- Review Activity -->
+        <activity android:name=".ReviewActivity" />
+
+        <!-- Organizer Create Event Fragment -->
         <activity android:name=".Organizer_CreateEventFragment" />
     </application>
-
 </manifest>
