@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", "Failed to check device ID: " + e.getMessage());
         });
 
-
         // Initialize fragments
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void navigateToHomeScreen() {
         // Navigate to the main/home screen of the app
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        Intent intent = new Intent(MainActivity.this, HomeFragment.class);
         startActivity(intent);
         finish();}
 
