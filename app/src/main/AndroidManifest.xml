@@ -8,6 +8,12 @@
     <!-- For Android 13 and above, optional additional permission -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <!-- Permission for camera -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -46,5 +52,12 @@
 
         <!-- Organizer Create Event Fragment -->
         <activity android:name=".Organizer_CreateEventFragment" />
+
+        <!-- QR Code Scanner Activity -->
+        <activity android:name=".CaptureAct"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"/>
+
     </application>
 </manifest>
