@@ -1,8 +1,10 @@
 package com.example.mohgggdraw;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
@@ -15,6 +17,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -99,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Display notification badge (if needed)
         bottomNavigationView.getOrCreateBadge(R.id.nav_notifications).setVisible(true);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                PackageManager.PERMISSION_GRANTED);
     }
 
     private void switchFragment(@NonNull Fragment fragment, int fragmentTagId) {
