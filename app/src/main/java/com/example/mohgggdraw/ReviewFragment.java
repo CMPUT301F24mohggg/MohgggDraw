@@ -20,6 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import android.provider.Settings;
+
 
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
@@ -94,16 +96,20 @@ public class ReviewFragment extends Fragment {
         });
     }
 
+
     private void createEventInFirebase() {
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
+
+        // Retrieve device ID as organizer ID
+        String deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
 
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("organizerId", "actualOrganizerId");  // Replace with actual organizer ID if available
+        eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
         eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
@@ -116,8 +122,8 @@ public class ReviewFragment extends Fragment {
         eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
         eventData.put("status", "active");
-        eventData.put("QRhash", "generatedQRHash"); // replace with QR code when available
-
+        eventData.put("QRhash", "generatedQRHash"); // Replace with actual QR code hash when available
+        eventData.put("EventWaitlist", null);
         // Add the new event data to Firestore
         eventsRef.add(eventData)
                 .addOnSuccessListener(documentReference -> {
