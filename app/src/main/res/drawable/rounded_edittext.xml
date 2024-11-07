@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:background="@android:color/transparent" /> <!-- Background color of the text box -->
+
+    <corners android:radius="6dp" /> <!-- Set the radius to round the corners -->
+
+    <stroke android:width="2dp" android:color="#BDBDBD" /> <!-- Optional: Add border -->
+
+    <padding
+        android:left="8dp"
+        android:top="8dp"
+        android:right="8dp"
+        android:bottom="8dp" /> <!-- Optional: Add padding inside the EditText -->
+
+</shape>
