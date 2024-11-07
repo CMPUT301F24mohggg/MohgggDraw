@@ -12,7 +12,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
-public class EventQr {
+import java.io.Serializable;
+
+public class EventQr  implements Serializable {
     private String eventId;
     private Bitmap qrBitmap;
     private int qrHash;
