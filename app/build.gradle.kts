@@ -48,6 +48,8 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:20.0.0")
     implementation("com.google.firebase:firebase-database:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    implementation(libs.fragment.testing)
+    implementation(libs.espresso.intents)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // Navigation dependencies
@@ -76,4 +78,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+    // Use Hamcrest version 1.3 to match Espresso's requirements
+    testImplementation("org.hamcrest:hamcrest-library:1.3")
+    androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
 }
