@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import android.provider.Settings;
@@ -123,7 +124,12 @@ public class ReviewFragment extends Fragment {
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
         eventData.put("status", "active");
         eventData.put("QRhash", "generatedQRHash"); // Replace with actual QR code hash when available
-        eventData.put("EventWaitlist", null);
+        eventData.put("EventWaitinglist", new ArrayList<>());
+        eventData.put("EventSelectedlist", new ArrayList<>());
+        eventData.put("EventCancelledlist", new ArrayList<>());
+        eventData.put("EventConfirmedlist", new ArrayList<>());
+
+
         // Add the new event data to Firestore
         eventsRef.add(eventData)
                 .addOnSuccessListener(documentReference -> {
