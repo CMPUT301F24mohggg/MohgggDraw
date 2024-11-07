@@ -3,6 +3,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
 android {
     namespace = "com.example.mohgggdraw"
     compileSdk = 34
@@ -41,6 +42,10 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:20.0.0")
     implementation("com.google.firebase:firebase-database:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    implementation(libs.androidx.fragment.testing)
+    testImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.junit)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // Navigation dependencies

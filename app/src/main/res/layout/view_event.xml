@@ -10,11 +10,13 @@
         android:id="@+id/location"
         android:layout_width="25dp"
         android:layout_height="21dp"
+        android:src="@drawable/img_9"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/eventInfoLocation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.082"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.457"
+        app:layout_constraintVertical_bias="0.459"
         tools:srcCompat="@tools:sample/avatars" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -24,10 +26,11 @@
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
 
+        app:layout_constraintVertical_bias="0.0"
         app:shapeAppearanceOverlay="@style/SpecificCornerRounded"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
@@ -36,11 +39,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
+        android:gravity="left"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.195"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.162"
+        app:layout_constraintStart_toEndOf="@+id/timeevent"
         app:layout_constraintTop_toBottomOf="@+id/eventInfoDay"
         app:layout_constraintVertical_bias="0.0" />
 
@@ -48,6 +52,7 @@
         android:id="@+id/eventtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="left"
         android:text="TextView"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -63,11 +68,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:gravity="left"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.195"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.162"
+        app:layout_constraintStart_toEndOf="@+id/dayevent"
         app:layout_constraintTop_toBottomOf="@+id/eventInfoLocation"
         app:layout_constraintVertical_bias="0.002" />
 
@@ -75,57 +81,66 @@
         android:id="@+id/eventInfoLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="left"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.195"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.162"
+        app:layout_constraintStart_toEndOf="@+id/location"
         app:layout_constraintTop_toBottomOf="@+id/eventtitle"
-        app:layout_constraintVertical_bias="0.039" />
+        app:layout_constraintVertical_bias="0.017" />
 
     <ImageView
         android:id="@+id/dayevent"
         android:layout_width="25dp"
         android:layout_height="21dp"
+        android:layout_marginTop="9dp"
+        android:src="@drawable/img_9"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/eventInfoDay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.082"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/location"
+        app:layout_constraintVertical_bias="0.005" />
 
     <ImageView
         android:id="@+id/timeevent"
         android:layout_width="25dp"
         android:layout_height="21dp"
+        android:layout_marginTop="11dp"
+        android:src="@drawable/img_9"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/eventInfoTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.082"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.547"
+        app:layout_constraintTop_toBottomOf="@+id/dayevent"
+        app:layout_constraintVertical_bias="0.0"
         tools:srcCompat="@tools:sample/avatars" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/maxcapacityevent"
         android:layout_width="25dp"
         android:layout_height="21dp"
-        android:layout_marginBottom="284dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/eventInfoPeople"
+        android:src="@drawable/img_9"
+        app:layout_constraintBottom_toTopOf="@+id/eventInfoButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.082"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/timeevent"
-        app:layout_constraintVertical_bias="0.937"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintVertical_bias="0.303" />
 
     <TextView
         android:id="@+id/eventInfoPeople"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="left"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/eventInfoButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.195"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.162"
+        app:layout_constraintStart_toEndOf="@+id/maxcapacityevent"
         app:layout_constraintTop_toBottomOf="@+id/eventInfoTime"
         app:layout_constraintVertical_bias="0.0" />
 
@@ -138,13 +153,13 @@
         android:focusable="true"
         android:paddingTop="10dp"
         android:text="eventInfoButton"
-        android:textSize="20sp"
         android:textColor="#7257FF"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.068"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventInfoPeople"
-        app:layout_constraintVertical_bias="0.113" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.709" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

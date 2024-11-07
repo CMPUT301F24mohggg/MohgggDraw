@@ -17,14 +17,27 @@ public class Event implements Serializable {
     //Placeholder
     String name = "placeholder";
     String date = "Jan 1";
-    String time = "1";
+    String time = "1:00 pm";
     String location = "yash apartment";
     String path = "image_2024-11-06_000509633.png";
     int id=1;
+    int maxCapacity = 100;
     boolean geolocation = true;
     private ArrayList<String> waitingList = new ArrayList<>();
 
     public Event() {
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(int maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 
     public int getId() {

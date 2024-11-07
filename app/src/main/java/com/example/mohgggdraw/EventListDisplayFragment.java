@@ -3,33 +3,49 @@ package com.example.mohgggdraw;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.mohgggdraw.databinding.ActivityMainBinding;
 
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class EventListDisplayFragment extends AppCompatActivity {
+public class EventListDisplayFragment extends Fragment {
 
     private ArrayList<Event> dataList;
     private ListView eventList;
     private EventAdapter eventAdapter;
     private User user = new User();
+    private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
+    private ViewPager2 viewPager2;
+
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.event_adapter_layout);
 
+        return inflater.inflate(R.layout.event_adapter_layout, container, false);
+    }
+        //return inflater.inflate(R.layout.fragment_home, container, false);
 
-        dataList = new ArrayList<Event>();
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
+    dataList = new ArrayList<Event>();
         for(int i=0;i<10;i++){
             Event event = new Event();
             dataList.add(event);
@@ -37,8 +53,8 @@ public class EventListDisplayFragment extends AppCompatActivity {
 
         }
 
-        eventAdapter = new EventAdapter(this, dataList);
-        eventList = findViewById(R.id.eventList);
+        eventAdapter = new EventAdapter(this.getContext(), dataList);
+        eventList = view.findViewById(R.id.eventList);
 
         eventList.setAdapter(eventAdapter);
         //setting up new book button
@@ -49,12 +65,17 @@ public class EventListDisplayFragment extends AppCompatActivity {
                                     final int i, long id) {
 
                 Event event = (Event) list.getItemAtPosition(i);
+                Fragment fragment = new WaitlistFragment(event);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null);
 
+                fragmentTransaction.show(fragment).commit();
 
-                Intent intent = new Intent(EventListDisplayFragment.this,WaitlistFragment.class);
-                intent.putExtra("event",event);
-                intent.putExtra("user",user);
-                startActivity(intent);
+                //Intent intent = new Intent(EventListDisplayFragment.this,WaitlistFragment.class);
+
+                //startActivity(intent);
 
 
             }

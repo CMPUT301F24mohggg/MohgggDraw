@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
         fragmentMap.put(R.id.nav_notifications, new NotificationFragment());
-        fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
+        fragmentMap.put(R.id.nav_myEvents, new EventListDisplayFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileFragment());
 
         // Initialize BottomNavigationView
