@@ -32,7 +32,7 @@ public class ReviewFragmentTest {
         // Click on the "Create Event" button in ReviewFragment
         onView(withId(R.id.button_create_event)).perform(click());
 
-        // Verify the success Toast message is displayed
+        // Retry mechanism for checking the Toast message
         onView(withText("Event successfully created and uploaded to Firestore!"))
                 .inRoot(new ToastMatcher())
                 .check(matches(withText("Event successfully created and uploaded to Firestore!")));
