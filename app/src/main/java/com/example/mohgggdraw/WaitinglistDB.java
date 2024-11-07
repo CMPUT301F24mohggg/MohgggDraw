@@ -2,6 +2,7 @@ package com.example.mohgggdraw;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -33,7 +34,7 @@ public class WaitinglistDB {
     public WaitinglistDB(Event event) {
         this.name = name;
         db = FirebaseFirestore.getInstance();
-         waitlistRef= db.collection("Event");
+         waitlistRef= db.collection("Events");
          myDoc = waitlistRef.document((String.valueOf(event.getId())));
          this.event = event;
     }
@@ -67,10 +68,13 @@ public class WaitinglistDB {
     public void removeFromDB(User user){
         myDoc.update("waitingList",FieldValue.arrayRemove(user.getEmail()));
     }
-    public StorageReference getImage(){
-        StorageReference ref = FirebaseStorage.getInstance().getReference("Untitled.png");
+    public StorageReference getImage(String path){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference ref = storage.getReferenceFromUrl(path);
+
         return ref;
     }
+
     public void updateWaitlist(){
         boolean present = false;
         myDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -83,9 +87,12 @@ public class WaitinglistDB {
                     DocumentSnapshot document = task.getResult();
 
                     docData =document.getData();
-                    ArrayList myWaitlist = (ArrayList) docData.get("waitingList");
+                    if(docData!= null){
+                        ArrayList myWaitlist = (ArrayList) docData.get("EventWaitinglist");
+                        event.setWaitingList(myWaitlist);
 
-                    event.setWaitingList(myWaitlist);
+                    }
+
 
 
                 } else {

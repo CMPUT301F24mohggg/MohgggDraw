@@ -19,18 +19,26 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
 
 public class WaitlistFragment extends Fragment {
-    Event event;
+    Event event = new Event();
     User user = new User();
     String path;
     Bitmap bmp;
     ImageView iv;
     StorageReference storageReference;
+
+
+    public WaitlistFragment(){
+        super();
+    }
+
+
 
     public WaitlistFragment(Event event) {
         super();
@@ -41,12 +49,26 @@ public class WaitlistFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null) {
+            if (getArguments().getBoolean("geo")) {
+                event.setGeolocation(true);
+                user.setEmail("geotest");
+            } else if (getArguments().getBoolean("geo") == false) {
+                user.setEmail("mewoowww normal");
+
+
+            }
+        }
+        event.setGeolocation(false);
 
         return inflater.inflate((R.layout.view_event), container, false);
     }
 
         public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
             super.onViewCreated(view, savedInstanceState);
+
+
+
             TextView name = (TextView) view.findViewById(R.id.eventtitle);
             TextView time = (TextView) view.findViewById(R.id.eventInfoTime);
             TextView day = (TextView) view.findViewById(R.id.eventInfoDay);
@@ -63,7 +85,7 @@ public class WaitlistFragment extends Fragment {
 
             path = event.getPath();
             iv = (ImageView) view.findViewById(R.id.eventimage);
-            StorageReference myimage = new WaitinglistDB(event).getImage();
+            StorageReference myimage = new WaitinglistDB(event).getImage(path);
             try{
                 File eventImage = File.createTempFile(event.getName(),".png");
                 myimage.getFile(eventImage)
@@ -99,7 +121,8 @@ public class WaitlistFragment extends Fragment {
                     if (event.hasGeolocation()) {
                         new JoinWaitlistButton(event, user,this).show(getActivity().getSupportFragmentManager(), "join");
                     } else {
-                        new WaitinglistDB(event).addToDB(user);
+                        new WaitinglistController(user,event).addUser(user);
+                        onDialogueFinished();
 
                     }
                 });
@@ -118,5 +141,11 @@ public class WaitlistFragment extends Fragment {
 
         fragmentTransaction.show(fragment).commit();
 
+    }
+    public Event getEvent(){
+        return event;
+    }
+    public User getUser(){
+        return user;
     }
 }

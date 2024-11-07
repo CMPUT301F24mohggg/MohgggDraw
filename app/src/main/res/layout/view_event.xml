@@ -145,9 +145,9 @@
         app:layout_constraintTop_toBottomOf="@+id/eventInfoTime"
         app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
+    <Button
         android:id="@+id/eventInfoButton"
-        android:layout_width="145dp"
+        android:layout_width="184dp"
         android:layout_height="60dp"
 
         android:clickable="true"
@@ -155,7 +155,8 @@
         android:paddingTop="10dp"
         android:text="eventInfoButton"
         android:textColor="#7257FF"
-        android:textSize="20sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
