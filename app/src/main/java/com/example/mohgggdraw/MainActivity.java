@@ -2,6 +2,7 @@ package com.example.mohgggdraw;
 
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -46,12 +49,14 @@ import java.util.Map;
 import com.google.zxing.*;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
+import com.journeyapps.barcodescanner.CaptureActivity;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-//import com.google.zxing.MultiFormatWriter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -124,5 +129,39 @@ public class MainActivity extends AppCompatActivity {
         // Set the new active fragment
         activeFragment = fragment;
     }
+
+    // Scan QR Code
+    private void scanCode() {
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Scan QR Code");
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+//        barLauncher.launch(options);
+    }
+
+    // Result for QR scan
+//    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
+//        if (result.getContents() != null) {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//            builder.setTitle("result");
+//            builder.setMessage(result.getContents());
+
+
+//            String eventId = result.getContents();
+
+
+                /* WAITLIST FRAGMENT NOT IMPLEMENTED YET*/
+                /* MAY NEED TO CREATE EVENT OBJ FROM DB? */
+
+//            Fragment fragment = new WaitlistFragment(event);
+//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.replace(R.id.fragment_container, fragment);
+//            fragmentTransaction.addToBackStack(null);
+//
+//            fragmentTransaction.show(fragment).commit();
+//        }
+//    });
 
 }

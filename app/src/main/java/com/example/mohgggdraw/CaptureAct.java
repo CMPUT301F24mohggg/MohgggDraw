@@ -1,4 +1,6 @@
 package com.example.mohgggdraw;
 
-public class CaptureAct {
+import com.journeyapps.barcodescanner.CaptureActivity;
+
+public class CaptureAct extends CaptureActivity {
 }
