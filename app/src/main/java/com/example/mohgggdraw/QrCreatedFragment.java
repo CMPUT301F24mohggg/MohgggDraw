@@ -1,10 +1,16 @@
 package com.example.mohgggdraw;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,30 +32,50 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class QrCreatedFragment extends Fragment {
-
+    Context context;
     private Button qrShareButton;
+    private Button viewEventButton;
     private ImageView newQrImageView;
     private EventQr eventQr;
 
+    public QrCreatedFragment(EventQr eventQr) {
+        this.eventQr = eventQr;
+        this.context = getActivity();
+    }
+
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        String eventId = getArguments().getString("event_id");
         View view = inflater.inflate(R.layout.fragment_qrcode_created, container, false);
         newQrImageView = view.findViewById(R.id.new_qrcode_iv);
         qrShareButton = view.findViewById(R.id.qrshare_button);
 
-        // Generate and hash QR
-        EventQr eventQr = new EventQr(eventId);
-        eventQr.generateQr();
-        eventQr.hashQr();
-
         // Set bitmap to ImageView
         newQrImageView.setImageBitmap(eventQr.getQrBitmap());
+
+
+//        viewEventButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//
+//                REQUIRES MASUDA'S CODE TO IMPLEMENT
+//
+//                Fragment fragment = new WaitlistFragment(event);
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.fragment_container, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//
+//                fragmentTransaction.show(fragment).commit();
+//            }
+//        });
+
 
         qrShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                qrcodeShare();
+                qrShare(eventQr.getQrBitmap());
             }
         });
         return view;
@@ -59,36 +87,19 @@ public class QrCreatedFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private static Uri saveImage(Bitmap image, Context context) {
-        File imagesFolder = new File(context.getCacheDir(), "images");
-        Uri uri = null;
-        try {
-            imagesFolder.mkdirs();
-            File file = new File(imagesFolder, "event_qrcode.jpg");
 
-            FileOutputStream stream = new FileOutputStream(file);
-            image.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-            stream.flush();
-            stream.close();
-            uri = FileProvider.getUriForFile(Objects.requireNonNull(context.getApplicationContext()),
-                    "com.example.mohgggdraw" + ".provider", file);
+    private void qrShare(Bitmap qrBitmap) {
 
-        } catch (IOException e) {
-            Log.d("TAG", "Exception" + e.getMessage());
-        }
-        return uri;
-    }
+        String stringPath = MediaStore.Images.Media.insertImage(this.getActivity().getContentResolver(),
+                qrBitmap, "Event QR Code", null);
 
-    private void qrcodeShare() {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/jpeg");
-        Uri bmpUri;
-        String textToShare = "Share event";
-        bmpUri = saveImage(eventQr.getQrBitmap(), getActivity().getApplicationContext());
-        share.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        share.putExtra(Intent.EXTRA_STREAM, bmpUri);
-        share.putExtra(Intent.EXTRA_SUBJECT, "Event QR Code");
-        share.putExtra(Intent.EXTRA_TEXT, textToShare);
-        startActivity(Intent.createChooser(share, "Share Event"));
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(stringPath));
+        intent.putExtra(Intent.EXTRA_TEXT, "Share this event!");
+
+        startActivity(Intent.createChooser(intent, "Share Event QR Code"));
+
+
     }
 }
