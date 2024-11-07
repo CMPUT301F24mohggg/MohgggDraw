@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation(platform("com.google.firebase:firebase-bom:31.0.2"))
     implementation("com.google.firebase:firebase-firestore:24.1.2")
     implementation("com.google.firebase:firebase-storage:20.0.0")

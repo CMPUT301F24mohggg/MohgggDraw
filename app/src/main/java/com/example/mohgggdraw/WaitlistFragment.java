@@ -93,8 +93,9 @@ public class WaitlistFragment extends Fragment {
 
 
             }else {
+                joinButton.setText("Join Event");
                 joinButton.setOnClickListener(v -> {
-                    joinButton.setText("Join Event");
+
                     if (event.hasGeolocation()) {
                         new JoinWaitlistButton(event, user,this).show(getActivity().getSupportFragmentManager(), "join");
                     } else {

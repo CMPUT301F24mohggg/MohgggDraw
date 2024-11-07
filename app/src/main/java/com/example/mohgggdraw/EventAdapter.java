@@ -32,7 +32,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         //creating the listview
         View view;
         if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.content,
+            view = LayoutInflater.from(getContext()).inflate(R.layout.event_array_content,
                     parent, false);
         } else {
             view = convertView;
