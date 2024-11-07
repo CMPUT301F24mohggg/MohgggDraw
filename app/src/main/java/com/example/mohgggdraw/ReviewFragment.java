@@ -9,9 +9,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.fragment.app.FragmentActivity;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
@@ -24,6 +27,8 @@ import java.util.Map;
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
+    private EventQr eventQr;
+    private int qrHash;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class ReviewFragment extends Fragment {
                 Glide.with(this).load(url).into(eventPoster);
             }
         });
+
 
         return view;
     }
@@ -98,6 +104,8 @@ public class ReviewFragment extends Fragment {
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
+//        EventQr eventQr = new EventQr()
+
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
 
@@ -116,12 +124,39 @@ public class ReviewFragment extends Fragment {
         eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
         eventData.put("status", "active");
-        eventData.put("QRhash", "generatedQRHash"); // replace with QR code when available
+
 
         // Add the new event data to Firestore
         eventsRef.add(eventData)
                 .addOnSuccessListener(documentReference -> {
+                    String eventId = documentReference.getId();  // Get the documentId
+
+                    // Generate QR code and put QR hash
+                    eventQr = new EventQr(eventId);
+                    eventQr.hashQr();
+                    qrHash = eventQr.getQrHash();
+                    eventData.put("QRhash", qrHash);
+
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error uploading event: ", e);
+                });
+
+        // Add the qrcode data to Firestore
+        eventsRef.add(eventData)
+                .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Event successfully created and uploaded to Firestore!", Toast.LENGTH_SHORT).show();
+
+                    // Swap fragment
+                    Fragment fragment = new QrCreatedFragment(eventQr);
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, fragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.show(fragment).commit();
+
+
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
