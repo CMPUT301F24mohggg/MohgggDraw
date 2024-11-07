@@ -82,12 +82,11 @@ public class UserFormActivity extends AppCompatActivity {
             Log.d("UserFormActivity", "Saving entrant data to Firestore");
             db.collection("user")
                     .document(deviceID)
-                    .collection("entrants")
-                    .add(userDetails)
-                    .addOnSuccessListener(documentReference -> {
+                    .set(userDetails)
+                    .addOnSuccessListener(aVoid -> {
                         Toast.makeText(UserFormActivity.this, "User data saved successfully", Toast.LENGTH_SHORT).show();
-                        Log.d("UserFormActivity", "Data saved successfully for entrant, Document ID: " + documentReference.getId());
-                        finish(); // Close the form screen
+                        Log.d("UserFormActivity", "Data saved successfully for entrant");
+                        navigateToHomeScreen(); // Navigate to home screen after signup
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(UserFormActivity.this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -98,17 +97,24 @@ public class UserFormActivity extends AppCompatActivity {
             Log.d("UserFormActivity", "Saving facility data to Firestore");
             db.collection("user")
                     .document(deviceID)
-                    .collection("facilities")
-                    .add(userDetails)
-                    .addOnSuccessListener(documentReference -> {
+                    .set(userDetails)
+                    .addOnSuccessListener(aVoid -> {
                         Toast.makeText(UserFormActivity.this, "User data saved successfully", Toast.LENGTH_SHORT).show();
-                        Log.d("UserFormActivity", "Data saved successfully for facility, Document ID: " + documentReference.getId());
-                        finish(); // Close the form screen
+                        Log.d("UserFormActivity", "Data saved successfully for facility");
+                        navigateToHomeScreen(); // Navigate to home screen after signup
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(UserFormActivity.this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.e("UserFormActivity", "Failed to save facility data: " + e.getMessage());
                     });
         }
+    }
+
+    private void navigateToHomeScreen() {
+        Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("navigateToHome", true); // Pass flag to navigate to home fragment
+        startActivity(intent);
+        finish();
     }
 }
