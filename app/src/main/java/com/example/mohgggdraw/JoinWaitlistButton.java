@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class JoinWaitlistButton extends DialogFragment {
-    Event event = new Event();
+    Event event;
     User user= new User();
     WaitlistFragment waitlistFragment;
     public JoinWaitlistButton(Event event, User user,WaitlistFragment waitlistFragment){

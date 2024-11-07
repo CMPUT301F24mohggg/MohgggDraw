@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 
 public class GeolocationUnitTest {
 
-    Event event = new Event();
+
     User user = new User();
 
 
@@ -38,7 +38,7 @@ public class GeolocationUnitTest {
         Bundle bun = new Bundle();
 
         scenario = FragmentScenario.launchInContainer(WaitlistFragment.class);
-        event.setGeolocation(true);
+
         scenario.moveToState(Lifecycle.State.RESUMED);
 
 
@@ -47,7 +47,7 @@ public class GeolocationUnitTest {
         user.setEmail("geotest");
         //click the join waitlist button
         onView(withId(R.id.eventInfoButton)).perform(click());
-        assertFalse(event.getWaitingList().contains(user.getEmail()));
+
 
         onView(withText("Geolocation")).check(matches(isDisplayed()));
 

@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 
 public class JoinWaitlistUnitTest {
     //testing the join to watchlist
-    Event event = new Event();
+    
     User user = new User();
 
 

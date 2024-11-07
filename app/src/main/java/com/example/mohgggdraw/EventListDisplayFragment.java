@@ -47,7 +47,7 @@ public class EventListDisplayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
     dataList = new ArrayList<Event>();
         for(int i=0;i<10;i++){
-            Event event = new Event();
+            Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
             dataList.add(event);
             new WaitinglistDB(event).updateWaitlist();
 

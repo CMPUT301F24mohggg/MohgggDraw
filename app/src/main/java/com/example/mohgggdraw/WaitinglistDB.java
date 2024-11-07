@@ -35,7 +35,7 @@ public class WaitinglistDB {
         this.name = name;
         db = FirebaseFirestore.getInstance();
          waitlistRef= db.collection("Events");
-         myDoc = waitlistRef.document((String.valueOf(event.getId())));
+         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
          this.event = event;
     }
 

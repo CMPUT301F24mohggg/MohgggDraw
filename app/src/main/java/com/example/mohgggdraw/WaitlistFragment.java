@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class WaitlistFragment extends Fragment {
-    Event event = new Event();
+    Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
     User user = new User();
     String path;
     Bitmap bmp;
@@ -76,18 +76,18 @@ public class WaitlistFragment extends Fragment {
             TextView location = (TextView) view.findViewById(R.id.eventInfoLocation);
 
 
-            name.setText(event.getName());
+            name.setText(event.getTitle());
             time.setText(event.getTime());
             day.setText(event.getDate());
             capacity.setText(String.valueOf(event.getMaxCapacity()));
             location.setText(event.getLocation());
 
 
-            path = event.getPath();
+            path = event.getPosterUrl();
             iv = (ImageView) view.findViewById(R.id.eventimage);
             StorageReference myimage = new WaitinglistDB(event).getImage(path);
             try{
-                File eventImage = File.createTempFile(event.getName(),".png");
+                File eventImage = File.createTempFile(event.getTitle(),".png");
                 myimage.getFile(eventImage)
                         .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
@@ -118,7 +118,7 @@ public class WaitlistFragment extends Fragment {
                 joinButton.setText("Join Event");
                 joinButton.setOnClickListener(v -> {
 
-                    if (event.hasGeolocation()) {
+                    if (event.isGeolocation()) {
                         new JoinWaitlistButton(event, user,this).show(getActivity().getSupportFragmentManager(), "join");
                     } else {
                         new WaitinglistController(user,event).addUser(user);

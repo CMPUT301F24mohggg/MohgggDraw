@@ -41,11 +41,11 @@ public class EventAdapter extends ArrayAdapter<Event> {
         TextView eventName = view.findViewById(R.id.eventname);
 
         //sets book listview text
-        eventName.setText(event.getName());
+        eventName.setText(event.getTitle());
         ImageView iv = (ImageView) view.findViewById(R.id.eventadapterimage);
-        StorageReference myImage = new WaitinglistDB(event).getImage(event.getPath());
+        StorageReference myImage = new WaitinglistDB(event).getImage(event.getPosterUrl());
         try{
-            File eventImage = File.createTempFile(event.getName(),".png");
+            File eventImage = File.createTempFile(event.getTitle(),".png");
             myImage.getFile(eventImage)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
