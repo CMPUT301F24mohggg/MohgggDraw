@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private LinearLayout signupLayout;
-    private FirebaseFirestore db;
 
     private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
     private Fragment activeFragment;
@@ -209,6 +208,25 @@ public class MainActivity extends AppCompatActivity {
         barLauncher.launch(options);
     }
 
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // Update the intent in case "navigateToHomeFragment" is set
+        initializeNavigation(); // Re-initialize the navigation on new intent
+    }
+}
+
+    private void scanCode() {
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Scan QR Code");
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barLauncher.launch(options);
+    }
+
     // Result for QR scan
     ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
 
@@ -245,11 +263,5 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent); // Update the intent in case "navigateToHomeFragment" is set
-        initializeNavigation(); // Re-initialize the navigation on new intent
-    }
 }
+
