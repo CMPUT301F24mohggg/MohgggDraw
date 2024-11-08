@@ -10,6 +10,7 @@ package com.example.mohgggdraw;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.auth.User;
 
+
 import java.util.ArrayList;
 
 public class Event {
@@ -151,4 +152,5 @@ public class Event {
     public void removeFromWaitingList(User user) {
         waitingList.remove(user.getUid());
     }
+
 }

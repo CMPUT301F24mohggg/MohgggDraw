@@ -18,6 +18,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.UUID;
 
+/***
+ This fragment is shown after an event is successfully created. It:
+ - Displays a success message to the user
+ - Allows the user to update the event poster image
+ - Handles image selection and uploading to Firebase Storage
+ ***/
 public class EventCreatedSuccessFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private Uri newImageUri;

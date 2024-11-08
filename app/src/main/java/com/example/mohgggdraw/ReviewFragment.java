@@ -21,9 +21,17 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import android.provider.Settings;
 
+/***
+ This fragment provides a review of all entered event details. It:
+ - Displays a summary of all event information
+ - Allows the user to review and confirm the event details
+ - Handles the final step of creating the event in Firebase Firestore
+ ***/
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
@@ -100,18 +108,22 @@ public class ReviewFragment extends Fragment {
         });
     }
 
+
     private void createEventInFirebase() {
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
-//        EventQr eventQr = new EventQr()
+
+        // Retrieve device ID as organizer ID
+        String deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
 
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
 
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("organizerId", "actualOrganizerId");  // Replace with actual organizer ID if available
+        eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
         eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
@@ -124,6 +136,11 @@ public class ReviewFragment extends Fragment {
         eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
         eventData.put("status", "active");
+        eventData.put("EventWaitinglist", new ArrayList<>());
+        eventData.put("EventSelectedlist", new ArrayList<>());
+        eventData.put("EventCancelledlist", new ArrayList<>());
+        eventData.put("EventConfirmedlist", new ArrayList<>());
+
 
 
         // Add the new event data to Firestore

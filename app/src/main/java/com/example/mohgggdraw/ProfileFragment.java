@@ -7,7 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
+/***
+ This fragment represents the user's profile screen. It:
+ - Inflates the layout for the profile screen
+ - Sets up any necessary UI components or listeners
+ ***/
 public class ProfileFragment extends Fragment {
 
     @Override

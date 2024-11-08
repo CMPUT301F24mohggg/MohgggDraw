@@ -14,6 +14,13 @@ import androidx.fragment.app.Fragment;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+
+/***
+ This fragment displays the user's events. It:
+ - Inflates the layout for displaying user events
+ - Sets up any necessary UI components or listeners
+ ***/
+
 public class MyEventsFragment extends Fragment {
 
     @Override
@@ -32,40 +39,4 @@ public class MyEventsFragment extends Fragment {
 
     }
 
-    // Scan QR Code
-    private void scanCode() {
-        ScanOptions options = new ScanOptions();
-        options.setPrompt("Scan QR Code");
-        options.setBeepEnabled(true);
-        options.setOrientationLocked(true);
-        options.setCaptureActivity(CaptureAct.class);
-        barLauncher.launch(options);
-    }
-
-    // Result for QR scan
-    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
-        if (result.getContents() != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("result");
-            String eventId = result.getContents();
-            builder.setMessage(eventId);
-            builder.setPositiveButton("close", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).show();
-
-
-
-//            Event event;
-//            Fragment fragment = new WaitlistFragment(event);
-//            FragmentManager fragmentManager = this.getSupportFragmentManager();
-//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//            fragmentTransaction.replace(R.id.fragment_container, fragment);
-//            fragmentTransaction.addToBackStack(null);
-//
-//            fragmentTransaction.show(fragment).commit();
-        }
-    });
 }

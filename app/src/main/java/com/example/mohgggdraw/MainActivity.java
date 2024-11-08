@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
 import com.google.zxing.*;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -62,6 +63,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+
+
+/***
+ This activity serves as the main entry point of the application. It:
+ - Initializes Firebase
+ - Sets up the bottom navigation view
+ - Manages fragment transactions for different navigation items
+ - Handles the display of notification badges
+ ***/
 
 public class MainActivity extends AppCompatActivity {
 
