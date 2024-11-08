@@ -1,8 +1,6 @@
-
 package com.example.mohgggdraw;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,36 +11,27 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.content.Intent;
-import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import java.util.HashMap;
-import java.util.Map;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,41 +40,70 @@ import java.util.Map;
 
 public class ProfileFragment extends Fragment {
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+
     private ImageView profileImageView;
     private TextView nameTextView;
+    private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
+    private Button buttonSubmit, buttonDelete;
+    private Toolbar toolbar;
+
     private StorageReference storageReference;
+    private FirebaseFirestore db;
     private String deviceID;
     private String userName;
     private boolean isGalleryImage = false;
-
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
-    private Button buttonSubmit, buttonDelete, buttonUploadImage, buttonDeleteImage;
-    private ImageView profileImageView;
-    private FirebaseFirestore db;
-    private String deviceID;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Initialize UI elements and Firebase instances
         initViews(view);
-
-
-        nameTextView.setOnClickListener(v -> promptUserName());
-        profileImageView.setOnClickListener(v -> handleProfileImageClick());
-
-
         db = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
-        return view;
 
+        // Get device ID
+        deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // Load existing user data
+        loadUserData();
+
+        // Set up click listeners
+        setupListeners();
+
+        return view;
     }
-    // initializing UI elements and retrieving device ID
+
     private void initViews(View view) {
         profileImageView = view.findViewById(R.id.profileImageView);
         nameTextView = view.findViewById(R.id.nameTextView);
-        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        editTextName = view.findViewById(R.id.editTextName);
+        editTextPhone = view.findViewById(R.id.editTextPhone);
+        editTextEmail = view.findViewById(R.id.editTextEmail);
+        editTextLocation = view.findViewById(R.id.editTextLocation);
+        buttonSubmit = view.findViewById(R.id.buttonSubmit);
+        buttonDelete = view.findViewById(R.id.buttonDelete);
+        toolbar = view.findViewById(R.id.toolbar);
+
+        // Set up the toolbar with back button functionality
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back_arrow);
+            }
+        }
+
+        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+    }
+
+    private void setupListeners() {
+        nameTextView.setOnClickListener(v -> promptUserName());
+        profileImageView.setOnClickListener(v -> handleProfileImageClick());
+
+        buttonSubmit.setOnClickListener(v -> updateUserData());
+        buttonDelete.setOnClickListener(v -> deleteUserData());
     }
 
     private void promptUserName() {
@@ -97,7 +115,7 @@ public class ProfileFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    // set user name and display default profile picture
+
     private void setUserName(String name) {
         userName = name.isEmpty() ? "User" : name;
         nameTextView.setText(userName);
@@ -152,7 +170,7 @@ public class ProfileFragment extends Fragment {
         String[] parts = name.split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
-    // creating a drawable to create the default user picture
+
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -193,7 +211,7 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl().addOnSuccessListener(uri -> saveUserProfileToFirebase(uri.toString())))
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
     }
-    // converting bitmap to byte array before uploading
+
     private byte[] getImageData(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -210,61 +228,27 @@ public class ProfileFragment extends Fragment {
                 .set(userProfile)
                 .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "User profile saved successfully"))
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error saving user profile", e));
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // Initialize Firestore
-        db = FirebaseFirestore.getInstance();
-
-        editTextName = view.findViewById(R.id.editTextName);
-        editTextPhone = view.findViewById(R.id.editTextPhone);
-        editTextEmail = view.findViewById(R.id.editTextEmail);
-        editTextLocation = view.findViewById(R.id.editTextLocation);
-        buttonSubmit = view.findViewById(R.id.buttonSubmit);
-        buttonDelete = view.findViewById(R.id.buttonDelete);
-        buttonUploadImage = view.findViewById(R.id.buttonUploadImage);
-        buttonDeleteImage = view.findViewById(R.id.buttonDeleteImage);
-        profileImageView = view.findViewById(R.id.profileImageView);
-
-        // Get device ID
-        deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-
-        // Load existing user data
-        loadUserData();
-
-        // Set up the submit button listener
-        buttonSubmit.setOnClickListener(v -> updateUserData());
-
-        // Set up the delete button listener
-        buttonDelete.setOnClickListener(v -> deleteUserData());
-
-        // Set up the upload image button listener
-        buttonUploadImage.setOnClickListener(v -> {
-            // Placeholder action for uploading an image
-            Toast.makeText(getContext(), "Upload Image clicked", Toast.LENGTH_SHORT).show();
-        });
-
-        // Set up the delete image button listener
-        buttonDeleteImage.setOnClickListener(v -> {
-            // Placeholder action for deleting an image
-            Toast.makeText(getContext(), "Delete Image clicked", Toast.LENGTH_SHORT).show();
-        });
     }
 
     private void loadUserData() {
         DocumentReference docRef = db.collection("user").document(deviceID);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
+                Log.d("ProfileFragment", "Document exists. Populating fields...");
                 editTextName.setText(documentSnapshot.getString("name"));
                 editTextPhone.setText(documentSnapshot.getString("phoneNumber"));
                 editTextEmail.setText(documentSnapshot.getString("email"));
                 editTextLocation.setText(documentSnapshot.getString("location"));
+                nameTextView.setText(documentSnapshot.getString("name") != null ? documentSnapshot.getString("name") : "User");
+                userName = documentSnapshot.getString("name");
+                setDefaultProfilePicture(); // Set profile picture using user's name initials
             } else {
+                Log.d("ProfileFragment", "No user data found for this device ID.");
                 Toast.makeText(getContext(), "No user data found", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
+            Log.e("ProfileFragment", "Failed to load user data: " + e.getMessage(), e);
             Toast.makeText(getContext(), "Failed to load user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e("ProfileFragment", "Failed to load user data: " + e.getMessage());
         });
     }
 
@@ -288,9 +272,7 @@ public class ProfileFragment extends Fragment {
 
         // Update user data in Firestore
         db.collection("user").document(deviceID).update(userDetails)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                })
+                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("ProfileFragment", "Failed to update profile: " + e.getMessage());
@@ -316,4 +298,3 @@ public class ProfileFragment extends Fragment {
         requireActivity().finish();
     }
 }
-

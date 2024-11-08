@@ -7,27 +7,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
+        <!-- Profile ImageView with placeholder -->
         <ImageView
             android:id="@+id/profileImageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="center_horizontal"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@android:drawable/ic_menu_gallery"
             android:contentDescription="Profile Image"
             android:layout_marginBottom="8dp" />
 
+        <!-- User Name TextView -->
         <TextView
-            android:id="@+id/textViewUserName"
+            android:id="@+id/userNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="User Name"
             android:textSize="20sp"
-            android:layout_gravity="center_horizontal" />
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="4dp" />
 
+        <!-- User Email TextView -->
         <TextView
-            android:id="@+id/textViewUserEmail"
+            android:id="@+id/userEmailTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="user@example.com"
@@ -35,6 +40,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="16dp" />
 
+        <!-- Edit Profile Button -->
         <Button
             android:id="@+id/buttonEditProfile"
             android:layout_width="wrap_content"
@@ -43,19 +49,24 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp" />
 
+        <!-- Settings Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Settings"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
+        <!-- Notifications Switch -->
         <Switch
             android:id="@+id/switchNotifications"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Notifications" />
+            android:text="Notifications"
+            android:layout_marginBottom="16dp" />
 
+        <!-- Log Out Button -->
         <Button
             android:id="@+id/buttonLogout"
             android:layout_width="wrap_content"

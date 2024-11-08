@@ -48,9 +48,6 @@
         <!-- Review Activity -->
         <activity android:name=".ReviewActivity" />
 
-        <!-- Organizer Activity (Existing Activity in your App) -->
-        <activity android:name=".Organizer" />
-
         <!-- Signup Step 1 Activity -->
         <activity android:name=".SignupActivity" />
         <activity android:name=".UserFormActivity" />

@@ -4,32 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonSignup;
     private LinearLayout signupLayout;
     private FirebaseFirestore db;
     private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
     private Fragment activeFragment;
     private BottomNavigationView bottomNavigationView;
+    private boolean isUserLoggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,44 +35,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        buttonSignup = findViewById(R.id.buttonSignup);
+        // Initialize views and Firestore
         signupLayout = findViewById(R.id.signup_layout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         db = FirebaseFirestore.getInstance();
 
+
+
         // Hide BottomNavigationView initially
         bottomNavigationView.setVisibility(View.GONE);
-
-        // Get device ID
-        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.d("MainActivity", "Device ID: " + deviceID);
-
-        // Check if intent contains flag to navigate to home
-        boolean navigateToHome = getIntent().getBooleanExtra("navigateToHome", false);
-        if (navigateToHome) {
-            navigateToHomeScreen();
-            return;
-        }
-
-        // Check if device ID exists in Firestore
-        db.collection("user").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                // Device ID exists, let user enter the app
-                Toast.makeText(MainActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                navigateToHomeScreen();
-            } else {
-                // Device ID does not exist, show signup option
-                signupLayout.setVisibility(View.VISIBLE);
-                buttonSignup.setOnClickListener(view -> {
-                    Intent intent = new Intent(MainActivity.this, SignupActivity.class);
-                    startActivity(intent);
-                });
-            }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(MainActivity.this, "Failed to check device ID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e("MainActivity", "Failed to check device ID: " + e.getMessage());
-        });
-
         // Initialize fragments
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
@@ -82,21 +51,53 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
 
+        // Check intent for navigation flag to home fragment
+        boolean navigateToHomeFragment = getIntent().getBooleanExtra("navigateToHomeFragment", false);
+        if (navigateToHomeFragment) {
+            isUserLoggedIn = true;
+            navigateToHomeScreen();
+            return;
+        }
+
         // Set up BottomNavigationView item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = fragmentMap.get(item.getItemId());
-            if (selectedFragment != null) {
-                if (selectedFragment instanceof ProfileOverviewFragment) {
-                    // Go to Profile Overview and hide other fragments
-                    for (Fragment fragment : fragmentMap.values()) {
-                        if (fragment != selectedFragment && fragment.isAdded()) {
-                            getSupportFragmentManager().beginTransaction().hide(fragment).commit();
-                        }
-                    }
+            if (isUserLoggedIn) {
+                Fragment selectedFragment = fragmentMap.get(item.getItemId());
+                if (selectedFragment != null) {
+                    switchFragment(selectedFragment);
                 }
-                switchFragment(selectedFragment, item.getItemId());
+            } else {
+                Toast.makeText(MainActivity.this, "Please sign up or log in to access this feature", Toast.LENGTH_SHORT).show();
             }
             return true;
+        });
+
+        // Get device ID
+        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        Log.d("MainActivity", "Device ID: " + deviceID);
+
+        // Check if device ID exists in Firestore
+        checkDeviceIDInFirestore(deviceID);
+    }
+
+    private void checkDeviceIDInFirestore(String deviceID) {
+        db.collection("user").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Device ID exists, proceed to home screen
+                isUserLoggedIn = true;
+                navigateToHomeScreen();
+            } else {
+                // Device ID does not exist, show signup option
+                signupLayout.setVisibility(View.VISIBLE);
+                findViewById(R.id.buttonSignup).setOnClickListener(view -> {
+                    Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+                    startActivity(intent);
+                    finish();
+                });
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(MainActivity.this, "Failed to check device ID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", "Failed to check device ID: " + e.getMessage());
         });
     }
 
@@ -109,26 +110,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Set default fragment to HomeFragment
         Fragment homeFragment = fragmentMap.get(R.id.nav_home);
-        if (homeFragment != null && activeFragment != homeFragment) {
-            switchFragment(homeFragment, R.id.nav_home);
+        if (homeFragment != null) {
+            switchFragment(homeFragment);
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
     }
 
-    private void switchFragment(@NonNull Fragment fragment, int fragmentTagId) {
+    private void switchFragment(@NonNull Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        if (!fragment.isAdded()) {
-            transaction.add(R.id.fragment_container, fragment, String.valueOf(fragmentTagId));
-        }
-
-        // Hide active fragment and show the selected fragment
-        if (activeFragment != null) {
-            transaction.hide(activeFragment);
-        }
-        transaction.show(fragment).commit();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
 
         // Set the new active fragment
         activeFragment = fragment;
     }
-
 }
