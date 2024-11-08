@@ -49,5 +49,6 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "a
 androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
 
 [plugins]
-androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+androidx-monitor = { id = "androidx.test.monitor", version.ref = "monitor" }
 android-application = { id = "com.android.application", version.ref = "agp" }
+
