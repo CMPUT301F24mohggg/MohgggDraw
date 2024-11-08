@@ -3,45 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+   >
 
-    <!-- Home Fragment -->
-    <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.mohgggdraw.HomeFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-        <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
 
-    <!-- Second Fragment -->
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.mohgggdraw.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
-
-    <!-- Review Fragment -->
-    <fragment
-        android:id="@+id/reviewFragment"
-        android:name="com.example.mohgggdraw.ReviewFragment"
-        android:label="Review Fragment"
-        tools:layout="@layout/fragment_review">
-        <action
-            android:id="@+id/action_reviewFragment_to_eventCreatedSuccessFragment"
-            app:destination="@id/eventCreatedSuccessFragment" />
-    </fragment>
-
-    <!-- Event Created Success Fragment -->
-    <fragment
-        android:id="@+id/eventCreatedSuccessFragment"
-        android:name="com.example.mohgggdraw.EventCreatedSuccessFragment"
-        android:label="Event Created Success"
-        tools:layout="@layout/fragment_event_created_success" />
 </navigation>
