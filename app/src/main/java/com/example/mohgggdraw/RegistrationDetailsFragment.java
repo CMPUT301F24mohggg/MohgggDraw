@@ -14,7 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Calendar;
-
+/***
+ This fragment handles the registration details for an event. It:
+ - Allows setting of registration open date, deadline, and event start time
+ - Uses DatePickerDialogs for easy date selection
+ - Saves the selected dates to the SharedViewModel
+ ***/
 public class RegistrationDetailsFragment extends Fragment {
 
     private SharedViewModel sharedViewModel;

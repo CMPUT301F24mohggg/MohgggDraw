@@ -9,7 +9,14 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Calendar;
-
+/***
+ This activity handles the registration details for an event. It:
+ - Retrieves event data (title, location, poster URL) from the previous activity
+ - Allows users to set registration open date, deadline, and event start time
+ - Uses DatePickerDialog for easy date selection
+ - Passes all collected data to the ParticipationSettingsActivity when "Next" is clicked
+ - Includes a "Back" button to return to the previous screen
+ ***/
 public class RegistrationDetailsActivity extends AppCompatActivity {
 
     @Override
