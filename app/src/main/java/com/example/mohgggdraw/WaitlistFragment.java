@@ -1,4 +1,8 @@
 package com.example.mohgggdraw;
 
-public class WaitlistFragment {
+import androidx.fragment.app.Fragment;
+
+public class WaitlistFragment extends Fragment {
+    public WaitlistFragment(Object p0) {
+    }
 }

@@ -1,9 +1,12 @@
 package com.example.mohgggdraw;
 
 
+import static android.app.PendingIntent.getActivity;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -22,6 +25,7 @@ import android.view.View;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -53,6 +57,7 @@ import com.journeyapps.barcodescanner.CaptureActivity;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
         fragmentMap.put(R.id.nav_notifications, new NotificationFragment());
-        fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
+        fragmentMap.put(R.id.nav_myEvents, new ScanQrFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileFragment());
 
         // Initialize BottomNavigationView
@@ -98,7 +103,11 @@ public class MainActivity extends AppCompatActivity {
         // Set up BottomNavigationView item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = fragmentMap.get(item.getItemId());
-            if (selectedFragment != null) {
+            if ((selectedFragment != null) && selectedFragment.getClass().getSimpleName().equals("ScanQrFragment")) {
+                scanCode();
+                return true;
+            }
+            else {
                 switchFragment(selectedFragment, item.getItemId());
             }
             return true;
@@ -137,31 +146,41 @@ public class MainActivity extends AppCompatActivity {
         options.setBeepEnabled(true);
         options.setOrientationLocked(true);
         options.setCaptureActivity(CaptureAct.class);
-//        barLauncher.launch(options);
+        barLauncher.launch(options);
     }
 
     // Result for QR scan
-//    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
-//        if (result.getContents() != null) {
-//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//            builder.setTitle("result");
-//            builder.setMessage(result.getContents());
+    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
+
+        if ((result.getContents() != null)) {
+            String eventId = result.getContents();
+            DocToEvent docToEvent = new DocToEvent(eventId);
+            docToEvent.getDocSnap();
+
+            if (!docToEvent.docExists()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Invalid Event QR Code");
+
+                builder.setMessage("Please scan a valid event QR code.");
+                builder.setPositiveButton("close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
+            } else {
 
 
-//            String eventId = result.getContents();
+                Event myevent = docToEvent.createEvent();
+                Fragment fragment = new WaitlistFragment(myevent);
+                FragmentManager fragmentManager = this.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null);
 
-
-                /* WAITLIST FRAGMENT NOT IMPLEMENTED YET*/
-                /* MAY NEED TO CREATE EVENT OBJ FROM DB? */
-
-//            Fragment fragment = new WaitlistFragment(event);
-//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//            fragmentTransaction.replace(R.id.fragment_container, fragment);
-//            fragmentTransaction.addToBackStack(null);
-//
-//            fragmentTransaction.show(fragment).commit();
-//        }
-//    });
+                fragmentTransaction.show(fragment).commit();
+            }
+        }
+    });
 
 }

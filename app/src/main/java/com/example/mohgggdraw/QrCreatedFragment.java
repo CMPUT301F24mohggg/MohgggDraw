@@ -58,10 +58,10 @@ public class QrCreatedFragment extends Fragment {
 //            @Override
 //            public void onClick(View view) {
 //
+//                DocToEvent docToEvent = new DocToEvent(eventQr.getEventId());
 //
-//                REQUIRES MASUDA'S CODE TO IMPLEMENT
-//
-//                Fragment fragment = new WaitlistFragment(event);
+//                Event myevent = docToEvent.createEvent();
+//                Fragment fragment = new WaitlistFragment(myevent);
 //                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 //                fragmentTransaction.replace(R.id.fragment_container, fragment);
