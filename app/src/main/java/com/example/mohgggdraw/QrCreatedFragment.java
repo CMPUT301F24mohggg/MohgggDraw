@@ -33,6 +33,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * QrCreatedFragment displays a generated QR code for an event and allows sharing or viewing event details.
+ *
+ * - Shows QR code in an ImageView.
+ * - Navigates to WaitlistFragment to view event details.
+ * - Shares QR code image via an intent.
+ *
+ * Constructor:
+ * - QrCreatedFragment(EventQr eventQr): Initializes with event QR data.
+ */
+
 public class QrCreatedFragment extends Fragment {
     Context context;
     private Button qrShareButton;
