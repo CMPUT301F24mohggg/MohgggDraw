@@ -41,33 +41,36 @@ android {
 }
 
 dependencies {
-
-    implementation (libs.recyclerview)
-    implementation (libs.firebase.messaging)
-    // Kotlin and Glide
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+    // Firebase BoM and dependencies
+    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-firestore:24.9.0")
     implementation("com.google.firebase:firebase-storage:20.0.0")
     implementation("com.google.firebase:firebase-database:20.1.0")
+    implementation("com.google.firebase:firebase-auth")
+
+    // Kotlin and Glide
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
+
+    // RecyclerView and Messaging
+    implementation(libs.recyclerview)
+    implementation(libs.firebase.messaging)
+
+    // Fragment and Espresso Testing
     implementation(libs.androidx.fragment.testing)
     testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.androidx.core)
     testImplementation(libs.androidx.junit)
     implementation(libs.fragment.testing)
     implementation(libs.espresso.intents)
-    implementation(libs.androidx.monitor)
-    annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
-    // Firebase BoM and dependencies
-    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation ("com.google.firebase:firebase-firestore:24.9.0")
-    implementation("com.google.firebase:firebase-storage")
-    implementation("com.google.firebase:firebase-database")
-    implementation("com.google.firebase:firebase-auth")
     // Navigation dependencies
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+
+    // UI Components
     implementation("androidx.appcompat:appcompat:1.3.1")
     implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.0")
@@ -75,7 +78,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 
-
+    // Additional libraries from libs
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -83,10 +86,11 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+
+    // JUnit and Espresso Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
