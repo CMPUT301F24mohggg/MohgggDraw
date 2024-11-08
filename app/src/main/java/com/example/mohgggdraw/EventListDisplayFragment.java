@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.mohgggdraw.databinding.ActivityMainBinding;
+import com.google.firebase.firestore.Query;
 
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,7 +32,12 @@ public class EventListDisplayFragment extends Fragment {
     private User user = new User();
     private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
     private ViewPager2 viewPager2;
+    private HomeFragment fragment;
 
+    public EventListDisplayFragment(User user, HomeFragment page){
+        this.user =user;
+        this.fragment = page;
+    }
 
 
     @Override
@@ -45,19 +51,21 @@ public class EventListDisplayFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
-    dataList = new ArrayList<Event>();
-        for(int i=0;i<10;i++){
-            Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
-            dataList.add(event);
-            new WaitinglistDB(event).updateWaitlist();
 
-        }
+    dataList = new ArrayList<Event>();
+//        for(int i=0;i<10;i++){
+//            Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
+//            dataList.add(event);
+//            new WaitinglistDB().updateWaitlist(event);
+//
+//        }
+        dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList = view.findViewById(R.id.eventList);
 
         eventList.setAdapter(eventAdapter);
-        //setting up new book button
+
 
         eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -65,21 +73,28 @@ public class EventListDisplayFragment extends Fragment {
                                     final int i, long id) {
 
                 Event event = (Event) list.getItemAtPosition(i);
-                Fragment fragment = new WaitlistFragment(event);
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment);
-                fragmentTransaction.addToBackStack(null);
+                fragment.goToNextPage(event);
 
-                fragmentTransaction.show(fragment).commit();
+//                Fragment fragment = new WaitlistFragment(event, user);
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.fragment_container, fragment,"324");
+//                fragmentTransaction.addToBackStack(null);
+//
+//                fragmentTransaction.commit();
 
                 //Intent intent = new Intent(EventListDisplayFragment.this,WaitlistFragment.class);
 
                 //startActivity(intent);
-
-
             }
         });
+    }
+    public void dataChange(){
+
+        eventAdapter = new EventAdapter(this.getContext(), dataList);
+
+        eventList.setAdapter(eventAdapter);
+
     }
 
 }

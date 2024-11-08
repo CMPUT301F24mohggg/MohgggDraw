@@ -43,7 +43,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         //sets book listview text
         eventName.setText(event.getTitle());
         ImageView iv = (ImageView) view.findViewById(R.id.eventadapterimage);
-        StorageReference myImage = new WaitinglistDB(event).getImage(event.getPosterUrl());
+        StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
         try{
             File eventImage = File.createTempFile(event.getTitle(),".png");
             myImage.getFile(eventImage)

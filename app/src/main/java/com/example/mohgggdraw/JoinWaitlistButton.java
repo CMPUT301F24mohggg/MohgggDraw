@@ -12,7 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class JoinWaitlistButton extends DialogFragment {
-    Event event;
+    Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
+
     User user= new User();
     WaitlistFragment waitlistFragment;
     public JoinWaitlistButton(Event event, User user,WaitlistFragment waitlistFragment){
@@ -36,7 +37,7 @@ public class JoinWaitlistButton extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Button button = view.findViewById(R.id.accept_terms_button);
         button.setOnClickListener(v ->{
-            new WaitinglistController(user, event).addUser(user);
+            new WaitinglistController(event).addUser(user);
             waitlistFragment.onDialogueFinished();
             dismiss();
         });

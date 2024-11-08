@@ -51,10 +51,10 @@ public class JoinWaitlistUnitTest {
         user.setEmail("mewoowww normal");
         scenario.moveToState(Lifecycle.State.RESUMED);
 
-
+        Thread.sleep(2000);
         //click the join waitlist button
         onView(withId(R.id.eventInfoButton)).perform(click());
-        //Thread.sleep(2000);
+
 
 
         //assertTrue(event.getWaitingList().contains("mewoowww normal"));

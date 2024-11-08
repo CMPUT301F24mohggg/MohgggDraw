@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -24,6 +25,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class WaitlistFragment extends Fragment {
     Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
@@ -32,6 +34,9 @@ public class WaitlistFragment extends Fragment {
     Bitmap bmp;
     ImageView iv;
     StorageReference storageReference;
+    private ViewPager2 viewPager2;
+    TextView joinButton;
+    HomeFragment home;
 
 
     public WaitlistFragment(){
@@ -40,9 +45,11 @@ public class WaitlistFragment extends Fragment {
 
 
 
-    public WaitlistFragment(Event event) {
+    public WaitlistFragment(Event event, User user,HomeFragment home) {
         super();
         this.event=event;
+        this.user = user;
+        this.home = home;
 
 
     }
@@ -52,14 +59,14 @@ public class WaitlistFragment extends Fragment {
         if(getArguments() != null) {
             if (getArguments().getBoolean("geo")) {
                 event.setGeolocation(true);
-                user.setEmail("geotest");
+                user.setUid("geotest");
             } else if (getArguments().getBoolean("geo") == false) {
-                user.setEmail("mewoowww normal");
+                user.setUid("mewoowww normal");
 
 
             }
         }
-        event.setGeolocation(false);
+        //event.setGeolocation(false);
 
         return inflater.inflate((R.layout.view_event), container, false);
     }
@@ -67,7 +74,7 @@ public class WaitlistFragment extends Fragment {
         public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
             super.onViewCreated(view, savedInstanceState);
 
-
+            viewPager2 = view.findViewById(R.id.view_pager);
 
             TextView name = (TextView) view.findViewById(R.id.eventtitle);
             TextView time = (TextView) view.findViewById(R.id.eventInfoTime);
@@ -85,7 +92,7 @@ public class WaitlistFragment extends Fragment {
 
             path = event.getPosterUrl();
             iv = (ImageView) view.findViewById(R.id.eventimage);
-            StorageReference myimage = new WaitinglistDB(event).getImage(path);
+            StorageReference myimage = new WaitinglistDB().getImage(path);
             try{
                 File eventImage = File.createTempFile(event.getTitle(),".png");
                 myimage.getFile(eventImage)
@@ -104,42 +111,64 @@ public class WaitlistFragment extends Fragment {
                 throw new RuntimeException(e);
             }
 
-            TextView joinButton = view.findViewById(R.id.eventInfoButton);
-
-            if (event.getWaitingList().contains(user.getEmail())){
-                joinButton.setText("Leave event");
-                joinButton.setOnClickListener(v->{
-                            new leaveEventButton(event, user,this).show(getActivity().getSupportFragmentManager(),"join");
-                        }
-                        );
-
-
-            }else {
-                joinButton.setText("Join Event");
+            joinButton = view.findViewById(R.id.eventInfoButton);
+            if(Objects.equals(event.getOrgID(), "Uaf")){
+                joinButton.setText("meowin");
                 joinButton.setOnClickListener(v -> {
+                    home.goToWaitlistView(event);
 
-                    if (event.isGeolocation()) {
-                        new JoinWaitlistButton(event, user,this).show(getActivity().getSupportFragmentManager(), "join");
-                    } else {
-                        new WaitinglistController(user,event).addUser(user);
-                        onDialogueFinished();
+            });
+            }else {
 
-                    }
-                });
+                if (event.getWaitingList().contains(user.getUid())) {
+                    joinButton.setText("Leave event");
+                    joinButton.setOnClickListener(v -> {
+                                new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
+                            }
+                    );
+
+
+                } else {
+                    joinButton.setText("Join Event");
+                    joinButton.setOnClickListener(v -> {
+
+                        if (event.isGeolocation()) {
+                            new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
+                        } else {
+                            new WaitinglistController(event).addUser(user);
+                            onDialogueFinished();
+
+                        }
+                    });
+                }
             }
-
-
         }
 
 
     public void onDialogueFinished(){
-        Fragment fragment = new WaitlistFragment(event);
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+        if (event.getWaitingList().contains(user.getUid())){
+            joinButton.setText("Leave event");
+            joinButton.setOnClickListener(v->{
+                        new leaveEventButton(event, user,this).show(getActivity().getSupportFragmentManager(),"join");
+                    }
+            );
 
-        fragmentTransaction.show(fragment).commit();
+
+        }else {
+            joinButton.setText("Join Event");
+            joinButton.setOnClickListener(v -> {
+
+                if (event.isGeolocation()) {
+                    new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
+                } else {
+                    new WaitinglistController(event).addUser(user);
+                    onDialogueFinished();
+
+                }
+            });
+        }
+
+
 
     }
     public Event getEvent(){

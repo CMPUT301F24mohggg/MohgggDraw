@@ -1,6 +1,8 @@
 package com.example.mohgggdraw;
 
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.ArrayList;
 
 public class Event {
@@ -13,11 +15,26 @@ public class Event {
     private String date="nov 1";
     private String time = "3:00";
     private int maxCapacity=100;
-    private boolean geolocation = true;
+    private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
+    private String orgID = "dasf";
 
     // Required empty constructor for Firebase
-    public Event(String eventId, String value, String location, String posterUrl, String registrationDetails, String participationSettings) {
+    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {
+        this.eventId = eventId;
+        this.title = title;
+        this.location = location;
+        this.posterUrl = posterUrl;
+        this.registrationDetails = registrationDetails;
+        this.participationSettings = participationSettings;
+    }
+
+    public String getOrgID() {
+        return orgID;
+    }
+
+    public void setOrgID(String orgID) {
+        this.orgID = orgID;
     }
 
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings, String value, String s, String string, Boolean aBoolean) {
@@ -91,12 +108,14 @@ public class Event {
     public void setParticipationSettings(String participationSettings) { this.participationSettings = participationSettings; }
 
     public void addToWaitingList(User user) {
-        this.waitingList.add(user.getEmail());
+        this.waitingList.add(user.getUid());
     }
 
     public void removeFromWaitingList(User user) {
-        waitingList.remove(user.getEmail());
+        waitingList.remove(user.getUid());
     }
+
+
 }
 
 //public class Event  {
