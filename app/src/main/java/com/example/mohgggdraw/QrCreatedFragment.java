@@ -80,7 +80,7 @@ public class QrCreatedFragment extends Fragment {
                 docToEvent.getDocSnap();
 
                 Event myevent = docToEvent.createEvent();
-                Fragment fragment = new WaitlistFragment(myevent);
+                Fragment fragment = new WaitlistFragment(myevent, new User(), new HomeFragment());
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, fragment);
