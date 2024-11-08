@@ -7,7 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
+/***
+ This fragment handles notifications in the application. It:
+ - Inflates the layout for displaying notifications
+ - Sets up any necessary UI components or listeners
+ ***/
 public class NotificationFragment extends Fragment {
 
     @Override

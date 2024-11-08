@@ -20,6 +20,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/***
+ This activity serves as the main entry point of the application. It:
+ - Initializes Firebase
+ - Sets up the bottom navigation view
+ - Manages fragment transactions for different navigation items
+ - Handles the display of notification badges
+ ***/
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout signupLayout;

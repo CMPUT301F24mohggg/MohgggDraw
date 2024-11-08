@@ -10,7 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.mohgggdraw.databinding.FragmentSecondBinding;
-
+/***
+ This fragment is part of the initial setup or navigation of the app. It:
+ - Inflates a layout defined in FragmentSecondBinding
+ - Sets up a button click listener to navigate to the BasicInformationFragment
+ ***/
 public class SecondFragment extends Fragment {
 
     private FragmentSecondBinding binding;

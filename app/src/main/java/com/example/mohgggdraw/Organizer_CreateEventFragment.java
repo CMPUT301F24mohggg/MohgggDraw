@@ -18,7 +18,13 @@ import com.google.firebase.storage.UploadTask;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+/***
+ This fragment manages the initial event creation process for organizers. It:
+ - Allows users to select an event poster image from the gallery
+ - Uploads the selected image to Firebase Storage
+ - Stores the download URL of the uploaded image in Firestore
+ - Displays the selected image in an ImageView
+ ***/
 public class Organizer_CreateEventFragment extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 1;

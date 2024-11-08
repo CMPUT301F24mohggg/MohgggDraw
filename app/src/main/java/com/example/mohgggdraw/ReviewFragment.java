@@ -23,7 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import android.provider.Settings;
 
-
+/***
+ This fragment provides a review of all entered event details. It:
+ - Displays a summary of all event information
+ - Allows the user to review and confirm the event details
+ - Handles the final step of creating the event in Firebase Firestore
+ ***/
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
