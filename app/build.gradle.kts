@@ -3,7 +3,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-
 android {
     namespace = "com.example.mohgggdraw"
     compileSdk = 34
@@ -37,16 +36,11 @@ android {
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation(platform("com.google.firebase:firebase-bom:31.0.2"))
     implementation("com.google.firebase:firebase-firestore:24.1.2")
     implementation("com.google.firebase:firebase-storage:20.0.0")
     implementation("com.google.firebase:firebase-database:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.2")
-    implementation(libs.androidx.fragment.testing)
-    testImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.androidx.core)
-    testImplementation(libs.androidx.junit)
     implementation(libs.fragment.testing)
     implementation(libs.espresso.intents)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
@@ -64,10 +58,8 @@ dependencies {
 
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test:runner:1.1.1")
-   
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     // Use Hamcrest version 1.3 to match Espresso's requirements
     testImplementation("org.hamcrest:hamcrest-library:1.3")
