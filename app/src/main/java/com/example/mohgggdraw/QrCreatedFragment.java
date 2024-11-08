@@ -1,7 +1,9 @@
 package com.example.mohgggdraw;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -37,10 +39,12 @@ public class QrCreatedFragment extends Fragment {
     private Button viewEventButton;
     private ImageView newQrImageView;
     private EventQr eventQr;
+    private String eventId;
 
     public QrCreatedFragment(EventQr eventQr) {
         this.eventQr = eventQr;
         this.context = getActivity();
+        this.eventId = eventQr.getEventId();
     }
 
 
@@ -48,29 +52,32 @@ public class QrCreatedFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_qrcode_created, container, false);
         newQrImageView = view.findViewById(R.id.new_qrcode_iv);
+        viewEventButton = view.findViewById(R.id.qrview_button);
         qrShareButton = view.findViewById(R.id.qrshare_button);
 
         // Set bitmap to ImageView
         newQrImageView.setImageBitmap(eventQr.getQrBitmap());
 
 
-//        viewEventButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                DocToEvent docToEvent = new DocToEvent(eventQr.getEventId());
-//
-//                Event myevent = docToEvent.createEvent();
-//                Fragment fragment = new WaitlistFragment(myevent);
-//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.fragment_container, fragment);
-//                fragmentTransaction.addToBackStack(null);
-//
-//                fragmentTransaction.show(fragment).commit();
-//            }
-//        });
 
+
+
+        viewEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DocToEvent docToEvent = new DocToEvent(eventId);
+                docToEvent.getDocSnap();
+
+                Event myevent = docToEvent.createEvent();
+                Fragment fragment = new WaitlistFragment(myevent);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null);
+
+                fragmentTransaction.show(fragment).commit();
+            }
+        });
 
         qrShareButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -157,18 +157,19 @@ public class MainActivity extends AppCompatActivity {
             DocToEvent docToEvent = new DocToEvent(eventId);
             docToEvent.getDocSnap();
 
-            if (!docToEvent.docExists()) {
+            if (!docToEvent.isSuccess()) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Invalid Event QR Code");
 
                 builder.setMessage("Please scan a valid event QR code.");
-                builder.setPositiveButton("close", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
                     }
                 }).show();
-            } else {
+            }
+            else {
 
 
                 Event myevent = docToEvent.createEvent();

@@ -2,11 +2,13 @@ package com.example.mohgggdraw;
 
 import android.util.Log;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /***
@@ -16,41 +18,51 @@ import java.util.Map;
 
 public class DocToEvent {
     private String eventId;
-    private DocumentReference docRef;
+    private CollectionReference collection;
     private DocumentSnapshot docSnap;
     private Map map;
-    private boolean exists;
+    private boolean getSuccess;
 
 
     public DocToEvent(String eventId) {
         this.eventId = eventId;
-        this.docRef = FirebaseFirestore.getInstance().collection("Events").document(eventId);
+        this.collection = FirebaseFirestore.getInstance().collection("Events");
         this.docSnap = null;
         this.map = null;
-        this.exists = false;
+        this.getSuccess = false;
     }
 
-    public boolean docExists () {
-        return this.exists;
+    public boolean isSuccess() {
+        return getSuccess;
     }
 
-    public void getDocSnap() {
-        int successfulFind;
-        this.docRef.get().addOnSuccessListener(docSnapshot -> {
+    public boolean getDocSnap() {
+        DocumentReference docRef;
+        try {
+            docRef = this.collection.document(eventId);
+        } catch (Exception e){
+            return false;
+        }
+        docRef.get().addOnSuccessListener(docSnapshot -> {
             if (docSnapshot.exists()) {
                 this.docSnap = docSnapshot;
                 this.map = docSnap.getData();
-                this.exists = true;
+                this.getSuccess = true;
             } else {
                 Log.d("Firestore", "No such document exists!");
             }
         }).addOnFailureListener(e -> {
             Log.e("Firestore", "Failed to retrieve document", e);
         });
+        return true;
     }
 
     public Event createEvent() {
         // Access a specific field with getString("something")
+        if (!this.getSuccess) {
+            return null;
+        }
+
         Event event;
         event = new Event(this.eventId,
                 docSnap.getString("eventTitle")+"please dont leave this stuff empty",
