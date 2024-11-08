@@ -17,7 +17,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/img"
+        android:src="@drawable/uploadposter"
         android:contentDescription="Event Poster"
         android:clickable="true"
         android:focusable="true" />
