@@ -37,6 +37,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+/***
+ This fragment represents the user's profile screen. It:
+ - Inflates the layout for the profile screen
+ - Sets up any necessary UI components or listeners
+ ***/
 
 public class ProfileFragment extends Fragment {
 

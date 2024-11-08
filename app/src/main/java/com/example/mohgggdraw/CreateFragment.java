@@ -13,7 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
-
+/***
+ This fragment manages the creation process for events. It:
+ - Sets up a ViewPager2 to navigate between different creation steps
+ - Handles navigation between steps (next and back buttons)
+ - Updates UI elements like progress bar and page title
+ - Saves data for the current page before moving to the next
+ ***/
 public class CreateFragment extends Fragment {
 
     private ViewPager2 viewPager2;

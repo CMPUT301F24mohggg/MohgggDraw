@@ -7,7 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
+/***
+ This fragment displays the user's events. It:
+ - Inflates the layout for displaying user events
+ - Sets up any necessary UI components or listeners
+ ***/
 public class MyEventsFragment extends Fragment {
 
     @Override

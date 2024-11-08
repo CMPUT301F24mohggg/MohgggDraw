@@ -8,6 +8,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+/***
+ This fragment represents the home screen of the application. It:
+ - Inflates the home screen layout
+ - Sets up any necessary UI components or listeners
+ ***/
 public class HomeFragment extends Fragment {
 
     @Override

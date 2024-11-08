@@ -1,5 +1,11 @@
 package com.example.mohgggdraw;
 
+/***
+ This class represents an event in the application. It:
+ - Stores event details such as title, location, poster URL, etc.
+ - Provides getters and setters for all event properties
+ - Includes a no-arg constructor for Firebase compatibility
+ ***/
 public class Event {
     private String eventId;
     private String title;
