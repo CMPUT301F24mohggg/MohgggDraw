@@ -46,6 +46,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.2")
 
+
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     implementation(libs.androidx.fragment.testing)

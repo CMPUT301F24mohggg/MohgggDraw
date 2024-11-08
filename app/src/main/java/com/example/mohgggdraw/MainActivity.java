@@ -183,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 Event myevent = docToEvent.createEvent();
-                Fragment fragment = new WaitlistFragment(myevent, new User(), new HomeFragment());
+                com.example.mohgggdraw.User user = new User();
+                Fragment fragment = new WaitlistFragment(myevent, user, new HomeFragment());
                 FragmentManager fragmentManager = this.getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, fragment);
