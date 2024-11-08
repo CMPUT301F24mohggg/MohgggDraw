@@ -3,7 +3,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-
 android {
     namespace = "com.example.mohgggdraw"
     compileSdk = 34
@@ -37,28 +36,27 @@ android {
 }
 
 dependencies {
+    // Kotlin and Glide
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
-    implementation(platform("com.google.firebase:firebase-bom:31.0.2"))
-    implementation("com.google.firebase:firebase-firestore:24.1.2")
-    implementation("com.google.firebase:firebase-storage:20.0.0")
-    implementation("com.google.firebase:firebase-database:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.2")
-    implementation(libs.androidx.fragment.testing)
-    testImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.androidx.core)
-    testImplementation(libs.androidx.junit)
-    implementation(libs.fragment.testing)
-    implementation(libs.espresso.intents)
+    implementation(libs.androidx.monitor)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
-    // Navigation dependencies
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+    // Firebase BoM and dependencies
+    implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-auth")
 
-    implementation("androidx.appcompat:appcompat:1.3.1")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
-    implementation("com.google.android.material:material:1.7.0") // Check for latest version
+    // Navigation components
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+
+    // AndroidX and Material dependencies
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 
@@ -66,10 +64,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test:runner:1.1.1")
-   
+    androidTestImplementation("androidx.test:runner:1.1.1")
 
-    // Use Hamcrest version 1.3 to match Espresso's requirements
+    // Additional testing dependencies
+    androidTestImplementation("androidx.fragment:fragment-testing:1.8.5")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
 }
