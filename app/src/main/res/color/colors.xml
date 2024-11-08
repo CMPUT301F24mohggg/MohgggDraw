@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <resources>
+        <color name="purple_200" tools:ignore="ExtraText,MissingPrefix">#BB86FC</color>
+        <color name="purple_500" tools:ignore="MissingPrefix">#6200EE</color>
+        <color name="purple_700" tools:ignore="MissingPrefix">#3700B3</color>
+        <color name="teal_200" tools:ignore="MissingPrefix">#03DAC5</color>
+        <color name="teal_700" tools:ignore="MissingPrefix">#018786</color>
+        <color name="black" tools:ignore="MissingPrefix">#000000</color>
+        <color name="white" tools:ignore="MissingPrefix">#FFFFFF</color>
+    </resources>
+
+</selector>
+
