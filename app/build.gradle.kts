@@ -49,6 +49,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.13.2")
     implementation(libs.espresso.intents)
     implementation(libs.fragment.testing)
+    testImplementation(libs.androidx.junit)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // Navigation components
