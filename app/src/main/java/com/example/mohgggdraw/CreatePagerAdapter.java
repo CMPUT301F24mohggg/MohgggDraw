@@ -3,7 +3,12 @@ package com.example.mohgggdraw;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-
+/***
+ This adapter manages the fragments used in the event creation process. It:
+ - Creates and returns the appropriate fragment for each position
+ - Determines the total number of creation steps
+ - Handles fragment identification and containment checks
+ ***/
 public class CreatePagerAdapter extends FragmentStateAdapter {
 
     public CreatePagerAdapter(@NonNull Fragment fragment) {

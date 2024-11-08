@@ -8,7 +8,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+/***
+ This activity provides a final review of all entered event details. It:
+ - Retrieves all event data from intent extras (title, location, dates, settings)
+ - Displays a summary of all event information in the UI
+ - Shows the geolocation setting using a checkbox
+ - Includes a "Back" button to return to the previous screen
+ - Provides a "Create Event" button for finalizing the event creation
+ ***/
 public class ReviewActivity extends AppCompatActivity {
 
     @Override

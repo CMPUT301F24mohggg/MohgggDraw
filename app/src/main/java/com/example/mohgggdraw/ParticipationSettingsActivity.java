@@ -6,7 +6,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import androidx.appcompat.app.AppCompatActivity;
-
+/***
+ This activity manages participation settings for an event. It does the following:
+ - Allows setting of maximum pooling sample and maximum entrants
+ - Handles enabling/disabling of geolocation for the event
+ - Retrieves previous event data from intent extras
+ - Passes all collected data (including new settings) to the ReviewActivity
+ ***/
 public class ParticipationSettingsActivity extends AppCompatActivity {
 
     private EditText maxPoolingSampleEditText;

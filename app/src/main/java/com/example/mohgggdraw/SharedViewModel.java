@@ -1,7 +1,12 @@
 package com.example.mohgggdraw;
 
 import androidx.lifecycle.*;
-
+/***
+ This SharedViewModel serves as a shared data store for the event creation process. It:
+ - Holds LiveData for all event details (title, location, dates, settings, etc.)
+ - Provides getters and setters for all stored data
+ - Allows fragments to observe and update event creation data
+ ***/
 public class SharedViewModel extends ViewModel {
     private final MutableLiveData<String> eventTitle = new MutableLiveData<>();
     private final MutableLiveData<String> eventLocation = new MutableLiveData<>();

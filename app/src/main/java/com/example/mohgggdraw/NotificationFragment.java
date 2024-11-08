@@ -38,6 +38,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/***
+ This fragment handles notifications in the application. It:
+ - Inflates the layout for displaying notifications
+ - Sets up any necessary UI components or listeners
+ ***/
 public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
