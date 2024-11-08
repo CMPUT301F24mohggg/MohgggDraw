@@ -23,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,7 +48,7 @@ public class ProfileOverviewFragment extends Fragment {
         // Initialize views
         userNameTextView = view.findViewById(R.id.userNameTextView);
         userEmailTextView = view.findViewById(R.id.userEmailTextView);
-        profileImageView = view.findViewById(R.id.profileImageView); // Ensure this matches your layout ID
+        profileImageView = view.findViewById(R.id.profileImageView);
         db = FirebaseFirestore.getInstance();
         deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -79,11 +81,21 @@ public class ProfileOverviewFragment extends Fragment {
             if (documentSnapshot.exists()) {
                 String userName = documentSnapshot.getString("name");
                 String userEmail = documentSnapshot.getString("email");
+                String profileImageUrl = documentSnapshot.getString("profileImageUrl");
 
                 userNameTextView.setText(userName != null ? userName : "User Name");
                 userEmailTextView.setText(userEmail != null ? userEmail : "user@example.com");
 
-                if (userName != null && !userName.isEmpty()) {
+                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                    // Load profile image from URL using Glide
+                    Glide.with(this)
+                            .load(profileImageUrl)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(createInitialsDrawable(getInitials(userName))) // Placeholder while loading
+                            .error(createInitialsDrawable(getInitials(userName))) // Fallback if image load fails
+                            .into(profileImageView);
+                } else {
+                    // Show initials if no profile image is set
                     profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
                 }
             } else {
@@ -96,7 +108,8 @@ public class ProfileOverviewFragment extends Fragment {
     }
 
     private String getInitials(String name) {
-        String[] parts = name.split(" ");
+        if (name == null || name.trim().isEmpty()) return "U"; // Default to "U" for User if name is empty
+        String[] parts = name.trim().split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
@@ -107,6 +120,7 @@ public class ProfileOverviewFragment extends Fragment {
         paint.setColor(Color.GRAY);
         paint.setTextSize(50);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAntiAlias(true); // Smooths text rendering
         canvas.drawText(initials, 50, 65, paint);
         return new BitmapDrawable(getResources(), bitmap);
     }

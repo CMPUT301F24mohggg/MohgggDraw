@@ -99,28 +99,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupListeners() {
-        nameTextView.setOnClickListener(v -> promptUserName());
         profileImageView.setOnClickListener(v -> handleProfileImageClick());
 
-        buttonSubmit.setOnClickListener(v -> updateUserData());
+        buttonSubmit.setOnClickListener(v -> updateUserData(null)); // Initially no image URL to update
         buttonDelete.setOnClickListener(v -> deleteUserData());
-    }
-
-    private void promptUserName() {
-        EditText input = new EditText(getContext());
-        new AlertDialog.Builder(getContext())
-                .setTitle("Enter Your Name")
-                .setView(input)
-                .setPositiveButton("OK", (dialog, which) -> setUserName(input.getText().toString().trim()))
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void setUserName(String name) {
-        userName = name.isEmpty() ? "User" : name;
-        nameTextView.setText(userName);
-        setDefaultProfilePicture();
-        saveUserProfileToFirebase(null);
     }
 
     private void handleProfileImageClick() {
@@ -152,7 +134,7 @@ public class ProfileFragment extends Fragment {
     private void resetToDefaultProfilePicture() {
         setDefaultProfilePicture();
         isGalleryImage = false;
-        saveUserProfileToFirebase(null);
+        updateUserData(null); // Clear image URL in Firestore
     }
 
     private void openGallery() {
@@ -208,7 +190,7 @@ public class ProfileFragment extends Fragment {
         StorageReference profileRef = storageReference.child("profile_pictures/" + deviceID + ".jpg");
 
         profileRef.putBytes(data)
-                .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl().addOnSuccessListener(uri -> saveUserProfileToFirebase(uri.toString())))
+                .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl().addOnSuccessListener(uri -> updateUserData(uri.toString())))
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
     }
 
@@ -216,18 +198,6 @@ public class ProfileFragment extends Fragment {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();
-    }
-
-    private void saveUserProfileToFirebase(String imageUrl) {
-        Map<String, Object> userProfile = new HashMap<>();
-        userProfile.put("deviceID", deviceID);
-        userProfile.put("userName", userName);
-        if (imageUrl != null) userProfile.put("profileImageUrl", imageUrl);
-
-        db.collection("user").document(deviceID)
-                .set(userProfile)
-                .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "User profile saved successfully"))
-                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error saving user profile", e));
     }
 
     private void loadUserData() {
@@ -252,7 +222,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void updateUserData() {
+    private void updateUserData(@Nullable String imageUrl) {
         String name = editTextName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -263,12 +233,15 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-        // Create user data map
+        // Create user data map with optional image URL
         Map<String, Object> userDetails = new HashMap<>();
         userDetails.put("name", name);
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
+        if (imageUrl != null) {
+            userDetails.put("profileImageUrl", imageUrl);
+        }
 
         // Update user data in Firestore
         db.collection("user").document(deviceID).update(userDetails)
