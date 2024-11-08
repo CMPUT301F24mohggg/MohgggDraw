@@ -13,7 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
+/***
+ This fragment manages participation settings for an event. It:
+ - Allows setting of maximum pooling sample and maximum entrants
+ - Handles enabling/disabling of geolocation for the event
+ - Saves these settings to the SharedViewModel
+ ***/
 public class ParticipationSettingsFragment extends Fragment {
 
     private SharedViewModel sharedViewModel;

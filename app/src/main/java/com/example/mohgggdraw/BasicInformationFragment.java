@@ -21,6 +21,13 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+/***
+ This fragment handles the initial event creation details. It allows users to:
+ - Upload an event poster image
+ - Enter the event title, location, and details
+ - Save this information to the SharedViewModel
+ - Upload the selected image to Firebase Storage
+ ***/
 public class BasicInformationFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;

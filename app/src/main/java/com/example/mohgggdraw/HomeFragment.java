@@ -11,6 +11,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+/***
+ This fragment represents the home screen of the application. It:
+ - Inflates the home screen layout
+ - Sets up any necessary UI components or listeners
+ ***/
 public class HomeFragment extends Fragment {
     private OrganizerViewModel organizerViewModel;
     private ViewPager2 viewPager2;
