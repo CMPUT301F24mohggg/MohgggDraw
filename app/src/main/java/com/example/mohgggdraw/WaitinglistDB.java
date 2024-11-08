@@ -2,7 +2,11 @@ package com.example.mohgggdraw;
 
 import static android.content.ContentValues.TAG;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -66,6 +70,13 @@ public class WaitinglistDB {
 
     //updates event doc waitlist field with new user
     public void addToDB(User user,Event event){
+        // Check if UID is set, if not, set it to device ID
+        if (user.getUid() == null || user.getUid().isEmpty()) {
+            @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(
+                    getContext().getContentResolver(), Settings.Secure.ANDROID_ID
+            );
+            user.setUid(deviceId);
+        }
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc.update("EventWaitinglist", FieldValue.arrayUnion(user.getUid()));
 
@@ -142,8 +153,8 @@ public class WaitinglistDB {
 
         Map map = doc.getData();
         //string concat are because database is very incosistent, many null where there should not be
-        Event myevent= new Event(doc.getId(),(String)map.get("eventTitle")+"please dont leave this stuff empty",(String)map.get("eventLocation")+"please dont leave this stuff empty",(String)map
-                .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave this stuff empty");
+        Event myevent= new Event(doc.getId(),(String)map.get("eventTitle")+" please dont leave eventId empty",(String)map.get("eventLocation")+" please dont leave event location empty",(String)map
+                .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave event detail empty");
         if(map.get("geoLocationEnabled")!=null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
         }

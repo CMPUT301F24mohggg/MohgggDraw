@@ -8,7 +8,7 @@ package com.example.mohgggdraw;
 public class User {
     //placeholder
     private String email = "asdfssasdf";
-    private String Uid = "myUid";
+    private String Uid;
 
     public String getUid() {
         return Uid;
