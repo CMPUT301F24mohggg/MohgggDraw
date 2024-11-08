@@ -1,10 +1,9 @@
-
 package com.example.mohgggdraw;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,48 +29,56 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
 
     private ImageView profileImageView;
     private TextView nameTextView;
+    private Switch notificationSwitch;
     private FirebaseFirestore db;
     private StorageReference storageReference;
     private String deviceID;
     private String userName;
-    private boolean isGalleryImage = false;
+    private boolean isGallery = false;
 
+    // code for picking image from gallery
     private static final int PICK_IMAGE_REQUEST = 1;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        // initializing UI elements
         initViews(view);
-
 
         nameTextView.setOnClickListener(v -> promptUserName());
         profileImageView.setOnClickListener(v -> handleProfileImageClick());
 
-
         db = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
-        return view;
 
+        notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> updateNotification(isChecked));
+        loadNotificationPreference();
+
+        // load user profile from firebase
+        loadUserProfile();
+
+        return view;
     }
-    // initializing UI elements and retrieving device ID
-    private void initViews(View view) {
+
+    private void initViews(View view) { // initialize views and retrieve device ID
         profileImageView = view.findViewById(R.id.profileImageView);
         nameTextView = view.findViewById(R.id.nameTextView);
+        notificationSwitch = view.findViewById(R.id.notificationSwitch);
         deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
@@ -83,43 +91,43 @@ public class ProfileFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    // set user name and display default profile picture
-    private void setUserName(String name) {
+
+    private void setUserName(String name) {// saves profile to firebase
         userName = name.isEmpty() ? "User" : name;
         nameTextView.setText(userName);
-        setDefaultProfilePicture();
+        setDefaultProfileImage();
         saveUserProfileToFirebase(null);
     }
-
+    // handling click options- if from gallery? show delete options, if not then show upload options
     private void handleProfileImageClick() {
-        if (isGalleryImage) {
-            confirmDeleteProfileImage();
+        if (isGallery) {
+            deleteProfileImage();
         } else {
-            showImageOptions();
+            imageOptions();
         }
     }
-
-    private void showImageOptions() {
+    // to upload a new profile picture
+    private void imageOptions() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Profile Picture")
                 .setMessage("Would you like to upload a profile picture from the gallery?")
                 .setPositiveButton("Yes", (dialog, which) -> openGallery())
-                .setNegativeButton("No", (dialog, which) -> resetToDefaultProfilePicture())
+                .setNegativeButton("No", (dialog, which) -> defaultProfileImage())
                 .show();
     }
 
-    private void confirmDeleteProfileImage() {
+    private void deleteProfileImage() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Delete Profile Picture")
                 .setMessage("Do you want to delete the current profile picture?")
-                .setPositiveButton("Yes", (dialog, which) -> resetToDefaultProfilePicture())
+                .setPositiveButton("Yes", (dialog, which) -> defaultProfileImage())
                 .setNegativeButton("No", null)
                 .show();
     }
 
-    private void resetToDefaultProfilePicture() {
-        setDefaultProfilePicture();
-        isGalleryImage = false;
+    private void defaultProfileImage() {
+        setDefaultProfileImage();
+        isGallery = false;
         saveUserProfileToFirebase(null);
     }
 
@@ -128,9 +136,9 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private void setDefaultProfilePicture() {
+    private void setDefaultProfileImage() {
         if (userName != null && !userName.isEmpty()) {
-            profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
+            profileImageView.setImageDrawable(createInitials(getInitials(userName)));
         }
     }
 
@@ -138,8 +146,8 @@ public class ProfileFragment extends Fragment {
         String[] parts = name.split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
-    // creating a drawable to create the default user picture
-    private Drawable createInitialsDrawable(String initials) {
+
+    private Drawable createInitials(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
@@ -158,28 +166,32 @@ public class ProfileFragment extends Fragment {
             handleGalleryResult(data.getData());
         }
     }
-
+    // handle image from gallery and upload to firebase
     private void handleGalleryResult(Uri imageUri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
             profileImageView.setImageBitmap(bitmap);
-            isGalleryImage = true;
-            uploadProfilePictureToFirebase(bitmap);
+            isGallery = true;
+            uploadProfileImageToFirebase(bitmap);
         } catch (IOException e) {
             Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
             Log.e("ProfileFragment", "Error loading image", e);
         }
     }
 
-    private void uploadProfilePictureToFirebase(Bitmap bitmap) {
+    private void uploadProfileImageToFirebase(Bitmap bitmap) {
         byte[] data = getImageData(bitmap);
         StorageReference profileRef = storageReference.child("profile_pictures/" + deviceID + ".jpg");
 
         profileRef.putBytes(data)
-                .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl().addOnSuccessListener(uri -> saveUserProfileToFirebase(uri.toString())))
+                .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            String imageUrl = uri.toString();
+                            saveUserProfileToFirebase(imageUrl); // Pass imageUrl here
+                        }))
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
     }
-    // converting bitmap to byte array before uploading
+    // convert bitmap to byte array before uploading
     private byte[] getImageData(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -197,5 +209,71 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "User profile saved successfully"))
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error saving user profile", e));
     }
+
+    private void updateNotification(boolean isEnabled) {
+        if (!isEnabled) {
+            db.collection("notification").document("notificationOptOut")
+                    .update("deviceId", FieldValue.arrayUnion(deviceID))
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted out of notifications"))
+                    .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting out", e));
+        } else {
+            db.collection("notification").document("notificationOptOut")
+                    .update("deviceId", FieldValue.arrayRemove(deviceID))
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted in to notifications"))
+                    .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting in", e));
+        }
+    }
+
+    private void loadNotificationPreference() {
+        db.collection("notification").document("notificationOptOut")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> deviceIDs = (List<String>) documentSnapshot.get("deviceId");
+                        notificationSwitch.setChecked(!(deviceIDs != null && deviceIDs.contains(deviceID)));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error loading preference", e));
+    }
+
+    // load the user profile from firebase
+    private void loadUserProfile() {
+        db.collection("user").document(deviceID)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        userName = documentSnapshot.getString("userName");
+                        String profileImageUrl = documentSnapshot.getString("profileImageUrl");
+
+
+                        if (userName != null) {
+                            nameTextView.setText(userName);
+                        }
+
+
+                        if (profileImageUrl != null) {
+                            loadProfileImage(profileImageUrl);
+                        } else {
+                            setDefaultProfileImage(); // set default if no image URL exists
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error loading user profile", e));
+    }
+
+    private void loadProfileImage(String imageUrl) {
+        StorageReference profileRef = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
+        profileRef.getBytes(Long.MAX_VALUE)
+                .addOnSuccessListener(bytes -> {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    profileImageView.setImageBitmap(bitmap);
+                    isGallery = true;
+                })
+                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error loading profile image", e));
+    }
 }
+
+
+
+
 
