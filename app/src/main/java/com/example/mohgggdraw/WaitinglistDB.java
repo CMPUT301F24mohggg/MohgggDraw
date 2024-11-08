@@ -137,7 +137,7 @@ public class WaitinglistDB {
 
         Map map = doc.getData();
         Event myevent= new Event(doc.getId(),(String)map.get("eventTitle")+"please dont leave this stuff empty",(String)map.get("eventLocation")+"please dont leave this stuff empty",(String)map
-                .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave this stuff empty","dfasf");
+                .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave this stuff empty");
         if(map.get("geoLocationEnabled")!=null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
         }

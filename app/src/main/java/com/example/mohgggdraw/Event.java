@@ -24,15 +24,15 @@ public class Event {
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
-    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings,String string) {}
+    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
-    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {
+    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails) {
         this.eventId = eventId;
         this.title = title;
         this.location = location;
         this.posterUrl = posterUrl;
         this.registrationDetails = registrationDetails;
-        this.participationSettings = participationSettings;
+
     }
 
     public String getOrgID() {
