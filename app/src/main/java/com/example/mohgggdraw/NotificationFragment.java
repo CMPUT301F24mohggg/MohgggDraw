@@ -26,9 +26,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -42,6 +44,7 @@ public class NotificationFragment extends Fragment {
     private List<NotificationModel> notificationList;
     private FirebaseFirestore db;
     private String deviceId;
+    private Boolean initialLoad;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,51 +62,71 @@ public class NotificationFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         notificationList = new ArrayList<>();
-        adapter = new NotificationAdapter(notificationList, this::handleDeclineAction); // Passing the decline handler
+        adapter = new NotificationAdapter(notificationList,
+                this::handleDeclineAction, // Decline listener
+                this::handleAcceptAction  // Accept listener
+        );
         recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
+        initialLoad = true;
         loadNotifications();
     }
+
+    public interface EventDetailsCallback {
+        void onEventDetailsFetched(NotificationModel notification);
+    }
+
 
     private void loadNotifications() {
         db.collection("notification")
                 .whereEqualTo("deviceId", deviceId)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w("NotificationFragment", "Listen failed.", e);
-                            return;
-                        }
+                .orderBy("created_at", Query.Direction.ASCENDING) // Order notifications by timestamp
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w("NotificationFragment", "Listen failed.", e);
+                        return;
+                    }
 
-                        if (snapshots != null) {
-                            int initialSize = notificationList.size();
-                            notificationList.clear(); // Clear old data
+                    if (snapshots != null && !snapshots.isEmpty()) {
+                        if (initialLoad) {
+                            initialLoad = false;
+                            notificationList.clear(); // Clear old data if necessary
 
+                            // Load all notifications initially
                             for (QueryDocumentSnapshot doc : snapshots) {
                                 NotificationModel notification = doc.toObject(NotificationModel.class);
-                                fetchEventDetails(notification);
+                                fetchEventDetails(notification, updatedNotification -> {
+                                    notificationList.add(updatedNotification);
+                                    adapter.notifyDataSetChanged();
+                                });
                             }
+                        } else {
+                            // Only handle the latest notification snapshot after initial load
+                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(snapshots.size() - 1);
+                            NotificationModel newNotification = latestDoc.toObject(NotificationModel.class);
 
-                            // Check if new notifications were added and trigger a notification
-                            if (notificationList.size() > initialSize) {
-                                for (NotificationModel newNotification : notificationList) {
-                                    // TODO: it didnt run thu show notification, figure why
-                                    showNotification(getContext(), "New Event Notification",
-                                            "testing notification",
-                                            "this ist he event title",
-                                            "this is the start time");
-                                }
-                            }
+                            fetchEventDetails(newNotification, updatedNotification -> {
+                                // Show the notification with event details
+                                showNotification(
+                                        getContext(),
+                                        newNotification.getTitle(),
+                                        newNotification.getMessage(),
+                                        updatedNotification.getTitle(),
+                                        updatedNotification.getStartTime()
+                                );
+
+                                // Add to notificationList and update the adapter
+                                notificationList.add(updatedNotification);
+                                adapter.notifyDataSetChanged();
+                            });
                         }
                     }
                 });
     }
 
 
-    private void fetchEventDetails(NotificationModel notification) {
-        Log.e("fetchEventDetails: ", "it ran thru here");
+    private void fetchEventDetails(NotificationModel notification, EventDetailsCallback callback) {
         String eventId = notification.getEventId();
         if (eventId == null || eventId.isEmpty()) {
             Log.w("NotificationFragment", "Notification has no event ID.");
@@ -114,46 +137,93 @@ public class NotificationFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Example of adding event details (assumes these fields exist)
                         String eventName = documentSnapshot.getString("eventTitle");
                         String startTime = documentSnapshot.getString("startTime");
-                        notification.setMessage("Event: " + eventName + " starts at: " + startTime);
+                        notification.setTitle(notification.getTitle());
+                        notification.setEventDetail("Event: " + eventName + " starts at: " + startTime);
+                        notification.setMessage(notification.getMessage());
                     } else {
                         notification.setMessage("Event details unavailable.");
                     }
 
-                    // Add the notification to the list and update the RecyclerView
-                    notificationList.add(notification);
-                    adapter.notifyDataSetChanged();
+                    // Notify the callback with the updated notification details
+                    callback.onEventDetailsFetched(notification);
                 })
                 .addOnFailureListener(e -> {
                     Log.w("NotificationFragment", "Failed to fetch event details for event ID: " + eventId, e);
                 });
     }
 
+
     private void handleDeclineAction(NotificationModel notification) {
         String eventId = notification.getEventId();
-        String userId = deviceId; // Using deviceId as the user ID for this example
+        String userId = deviceId; // Using deviceId as the user ID
 
         DocumentReference eventRef = db.collection("Events").document(eventId);
         db.runTransaction(transaction -> {
-            List<String> selectedList = (List<String>) transaction.get(eventRef).get("EventSelectedlist");
-            List<String> cancelledList = (List<String>) transaction.get(eventRef).get("EventCancelledlist");
+            DocumentSnapshot snapshot = transaction.get(eventRef);
+            List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
+            List<String> cancelledList = (List<String>) snapshot.get("EventCancelledlist");
 
             if (selectedList != null && cancelledList != null) {
+                // Check if user is already in cancelledList
+                if (cancelledList.contains(userId)) {
+                    return "already_declined";
+                }
+
+                // Remove user from selectedList and add to cancelledList
                 selectedList.remove(userId);
                 cancelledList.add(userId);
 
                 transaction.update(eventRef, "EventSelectedlist", selectedList);
                 transaction.update(eventRef, "EventCancelledlist", cancelledList);
             }
-            return null;
-        }).addOnSuccessListener(aVoid -> {
-            Toast.makeText(getContext(), "Decline action recorded successfully.", Toast.LENGTH_SHORT).show();
+            return "decline_recorded";
+        }).addOnSuccessListener(result -> {
+            if ("already_declined".equals(result)) {
+                Toast.makeText(getContext(), "Action already completed.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Decline action recorded successfully.", Toast.LENGTH_SHORT).show();
+            }
         }).addOnFailureListener(e -> {
             Log.w("NotificationFragment", "Error recording decline action", e);
         });
     }
+
+    private void handleAcceptAction(NotificationModel notification) {
+        String eventId = notification.getEventId();
+        String userId = deviceId;
+
+        DocumentReference eventRef = db.collection("Events").document(eventId);
+        db.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(eventRef);
+            List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
+            List<String> confirmedList = (List<String>) snapshot.get("EventConfirmedlist");
+
+            if (selectedList != null && confirmedList != null) {
+                if (confirmedList.contains(userId)) {
+                    return "already_confirmed";
+                }
+
+                selectedList.remove(userId);
+                confirmedList.add(userId);
+
+                transaction.update(eventRef, "EventSelectedlist", selectedList);
+                transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+            }
+            return "accept_recorded";
+        }).addOnSuccessListener(result -> {
+            if ("already_confirmed".equals(result)) {
+                Toast.makeText(getContext(), "Action already completed.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Accept action recorded successfully.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Log.w("NotificationFragment", "Error recording accept action", e);
+        });
+    }
+
+
 
     public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
         Log.e("showNotification: ", "it ran thru here");
@@ -167,14 +237,20 @@ public class NotificationFragment extends Fragment {
         // Create PendingIntent to open the main activity
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
 
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notification_channel_id")
                 .setSmallIcon(R.drawable.bell)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(eventTitle + " starts at: " + startTime))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

@@ -16,12 +16,14 @@ import java.util.List;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
     private List<NotificationModel> notificationList;
     private DeclineActionListener declineActionListener;
+    private AcceptActionListener acceptActionListener;
     private FirebaseFirestore db; // Firebase instance to fetch event details dynamically
 
-    public NotificationAdapter(List<NotificationModel> notificationList, DeclineActionListener declineActionListener) {
+    public NotificationAdapter(List<NotificationModel> notificationList, DeclineActionListener declineActionListener, AcceptActionListener acceptActionListener) {
         this.notificationList = notificationList;
         this.declineActionListener = declineActionListener;
-        this.db = FirebaseFirestore.getInstance(); // Initialize Firestore instance
+        this.acceptActionListener = acceptActionListener;
+        this.db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -39,6 +41,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // Set notification title
         holder.title.setText(notification.getTitle() != null ? notification.getTitle() : "Notification");
         holder.message.setText(notification.getMessage());
+        holder.details.setText(notification.getEventDetail());
 
         // Dynamically fetch event details and populate UI
         fetchEventDetails(notification.getEventId(), holder);
@@ -50,21 +53,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             // Handle decline button click with the listener
             holder.declineButton.setOnClickListener(v -> declineActionListener.onDecline(notification));
+            holder.acceptButton.setOnClickListener(v -> acceptActionListener.onAccept(notification));
         } else {
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
         }
 
-        // Implement dropdown toggle functionality
-        holder.itemView.setOnClickListener(v -> {
-            if (holder.details.getVisibility() == View.GONE) {
-                holder.details.setVisibility(View.VISIBLE);
-                holder.poster.setVisibility(View.VISIBLE);
-            } else {
-                holder.details.setVisibility(View.GONE);
-                holder.poster.setVisibility(View.GONE);
-            }
-        });
     }
 
     private void fetchEventDetails(String eventId, NotificationViewHolder holder) {
@@ -79,7 +73,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         // Populate the event details dynamically
-                        String eventDetails = documentSnapshot.getString("details"); // Example field
+                        String eventDetails = documentSnapshot.getString("eventDetail"); // Example field
                         String posterUrl = documentSnapshot.getString("imageUrl");  // Example field
 
                         // Set event details in TextView
@@ -126,7 +120,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             declineButton = itemView.findViewById(R.id.decline_button);
 
             // Initially hide the event details and poster (collapsed state)
-            details.setVisibility(View.GONE);
             poster.setVisibility(View.GONE);
         }
     }
@@ -134,5 +127,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     // Interface for the decline action
     public interface DeclineActionListener {
         void onDecline(NotificationModel notification);
+    }
+
+    public interface AcceptActionListener {
+        void onAccept(NotificationModel notification);
     }
 }
