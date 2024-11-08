@@ -12,13 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
-
+/**
+ * Adapter for displaying notifications in a RecyclerView.
+ * Each notification item can include a title, message, event details, and action buttons
+ * for accepting or declining the notification. This adapter supports fetching event details dynamically from Firestore.
+ */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
     private List<NotificationModel> notificationList;
     private DeclineActionListener declineActionListener;
     private AcceptActionListener acceptActionListener;
     private FirebaseFirestore db; // Firebase instance to fetch event details dynamically
 
+    /**
+     * Constructs a new NotificationAdapter with the given notification list and action listeners.
+     *
+     * @param notificationList      List of NotificationModel objects to display.
+     * @param declineActionListener Listener for decline button actions.
+     * @param acceptActionListener  Listener for accept button actions.
+     */
     public NotificationAdapter(List<NotificationModel> notificationList, DeclineActionListener declineActionListener, AcceptActionListener acceptActionListener) {
         this.notificationList = notificationList;
         this.declineActionListener = declineActionListener;
@@ -61,6 +72,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     }
 
+
+    /**
+     * Fetches event details from Firestore and updates the UI with the event information.
+     *
+     * @param eventId The ID of the event to fetch details for.
+     * @param holder  The ViewHolder containing views to update with event information.
+     */
     private void fetchEventDetails(String eventId, NotificationViewHolder holder) {
         if (eventId == null || eventId.isEmpty()) {
             holder.details.setText("Event details unavailable.");
@@ -104,11 +122,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return notificationList.size();
     }
 
+    /**
+     * ViewHolder class for each notification item.
+     */
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
         TextView title, details, message;
         ImageView poster;
         Button acceptButton, declineButton;
 
+        /**
+         * Constructs a NotificationViewHolder and initializes its UI components.
+         *
+         * @param itemView The view representing an individual notification item.
+         */
         public NotificationViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.notification_title);
@@ -124,12 +150,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
-    // Interface for the decline action
+    /**
+     * Interface for handling decline actions on notifications.
+     */
     public interface DeclineActionListener {
+        /**
+         * Called when a notification is declined.
+         *
+         * @param notification The declined NotificationModel.
+         */
         void onDecline(NotificationModel notification);
     }
 
+    /**
+     * Interface for handling accept actions on notifications.
+     */
     public interface AcceptActionListener {
+        /**
+         * Called when a notification is accepted.
+         *
+         * @param notification The accepted NotificationModel.
+         */
         void onAccept(NotificationModel notification);
     }
 }

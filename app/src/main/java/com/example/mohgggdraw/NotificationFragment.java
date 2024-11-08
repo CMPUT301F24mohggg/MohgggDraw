@@ -1,3 +1,8 @@
+/**
+ * Fragment that handles the display and interaction with notifications in the app.
+ * Handles the loading of notifications from Firestore, displaying them, and handling actions
+ * like accepting or declining events.
+ */
 package com.example.mohgggdraw;
 
 import android.app.Notification;
@@ -38,11 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/***
- This fragment handles notifications in the application. It:
- - Inflates the layout for displaying notifications
- - Sets up any necessary UI components or listeners
- ***/
+
 public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
@@ -51,11 +52,29 @@ public class NotificationFragment extends Fragment {
     private String deviceId;
     private Boolean initialLoad;
 
+    /**
+     * Inflates the fragment's view and initializes the RecyclerView and Firestore instance.
+     * Also fetches the device ID dynamically to fetch notifications related to this device.
+     *
+     * @param inflater The LayoutInflater object to inflate the view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     *
+     * @return The root view of the fragment's layout.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_notification, container, false);
     }
 
+
+    /**
+     * Called when the view for the fragment has been created. Sets up the RecyclerView with
+     * the adapter and starts loading notifications from Firestore.
+     *
+     * @param view The root view of the fragment's layout.
+     * @param savedInstanceState A Bundle containing the fragment's previously saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -78,11 +97,24 @@ public class NotificationFragment extends Fragment {
         loadNotifications();
     }
 
+    /**
+     * Callback interface for fetching event details.
+     */
     public interface EventDetailsCallback {
+        /**
+         * Called when event details have been fetched and the notification has been updated.
+         *
+         * @param notification The updated notification with event details.
+         */
         void onEventDetailsFetched(NotificationModel notification);
     }
 
 
+    /**
+     * Loads notifications from Firestore and listens for updates in real-time.
+     * Notifications are filtered by device ID and ordered by the creation timestamp.
+     * On the first load, it fetches all notifications; subsequent updates only fetch the latest ones.
+     */
     private void loadNotifications() {
         db.collection("notification")
                 .whereEqualTo("deviceId", deviceId)
@@ -131,6 +163,14 @@ public class NotificationFragment extends Fragment {
     }
 
 
+
+    /**
+     * Fetches event details from the Firestore database for a specific notification.
+     * Updates the notification with event details such as the event title and start time.
+     *
+     * @param notification The notification object to be updated with event details.
+     * @param callback The callback to notify when event details are fetched.
+     */
     private void fetchEventDetails(NotificationModel notification, EventDetailsCallback callback) {
         String eventId = notification.getEventId();
         if (eventId == null || eventId.isEmpty()) {
@@ -160,6 +200,13 @@ public class NotificationFragment extends Fragment {
     }
 
 
+
+    /**
+     * Handles the action when the user declines an event notification.
+     * It removes the user from the selected list and adds them to the cancelled list in Firestore.
+     *
+     * @param notification The notification representing the event the user wants to decline.
+     */
     private void handleDeclineAction(NotificationModel notification) {
         String eventId = notification.getEventId();
         String userId = deviceId; // Using deviceId as the user ID
@@ -195,6 +242,13 @@ public class NotificationFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Handles the action when the user accepts an event notification.
+     * It removes the user from the selected list and adds them to the confirmed list in Firestore.
+     *
+     * @param notification The notification representing the event the user wants to accept.
+     */
     private void handleAcceptAction(NotificationModel notification) {
         String eventId = notification.getEventId();
         String userId = deviceId;
@@ -229,7 +283,15 @@ public class NotificationFragment extends Fragment {
     }
 
 
-
+    /**
+     * Displays a local notification for an event, including the event's title, message, and start time.
+     *
+     * @param context The context used to display the notification.
+     * @param title The title of the notification.
+     * @param message The message of the notification.
+     * @param eventTitle The title of the event.
+     * @param startTime The start time of the event.
+     */
     public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
         Log.e("showNotification: ", "it ran thru here");
         createNotificationChannel(context); // Ensure the channel is created first
@@ -274,6 +336,11 @@ public class NotificationFragment extends Fragment {
         Log.d("NotificationFragment", "Notification should now be visible.");
     }
 
+    /**
+     * Creates the notification channel required for displaying notifications on Android O and above.
+     *
+     * @param context The context used to create the notification channel.
+     */
     public void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Notification Channel Name";
