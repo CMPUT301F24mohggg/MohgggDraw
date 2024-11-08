@@ -1,5 +1,8 @@
 package com.example.mohgggdraw;
 
+/***
+ * Controller to interact with event object and database together
+ * ***/
 public class WaitinglistController {
 
 
@@ -7,19 +10,18 @@ public class WaitinglistController {
     private Event event;
 
     public WaitinglistController(Event event) {
-
         this.event = event;
         db = new WaitinglistDB();
     }
 
+    //add user to db and update event
     public void addUser(User user){
         db.addToDB(user,event);
         event.addToWaitingList(user);
-        //update
-        //implement another add if needed
-        //will remove from wwaitlist arraylist when admin/organizer view as well
+
 
     }
+    //remove from db and update event
     public void removeUser(User user){
         db.removeFromDB(user,event);
         event.removeFromWaitingList(user);

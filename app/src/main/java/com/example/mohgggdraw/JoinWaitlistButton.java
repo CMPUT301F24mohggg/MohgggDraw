@@ -11,6 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+
+/***
+ * dialogue popup warning for geolocation events
+ * ***/
 public class JoinWaitlistButton extends DialogFragment {
     Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
 
@@ -33,7 +37,7 @@ public class JoinWaitlistButton extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         View view = LayoutInflater.from(getContext()).inflate(R.layout.join_activity,null);
-
+        //creating accept button that adds to database
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Button button = view.findViewById(R.id.accept_terms_button);
         button.setOnClickListener(v ->{
@@ -43,7 +47,7 @@ public class JoinWaitlistButton extends DialogFragment {
         });
         return builder
                 .setView(view)
-                .setTitle("warningskull")
+                .setTitle("warning")
                 .create();
 
 

@@ -3,7 +3,10 @@ package com.example.mohgggdraw;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -21,6 +24,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import androidx.test.filters.LargeTest;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,41 +35,25 @@ import org.junit.runner.RunWith;
 public class JoinWaitlistUnitTest {
     //testing the join to watchlist
     
-    User user = new User();
 
 
+        @Before
+        public void setUp() {
+            User user = new User();
+            Bundle mybun = new Bundle();
+            mybun.putBoolean("Geo",false);
+            FragmentScenario scenario = FragmentScenario.launchInContainer(WaitlistFragment.class,mybun,new FragmentFactory());
+
+        }
+
+        @Test
+        public void testJoinWaitlist() {
+            onView(withId(R.id.eventInfoButton)).perform(click());
+
+            onView(withText("Leave event")).check(matches(isDisplayed()));
+
+        }
 
 
-
-
-    @Test
-
-    public void testAddToWishlist() throws InterruptedException {
-
-        FragmentScenario<WaitlistFragment> scenario;
-        Bundle mybun = new Bundle();
-        mybun.putBoolean("Geo",false);
-
-        scenario = FragmentScenario.launchInContainer(WaitlistFragment.class,mybun,new FragmentFactory());
-
-
-        user.setEmail("mewoowww normal");
-        scenario.moveToState(Lifecycle.State.RESUMED);
-
-        Thread.sleep(2000);
-        //click the join waitlist button
-        onView(withId(R.id.eventInfoButton)).perform(click());
-
-
-
-        //assertTrue(event.getWaitingList().contains("mewoowww normal"));
-        onView(withText("Leave event")).check(matches(isDisplayed()));
-
-        //
-
-
-
-
-    }
 }
 

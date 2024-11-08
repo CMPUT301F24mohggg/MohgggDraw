@@ -33,6 +33,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //sets pager adapter to transition between homepages and event view pages
         waitlistAdapter = new WaitlistPagerAdapter(this, user);
         organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
         viewPager2 = view.findViewById(R.id.waitlist_viewpage);
@@ -40,7 +41,7 @@ public class HomeFragment extends Fragment {
 
 
         viewPager2.setAdapter(waitlistAdapter);
-
+        //main eventview page
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -51,13 +52,14 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-
+        //goest to main home
         backButton.setOnClickListener(v -> {
             if (viewPager2.getCurrentItem() > 0) {
                 viewPager2.setCurrentItem(0);
             }
         });
     }
+    //goes to eventview
     public void goToNextPage(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
@@ -65,6 +67,7 @@ public class HomeFragment extends Fragment {
         backButton.setVisibility(View.VISIBLE);
 
     }
+    //waitlist view
     public void goToWaitlistView(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);

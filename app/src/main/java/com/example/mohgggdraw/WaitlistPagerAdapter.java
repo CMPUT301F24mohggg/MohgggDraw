@@ -4,6 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+/***
+ * waitlist pager adapter to move between the waitlist homepages
+ * ***/
+
 public class WaitlistPagerAdapter extends FragmentStateAdapter {
     Event event;
     User user;
@@ -17,6 +21,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
 
     }
 
+    //different pages in hometab
     @NonNull
     @Override
     public Fragment createFragment(int position) {
@@ -30,13 +35,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
             default:
                 return new EventListDisplayFragment(user, (HomeFragment) fragment);
         }
-//        if(position == 1){
-//            return new WaitlistFragment(event,user,(HomeFragment) fragment);
-//        }
-//        else{
 //
-//            return new EventListDisplayFragment(user, (HomeFragment) fragment);
-//        }
     }
 
     @Override

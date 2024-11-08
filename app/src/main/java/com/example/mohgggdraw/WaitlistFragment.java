@@ -25,8 +25,12 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
+/***
+ * Fragment to view event and join waitlist
+ * ***/
 public class WaitlistFragment extends Fragment {
     Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
     User user = new User();
@@ -56,17 +60,26 @@ public class WaitlistFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //mainly for testing purpose as i can build objects from the arguments
         if(getArguments() != null) {
-            if (getArguments().getBoolean("geo")) {
+            Bundle args = getArguments();
+            if (getArguments().getBoolean("Geo")) {
                 event.setGeolocation(true);
                 user.setUid("geotest");
-            } else if (getArguments().getBoolean("geo") == false) {
+            } else if (getArguments().getBoolean("Geo") == false) {
                 user.setUid("mewoowww normal");
-
-
+                event.setGeolocation(false);
+            }
+            if (getArguments().getBoolean("Org")){
+                event.setOrgID("Uaf");
+                ArrayList<String> list = new ArrayList<String>();
+                list.add("meow1");
+                list.add("meow2");
+                list.add("meow3");
+                event.setWaitingList(list);
             }
         }
-        //event.setGeolocation(false);
+
 
         return inflater.inflate((R.layout.view_event), container, false);
     }
@@ -89,7 +102,7 @@ public class WaitlistFragment extends Fragment {
             capacity.setText(String.valueOf(event.getMaxCapacity()));
             location.setText(event.getLocation());
 
-
+// pulling and creating image
             path = event.getPosterUrl();
             iv = (ImageView) view.findViewById(R.id.eventimage);
             StorageReference myimage = new WaitinglistDB().getImage(path);
@@ -110,10 +123,11 @@ public class WaitlistFragment extends Fragment {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
+// logic to decide if button is join leave or view waitlist
             joinButton = view.findViewById(R.id.eventInfoButton);
             if(Objects.equals(event.getOrgID(), "Uaf")){
-                joinButton.setText("meowin");
+                //if organizer view waitlist
+                joinButton.setText("View waitlist");
                 joinButton.setOnClickListener(v -> {
                     home.goToWaitlistView(event);
 
@@ -121,6 +135,7 @@ public class WaitlistFragment extends Fragment {
             }else {
 
                 if (event.getWaitingList().contains(user.getUid())) {
+                    //if in event leave waitlist
                     joinButton.setText("Leave event");
                     joinButton.setOnClickListener(v -> {
                                 new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
@@ -129,9 +144,11 @@ public class WaitlistFragment extends Fragment {
 
 
                 } else {
-                    joinButton.setText("Join Event");
+                    //if not in waitlist join
+                    joinButton.setText("Join event");
                     joinButton.setOnClickListener(v -> {
 
+                        //logic for geolocation
                         if (event.isGeolocation()) {
                             new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
                         } else {
@@ -146,6 +163,7 @@ public class WaitlistFragment extends Fragment {
 
 
     public void onDialogueFinished(){
+        //refresh page after dialogue to update teh buttons
         if (event.getWaitingList().contains(user.getUid())){
             joinButton.setText("Leave event");
             joinButton.setOnClickListener(v->{
@@ -155,7 +173,7 @@ public class WaitlistFragment extends Fragment {
 
 
         }else {
-            joinButton.setText("Join Event");
+            joinButton.setText("Join event");
             joinButton.setOnClickListener(v -> {
 
                 if (event.isGeolocation()) {

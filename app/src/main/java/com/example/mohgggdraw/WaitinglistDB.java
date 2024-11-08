@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import kotlin.jvm.Synchronized;
-
+/***
+ * Waitinglist db interacts with all firebase directly
+ * deals with adding querying and stuff for other classes
+ * ***/
 public class WaitinglistDB {
     private FirebaseFirestore db;
     private CollectionReference waitlistRef;
@@ -62,17 +64,19 @@ public class WaitinglistDB {
         return name;
     }
 
+    //updates event doc waitlist field with new user
     public void addToDB(User user,Event event){
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc.update("EventWaitinglist", FieldValue.arrayUnion(user.getUid()));
 
 
     }
-
+// removes event doc waitlist user
     public void removeFromDB(User user, Event event){
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc.update("EventWaitinglist",FieldValue.arrayRemove(user.getUid()));
     }
+    //gets image from path in firebase
     public StorageReference getImage(String path){
         if(path==null){
             path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
@@ -83,7 +87,7 @@ public class WaitinglistDB {
         return ref;
     }
 
-
+    //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
     public void updateWaitlist(Event event){
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
 
@@ -113,6 +117,8 @@ public class WaitinglistDB {
         });
 
     }
+    //query to pull all events into arraylist with the field eventwaitinglist mainly for test purpose
+
     public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment){
         ArrayList<Event> myArray= new ArrayList<>();
         Task query= waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -122,9 +128,6 @@ public class WaitinglistDB {
                 for (DocumentSnapshot doc: queryDocumentSnapshots) {
 
                     myArray.add(docSnapshotToEvent(doc));
-
-
-
                 }
                 fragment.dataChange();
             }
@@ -132,10 +135,13 @@ public class WaitinglistDB {
 
         return myArray;
     }
+
+    //takes doc snapshot of event and turns into event object
     public Event docSnapshotToEvent(DocumentSnapshot doc){
 
 
         Map map = doc.getData();
+        //string concat are because database is very incosistent, many null where there should not be
         Event myevent= new Event(doc.getId(),(String)map.get("eventTitle")+"please dont leave this stuff empty",(String)map.get("eventLocation")+"please dont leave this stuff empty",(String)map
                 .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave this stuff empty");
         if(map.get("geoLocationEnabled")!=null) {

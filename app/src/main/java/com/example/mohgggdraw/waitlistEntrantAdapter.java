@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+/***
+ * Array adapter for waitlist entrants
+ * ***/
 
 public class waitlistEntrantAdapter extends ArrayAdapter<String> {
 
@@ -29,6 +32,7 @@ public class waitlistEntrantAdapter extends ArrayAdapter<String> {
         } else {
             view = convertView;
         }
+        //creating the content
 
         TextView person = view.findViewById(R.id.waitlistPersonName);
         person.setText(getItem(position));

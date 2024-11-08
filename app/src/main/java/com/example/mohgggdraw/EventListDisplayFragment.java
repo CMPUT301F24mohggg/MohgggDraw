@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/***
+ * Fragment to display Array of lists
+ * used to display list of user events
+ * ***/
 public class EventListDisplayFragment extends Fragment {
 
     private ArrayList<Event> dataList;
@@ -59,6 +63,7 @@ public class EventListDisplayFragment extends Fragment {
 //            new WaitinglistDB().updateWaitlist(event);
 //
 //        }
+        //pulling all data for test purpose
         dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
@@ -66,7 +71,7 @@ public class EventListDisplayFragment extends Fragment {
 
         eventList.setAdapter(eventAdapter);
 
-
+//onclick per event item
         eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> list, View view,
@@ -75,20 +80,11 @@ public class EventListDisplayFragment extends Fragment {
                 Event event = (Event) list.getItemAtPosition(i);
                 fragment.goToNextPage(event);
 
-//                Fragment fragment = new WaitlistFragment(event, user);
-//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.fragment_container, fragment,"324");
-//                fragmentTransaction.addToBackStack(null);
-//
-//                fragmentTransaction.commit();
 
-                //Intent intent = new Intent(EventListDisplayFragment.this,WaitlistFragment.class);
-
-                //startActivity(intent);
             }
         });
     }
+    //updates list when data is changed
     public void dataChange(){
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);

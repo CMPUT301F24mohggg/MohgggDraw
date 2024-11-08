@@ -20,7 +20,10 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
+/***
+ * Event adapter for listview
+ * takes arraylist of events to display according to event array content
+ ***/
 public class EventAdapter extends ArrayAdapter<Event> {
     public EventAdapter(Context context, ArrayList events) {
         super(context, 0, events);
@@ -40,9 +43,10 @@ public class EventAdapter extends ArrayAdapter<Event> {
         Event event = getItem(position);
         TextView eventName = view.findViewById(R.id.eventname);
 
-        //sets book listview text
+        //sets event listview text
         eventName.setText(event.getTitle());
         ImageView iv = (ImageView) view.findViewById(R.id.eventadapterimage);
+        //tries to pull image
         StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
         try{
             File eventImage = File.createTempFile(event.getTitle(),".png");

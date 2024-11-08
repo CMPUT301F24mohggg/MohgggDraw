@@ -24,8 +24,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class BasicInformationFragmentTest {
 
-    @Rule
-    public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
+    //@Rule
+    //public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
 
     @Before
     public void setUp() {

@@ -1,6 +1,9 @@
 package com.example.mohgggdraw;
 
-import java.io.Serializable;
+/***
+ * mainly for testing purpose
+ * user that carries important info about itself
+ * ***/
 
 public class User {
     //placeholder

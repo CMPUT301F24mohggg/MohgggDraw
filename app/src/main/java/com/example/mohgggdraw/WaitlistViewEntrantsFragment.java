@@ -11,6 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
+/***
+ * Fragment to view waitlist
+ *
+ * ***/
+
 public class WaitlistViewEntrantsFragment extends Fragment {
     private ArrayList<String > dataList;
     private waitlistEntrantAdapter entrantAdapter;
@@ -29,6 +34,7 @@ public class WaitlistViewEntrantsFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //creates data from events waitlist to display
         dataList = event.getWaitingList();
 
         entrantAdapter = new waitlistEntrantAdapter(this.getContext(), dataList);

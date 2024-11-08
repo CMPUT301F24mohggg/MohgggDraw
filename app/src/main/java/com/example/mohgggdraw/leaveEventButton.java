@@ -11,6 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+
+/***
+ * warning if leaving the waitlist
+ *
+ * ***/
 public class leaveEventButton extends DialogFragment {
     Event event;
     User user;
@@ -27,7 +32,7 @@ public class leaveEventButton extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         View view = LayoutInflater.from(getContext()).inflate(R.layout.leave_activity,null);
-
+        //creating leave button taht removes from database
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Button button = view.findViewById(R.id.leaveButton);
         button.setOnClickListener(v ->{
