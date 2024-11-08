@@ -3,6 +3,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
 android {
     namespace = "com.example.mohgggdraw"
     compileSdk = 34
@@ -36,7 +37,11 @@ android {
 }
 
 dependencies {
-    // Firebase BoM
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+    implementation("com.github.bumptech.glide:glide:4.13.2")
+    implementation(libs.androidx.fragment.testing)
+    testImplementation(libs.androidx.espresso.core)
+        // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.5.0"))
 
     // Firebase dependencies (no version numbers since BoM is used)
@@ -47,6 +52,9 @@ dependencies {
 
     // Glide for image loading
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.junit)
+    implementation(libs.fragment.testing)
     implementation(libs.espresso.intents)
     implementation(libs.fragment.testing)
     testImplementation(libs.androidx.junit)
@@ -65,8 +73,10 @@ dependencies {
 
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test:runner:1.1.1")
+   
 
     // Hamcrest for testing
     testImplementation("org.hamcrest:hamcrest-library:1.3")
