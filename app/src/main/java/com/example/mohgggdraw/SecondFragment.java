@@ -20,7 +20,6 @@ public class SecondFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -28,10 +27,8 @@ public class SecondFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // This button now starts the Organizer activity
         binding.buttonSecond.setOnClickListener(v -> {
-            // Start Organizer Activity
-            Intent intent = new Intent(getActivity(), Organizer_CreateEventFragment.class);
+            Intent intent = new Intent(getActivity(), BasicInformationFragment.class);
             startActivity(intent);
         });
     }

@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permission to read external storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- For Android 13 and above, optional additional permission -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- Internet permission -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -28,6 +33,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Organizer Activity with windowSoftInputMode set to adjustResize -->
+        <activity
+            android:name=".BasicInformationFragment"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Registration Details Activity -->
+        <activity android:name=".RegistrationDetailsActivity" />
+
+        <!-- Participation Settings Activity -->
+        <activity android:name=".ParticipationSettingsActivity" />
+
+        <!-- Review Activity -->
+        <activity android:name=".ReviewActivity" />
 
         <!-- Organizer Activity (Existing Activity in your App) -->
         <activity android:name=".Organizer" />
