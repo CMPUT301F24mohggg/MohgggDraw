@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private void switchFragment(@NonNull Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null); // Optional: Add to back stack if you want back navigation support
+        transaction.addToBackStack(null);
         transaction.commit();
 
         // Set the new active fragment
