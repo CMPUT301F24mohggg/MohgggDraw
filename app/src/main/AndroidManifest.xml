@@ -8,6 +8,10 @@
 
     <!-- For Android 13 and above, optional additional permission -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Internet permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 
     <!-- Permission for camera -->
     <uses-feature
@@ -26,7 +30,7 @@
         android:theme="@style/Theme.MohgggDraw"
         tools:targetApi="31">
 
-        <!-- MainActivity (launcher activity) -->
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -61,7 +65,10 @@
         <!-- Review Activity -->
         <activity android:name=".ReviewActivity" />
 
-        <!-- Organizer Create Event Fragment -->
+        <!-- Signup Step 1 Activity -->
+        <activity android:name=".SignupActivity" />
+        <activity android:name=".UserFormActivity" />
+
         <activity android:name=".Organizer_CreateEventFragment" />
 
         <!-- QR Code Scanner Activity -->
