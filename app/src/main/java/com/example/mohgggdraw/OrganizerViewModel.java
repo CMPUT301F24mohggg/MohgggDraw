@@ -2,7 +2,11 @@ package com.example.mohgggdraw;
 
 import android.net.Uri;
 import androidx.lifecycle.ViewModel;
-
+/***
+ This ViewModel stores and manages UI-related data for the organizer. It:
+ - Holds data related to event creation (image URI, title, location, details)
+ - Provides getters and setters for all stored data
+ ***/
 public class OrganizerViewModel extends ViewModel {
     private Uri eventImageUri;
     private String eventTitle;
