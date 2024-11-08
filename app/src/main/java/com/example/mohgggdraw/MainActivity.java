@@ -40,24 +40,12 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         db = FirebaseFirestore.getInstance();
 
-
-
-        // Hide BottomNavigationView initially
-        bottomNavigationView.setVisibility(View.GONE);
         // Initialize fragments
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
         fragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
-
-        // Check intent for navigation flag to home fragment
-        boolean navigateToHomeFragment = getIntent().getBooleanExtra("navigateToHomeFragment", false);
-        if (navigateToHomeFragment) {
-            isUserLoggedIn = true;
-            navigateToHomeScreen();
-            return;
-        }
 
         // Set up BottomNavigationView item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -76,23 +64,25 @@ public class MainActivity extends AppCompatActivity {
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d("MainActivity", "Device ID: " + deviceID);
 
-        // Check if device ID exists in Firestore
-        checkDeviceIDInFirestore(deviceID);
+        // Initialize the view based on login status
+        checkAndInitializeUser(deviceID);
     }
 
-    private void checkDeviceIDInFirestore(String deviceID) {
+    private void checkAndInitializeUser(String deviceID) {
         db.collection("user").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Device ID exists, proceed to home screen
+                // User is logged in, proceed to initialize navigation
                 isUserLoggedIn = true;
-                navigateToHomeScreen();
+                initializeNavigation();
             } else {
-                // Device ID does not exist, show signup option
+                // User is not logged in, show signup layout
+                isUserLoggedIn = false;
                 signupLayout.setVisibility(View.VISIBLE);
+                bottomNavigationView.setVisibility(View.GONE); // Hide navigation if not logged in
+
                 findViewById(R.id.buttonSignup).setOnClickListener(view -> {
                     Intent intent = new Intent(MainActivity.this, SignupActivity.class);
                     startActivity(intent);
-                    finish();
                 });
             }
         }).addOnFailureListener(e -> {
@@ -101,17 +91,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void navigateToHomeScreen() {
-        // Hide Signup Layout
+    private void initializeNavigation() {
         signupLayout.setVisibility(View.GONE);
-
-        // Show BottomNavigationView
         bottomNavigationView.setVisibility(View.VISIBLE);
 
-        // Set default fragment to HomeFragment
-        Fragment homeFragment = fragmentMap.get(R.id.nav_home);
-        if (homeFragment != null) {
-            switchFragment(homeFragment);
+        // Check if we need to navigate to the home fragment directly
+        boolean navigateToHomeFragment = getIntent().getBooleanExtra("navigateToHomeFragment", false);
+        if (navigateToHomeFragment || activeFragment == null) {
+            // Set default fragment to HomeFragment
+            switchFragment(fragmentMap.get(R.id.nav_home));
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
     }
@@ -119,9 +107,17 @@ public class MainActivity extends AppCompatActivity {
     private void switchFragment(@NonNull Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null); // Optional: Add to back stack if you want back navigation support
         transaction.commit();
 
         // Set the new active fragment
         activeFragment = fragment;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // Update the intent in case "navigateToHomeFragment" is set
+        initializeNavigation(); // Re-initialize the navigation on new intent
     }
 }

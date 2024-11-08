@@ -19,7 +19,7 @@ public class UserFormActivity extends AppCompatActivity {
 
     private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
     private Button buttonSubmit;
-    private String userType;
+    private String userType; // Should be either "entrant", "organizer", or "admin"
     private FirebaseFirestore db;
 
     @Override
@@ -37,13 +37,15 @@ public class UserFormActivity extends AppCompatActivity {
         buttonSubmit = findViewById(R.id.buttonSubmit);
 
         // Get user type from intent
-        userType = getIntent().getStringExtra("userType");
+        userType = getIntent().getStringExtra("userType"); // "entrant", "organizer", or "admin"
 
         // Set hints based on user type
-        if ("facility".equals(userType)) {
-            editTextName.setHint("Facility Name");
+        if ("organizer".equals(userType)) {
+            editTextName.setHint("Organizer Name");
+        } else if ("admin".equals(userType)) {
+            editTextName.setHint("Admin Name");
         } else {
-            editTextName.setHint("Name");
+            editTextName.setHint("Entrant Name");
         }
 
         // Set up the submit button listener
@@ -73,30 +75,33 @@ public class UserFormActivity extends AppCompatActivity {
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
+        userDetails.put("name", name);
+        userDetails.put("userType", getUserTypeCode(userType)); // Store the user type as 0, 1, or 2
 
-        Log.d("UserFormActivity", "Attempting to save data to Firestore...");
-
-        if ("entrant".equals(userType)) {
-            userDetails.put("name", name);
-            Log.d("UserFormActivity", "Saving entrant data to Firestore");
-        } else if ("facility".equals(userType)) {
-            userDetails.put("facilityName", name);
-            Log.d("UserFormActivity", "Saving facility data to Firestore");
-        }
-
-        // Save data to Firestore
-        db.collection("user")
-                .document(deviceID)
+        // Save data to Firestore under the "user" collection with deviceID as the document ID
+        db.collection("user").document(deviceID)
                 .set(userDetails)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(UserFormActivity.this, "User data saved successfully", Toast.LENGTH_SHORT).show();
                     Log.d("UserFormActivity", "Data saved successfully");
-                    navigateToHomeScreen(); // Navigate to home screen after signup
+                    navigateToHomeScreen(); // Navigate to MainActivity after saving
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(UserFormActivity.this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("UserFormActivity", "Failed to save data: " + e.getMessage());
                 });
+    }
+
+    private int getUserTypeCode(String userType) {
+        switch (userType) {
+            case "organizer":
+                return 1;
+            case "admin":
+                return 2;
+            case "entrant":
+            default:
+                return 0;
+        }
     }
 
     private void navigateToHomeScreen() {
