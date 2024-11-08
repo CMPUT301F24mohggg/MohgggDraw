@@ -95,8 +95,7 @@
             android:layout_height="wrap_content"
             android:text="Delete Profile"
             android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/holo_red_dark" />
+            android:layout_gravity="center_horizontal"/>
 
     </LinearLayout>
 </RelativeLayout>
