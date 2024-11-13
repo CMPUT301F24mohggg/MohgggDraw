@@ -28,7 +28,7 @@ public class CreatePagerAdapter extends FragmentStateAdapter {
             case 3:
                 return new ReviewFragment();
             default:
-                return new EventCreatedSuccessFragment();
+                return new EventEditPageFragment();
         }
     }
 
