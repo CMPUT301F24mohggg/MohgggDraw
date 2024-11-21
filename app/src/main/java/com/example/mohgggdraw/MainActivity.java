@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_home, new HomeFragment());
         fragmentMap.put(R.id.nav_create, new CreateFragment());
         fragmentMap.put(R.id.nav_notifications, new NotificationFragment());
-        fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
+        fragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
 
         // Set up BottomNavigationView item selection listener

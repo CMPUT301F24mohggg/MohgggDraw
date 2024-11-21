@@ -13,6 +13,9 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
+      <SelectionState runConfigName="Tests in 'com.example.mohgggdraw'">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
       <SelectionState runConfigName="testRecyclerViewIsDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
