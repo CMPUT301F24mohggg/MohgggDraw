@@ -1,5 +1,7 @@
 package com.example.mohgggdraw;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.content.ContextWrapper;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +30,12 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,55 +55,77 @@ import java.util.Objects;
 
 public class QrCreatedFragment extends Fragment {
     Context context;
+    private WaitinglistDB waitinglistDB;
     private Button qrShareButton;
     private Button viewEventButton;
     private ImageView newQrImageView;
     private EventQr eventQr;
+    private SharedViewModel sharedViewModel;
     private String eventId;
+    private ScannerViewModel scannerViewModel;
 
-    public QrCreatedFragment(EventQr eventQr) {
-        this.eventQr = eventQr;
+    public QrCreatedFragment() {
+        this.eventQr = null;
         this.context = getActivity();
-        this.eventId = eventQr.getEventId();
     }
 
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_qrcode_created, container, false);
-        newQrImageView = view.findViewById(R.id.new_qrcode_iv);
-        viewEventButton = view.findViewById(R.id.qrview_button);
-        qrShareButton = view.findViewById(R.id.qrshare_button);
-
-        // Set bitmap to ImageView
-        newQrImageView.setImageBitmap(eventQr.getQrBitmap());
-
-
-
-
-
-        viewEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // NOTHINGGGGGGGGGG... yet.
-            }
-        });
-
-        qrShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                qrShare(eventQr.getQrBitmap());
-            }
-        });
-        return view;
-
+        return inflater.inflate(R.layout.fragment_qrcode_created, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        newQrImageView = view.findViewById(R.id.new_qrcode_iv);
+        viewEventButton = view.findViewById(R.id.qrview_button);
+        qrShareButton = view.findViewById(R.id.qrshare_button);
+        waitinglistDB = new WaitinglistDB();
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        scannerViewModel = new ViewModelProvider(requireActivity()).get(ScannerViewModel.class);
+
+
+        // Observe eventQr from SharedViewModel
+        sharedViewModel.getEventQr().observe(getViewLifecycleOwner(), eventQr -> {
+            if (eventQr != null) {
+                setEventQr(eventQr); // Update local instance
+                updateUI(eventQr); // Update the UI with eventQr
+            }
+        });
     }
 
+
+
+
+
+
+
+
+    private void updateUI(EventQr eventQr) {
+        // Set QR code bitmap
+        newQrImageView.setImageBitmap(eventQr.getQrBitmap());
+
+        // Set button actions
+        viewEventButton.setOnClickListener(v -> {
+            createEvent();
+            // Swap to the QrWaitlistFragment
+            swapFragment(5);
+        });
+
+        qrShareButton.setOnClickListener(v -> qrShare(eventQr.getQrBitmap()));
+    }
+
+
+    private void swapFragment(int postition) {
+        ((CreateFragment) requireParentFragment()).swapToFragment(postition);
+    }
+
+
+    public void setEventQr(EventQr eventQr) {
+        this.eventQr = eventQr;
+        this.eventId = eventQr.getEventId();
+    }
 
     private void qrShare(Bitmap qrBitmap) {
 
@@ -107,7 +138,28 @@ public class QrCreatedFragment extends Fragment {
         intent.putExtra(Intent.EXTRA_TEXT, "Share this event!");
 
         startActivity(Intent.createChooser(intent, "Share Event QR Code"));
-
-
     }
+
+    private void createEvent() {
+        // Get Document snapshot, create and set Event to SharedViewModel
+        if (eventId != null) {
+            DocumentReference docRef = waitinglistDB.getWaitlistRef().document((String) eventId);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+
+                        // If exists return event
+                        Event event = waitinglistDB.docSnapshotToEvent(document);
+                        sharedViewModel.setEvent(event);   // Send Event obj
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+        }
+    }
+
+
 }
