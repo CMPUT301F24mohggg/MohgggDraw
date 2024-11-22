@@ -62,7 +62,6 @@ public class QrCreatedFragment extends Fragment {
     private EventQr eventQr;
     private SharedViewModel sharedViewModel;
     private String eventId;
-    private ScannerViewModel scannerViewModel;
 
     public QrCreatedFragment() {
         this.eventQr = null;
@@ -83,8 +82,6 @@ public class QrCreatedFragment extends Fragment {
         qrShareButton = view.findViewById(R.id.qrshare_button);
         waitinglistDB = new WaitinglistDB();
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        scannerViewModel = new ViewModelProvider(requireActivity()).get(ScannerViewModel.class);
-
 
         // Observe eventQr from SharedViewModel
         sharedViewModel.getEventQr().observe(getViewLifecycleOwner(), eventQr -> {
@@ -94,12 +91,6 @@ public class QrCreatedFragment extends Fragment {
             }
         });
     }
-
-
-
-
-
-
 
 
     private void updateUI(EventQr eventQr) {
