@@ -16,15 +16,15 @@ import androidx.fragment.app.DialogFragment;
  * warning if leaving the waitlist
  *
  * ***/
-public class leaveEventButton extends DialogFragment {
+public class QrLeaveEventButton extends DialogFragment {
     Event event;
     User user;
-    WaitlistFragment waitlistFragment;
-    public leaveEventButton(Event event, User user, WaitlistFragment waitlistFragment){
+    QrWaitlistFragment qrWaitlistFragment;
+    public QrLeaveEventButton(Event event, User user, QrWaitlistFragment qrWaitlistFragment){
         super();
         this.event = event;
         this.user = user;
-        this.waitlistFragment = waitlistFragment;
+        this.qrWaitlistFragment = qrWaitlistFragment;
 
     }
 
@@ -37,7 +37,7 @@ public class leaveEventButton extends DialogFragment {
         Button button = view.findViewById(R.id.leaveButton);
         button.setOnClickListener(v ->{
             new WaitinglistController(event).removeUser(user);
-            waitlistFragment.onDialogueFinished();
+            qrWaitlistFragment.onDialogueFinished();
             dismiss();
         });
         return builder

@@ -11,37 +11,27 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanOptions;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collector;
 
 /***
  This fragment starts an Intent for QR scanner. It:
  - Uses the camera to scan a QR code
  - Displays the event details if the QR code is valid
  ***/
-public class ScannerFragment extends Fragment {
+public class ScannerFragmentOld extends Fragment {
 
     private String eventId;
     private WaitinglistDB waitinglistDB = new WaitinglistDB();
@@ -50,7 +40,7 @@ public class ScannerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_scanqr, container, false);
+        return inflater.inflate(R.layout.fragment_scanner, container, false);
     }
 
 

@@ -1,4 +1,4 @@
 package com.example.mohgggdraw;
 
-public class ScannerPagerController {
+public class ScannerPagerOverview {
 }

@@ -15,20 +15,20 @@ import androidx.fragment.app.DialogFragment;
 /***
  * dialogue popup warning for geolocation events
  * ***/
-public class JoinWaitlistButton extends DialogFragment {
+public class QrJoinWaitlistButton extends DialogFragment {
     Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
 
     User user= new User();
-    WaitlistFragment waitlistFragment;
-    public JoinWaitlistButton(Event event, User user,WaitlistFragment waitlistFragment){
+    QrWaitlistFragment qrWaitlistFragment;
+    public QrJoinWaitlistButton(Event event, User user, QrWaitlistFragment qrWaitlistFragment){
         super();
         this.event = event;
         this.user = user;
-        this.waitlistFragment=waitlistFragment;
+        this.qrWaitlistFragment = qrWaitlistFragment;
 
     }
 
-    public JoinWaitlistButton(){
+    public QrJoinWaitlistButton(){
         super();
 
     }
@@ -42,7 +42,7 @@ public class JoinWaitlistButton extends DialogFragment {
         Button button = view.findViewById(R.id.accept_terms_button);
         button.setOnClickListener(v ->{
             new WaitinglistController(event).addUser(user);
-            waitlistFragment.onDialogueFinished();
+            qrWaitlistFragment.onDialogueFinished();
             dismiss();
         });
         return builder

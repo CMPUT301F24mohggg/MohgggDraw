@@ -1,138 +1,116 @@
 package com.example.mohgggdraw;
 
-import static android.content.ContentValues.TAG;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.gms.common.util.ArrayUtils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collector;
 
 /***
- This fragment starts an Intent for QR scanner. It:
- - Uses the camera to scan a QR code
- - Displays the event details if the QR code is valid
+ This fragment manages the creation process for events. It:
+ - Sets up a ViewPager2 to navigate between different creation steps
+ - Handles navigation between steps (next and back buttons)
+ - Updates UI elements like progress bar and page title
+ - Saves data for the current page before moving to the next
  ***/
 public class ScannerFragment extends Fragment {
-
     private String eventId;
-//    private DocumentSnapshot documentSnapshot;
     private WaitinglistDB waitinglistDB = new WaitinglistDB();
     private CollectionReference eventRef = waitinglistDB.getWaitlistRef();
+    private ViewPager2 viewPager2;
+    private ScannerViewModel scannerViewModel;
+    private ImageView backButton;
+    private ViewPager2.OnPageChangeCallback pageChangeCallback;
 
-    @Nullable
+
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_scanqr, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        scannerViewModel = new ViewModelProvider(requireActivity()).get(ScannerViewModel.class);
+        return inflater.inflate(R.layout.fragment_scanner, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        backButton = view.findViewById(R.id.scanner_back_button);
 
-// Start QR scanner Activity
-        Intent intent = new Intent(getActivity(), ScannerActivity.class);
-        ScannerActivityResultLauncher.launch(intent);
-    }
 
-    ActivityResultLauncher<Intent> ScannerActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent resultIntent = result.getData();
-                        eventId = resultIntent.getStringExtra("qrTextKey");
-
-                        // Validate ID
-                        validEventId(eventId);
-                    }
-                }
-            });
+        // Set up adapter for ViewPager2
+        viewPager2 = view.findViewById(R.id.scanner_viewpager);
+        ScannerPagerAdapter adapter = new ScannerPagerAdapter(this);
+        viewPager2.setAdapter(adapter);
 
 
 
-    private void goToEvent() {
-
-    }
-
-
-
-    private void validEventId(String eventId) {
-
-        DocumentReference docRef = eventRef.document(eventId);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        // Whenever page changes to camera fragment set to start scanning
+        viewPager2.registerOnPageChangeCallback(pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-
-                    if (document.exists()) {
-                        // If exists return event
-                        Event event = returnEvent(document);
-                        swapToEventFrag(event);
-                    } else {
-                        displayInvalid();
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (position == 0) {
+                    scannerViewModel.setScanStatus(1);
                 }
+                updateUIForPosition(position);
             }
         });
+
+
+        backButton.setOnClickListener(v -> {
+            swapToFragment(0);
+        });
+
+
+        // Swap to camera fragment
+        swapToFragment(0);
+
     }
 
-
-    private void swapToEventFrag(Event event) {
-        // Swap to the event fragment
-
+    // Unregister to prevent memory leaks
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        viewPager2.unregisterOnPageChangeCallback(pageChangeCallback);
     }
 
-
-    private Event returnEvent(DocumentSnapshot document) {
-        Event event = waitinglistDB.docSnapshotToEvent(document);
-        return event;
+    public void swapToFragment(int position) {
+        if (viewPager2 != null) {
+            viewPager2.setCurrentItem(position);
+        }
     }
 
+    private void updateUIForPosition(int position) {
+        boolean isBackButtonVisible = true;
 
-    private void displayInvalid() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Invalid QR Code");
-        builder.setMessage("Please scan a valid QR code. ");
-        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).show();
+        switch (position) {
+            case 0:
+                isBackButtonVisible = false;
+                break;
+            case 1:
+                isBackButtonVisible = true;
+                break;
+            case 2:
+                isBackButtonVisible = true;
+                break;
+            default:
+                break;
+        }
+        backButton.setVisibility(isBackButtonVisible ? View.VISIBLE : View.INVISIBLE);
     }
+
 }
+
+
+
