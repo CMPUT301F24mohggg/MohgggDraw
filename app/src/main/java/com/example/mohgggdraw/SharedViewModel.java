@@ -19,6 +19,13 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<Boolean> enableGeolocation = new MutableLiveData<>();
     private final MutableLiveData<String> imageUrl = new MutableLiveData<>();
     private final MutableLiveData<Boolean> triggerSaveEvent = new MutableLiveData<>();
+    private final MutableLiveData<Integer> newPosition = new MutableLiveData<>();
+    private final MutableLiveData<EventQr> eventQr = new MutableLiveData<>();
+    private final MutableLiveData<Event> event = new MutableLiveData<>();
+
+    public SharedViewModel() {
+        this.newPosition.setValue(0);
+    }
 
     // Getters and setters for all fields
     public LiveData<String> getEventTitle() { return eventTitle; }
@@ -53,6 +60,31 @@ public class SharedViewModel extends ViewModel {
 
     public LiveData<Boolean> getTriggerSaveEvent() { return triggerSaveEvent; }
     public void setTriggerSaveEvent(Boolean trigger) { triggerSaveEvent.setValue(trigger); }
+
+
+    public LiveData<Event> getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event.setValue(event);
+    }
+
+    public LiveData<EventQr> getEventQr() {
+        return eventQr;
+    }
+
+    public void setEventQr(EventQr eventQr) {
+        this.eventQr.setValue(eventQr);
+    }
+
+    public LiveData<Integer> getNewPosition() {
+        return newPosition;
+    }
+
+    public void setNewPosition(int position) {
+        this.newPosition.setValue(position);
+    }
 
     // Method to update geolocation status based on an integer input
     public void setGeolocationValue(int i) {

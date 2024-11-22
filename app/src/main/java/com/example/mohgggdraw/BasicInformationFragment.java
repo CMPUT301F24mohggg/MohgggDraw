@@ -133,4 +133,10 @@ public class BasicInformationFragment extends Fragment {
         sharedViewModel.setEventLocation(locationInput.getText().toString());
         sharedViewModel.setEventDetail(detailInput.getText().toString());
     }
+
+    public void resetData() {
+        sharedViewModel.setEventTitle(null);
+        sharedViewModel.setEventLocation(null);
+        sharedViewModel.setEventDetail(null);
+    }
 }

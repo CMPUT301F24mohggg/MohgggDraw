@@ -27,6 +27,10 @@ public class CreatePagerAdapter extends FragmentStateAdapter {
                 return new ParticipationSettingsFragment();
             case 3:
                 return new ReviewFragment();
+            case 4:
+                return new QrCreatedFragment();
+            case 5:
+                return new QrWaitlistFragment(1);
             default:
                 return new EventCreatedSuccessFragment();
         }
@@ -34,7 +38,7 @@ public class CreatePagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 5; // Total number of pages
+        return 7; // Total number of pages
     }
 
     @Override

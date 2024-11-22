@@ -1,5 +1,7 @@
 package com.example.mohgggdraw;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -113,10 +115,8 @@ public class ReviewFragment extends Fragment {
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
-
         // Retrieve device ID as organizer ID
         String deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-
 
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
@@ -142,7 +142,6 @@ public class ReviewFragment extends Fragment {
         eventData.put("EventConfirmedlist", new ArrayList<>());
 
 
-
         // Add the new event data to Firestore
         eventsRef.add(eventData)
                 .addOnSuccessListener(documentReference -> {
@@ -152,32 +151,17 @@ public class ReviewFragment extends Fragment {
                     eventQr = new EventQr(eventId);
                     eventQr.hashQr();
                     qrHash = eventQr.getQrHash();
-                    eventData.put("QRhash", qrHash);
-
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error uploading event: ", e);
-                });
-
-        // Add the qrcode data to Firestore
-        eventsRef.add(eventData)
-                .addOnSuccessListener(documentReference -> {
+                    documentReference.update("QRhash", qrHash);
+                    sharedViewModel.setEventQr(eventQr);
                     Toast.makeText(getContext(), "Event successfully created and uploaded to Firestore!", Toast.LENGTH_SHORT).show();
 
-                    // Swap fragment
-                    Fragment fragment = new QrCreatedFragment(eventQr);
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, fragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.show(fragment).commit();
-
-
+                    // Swap to next fragment
+                    ((CreateFragment) requireParentFragment()).swapToFragment(4);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Error uploading event: ", e);
                 });
+
     }
 }
