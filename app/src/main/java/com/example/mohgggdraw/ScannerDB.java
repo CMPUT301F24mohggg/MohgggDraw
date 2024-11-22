@@ -14,12 +14,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-/*** Deals with the DB for DocToEvent
- *
- *
+
+/**
+ * Database manager for scanner-related data.
  */
-
-
 public class ScannerDB {
     private FirebaseFirestore db;
     private CollectionReference eventRef;
@@ -56,9 +54,5 @@ public class ScannerDB {
         getDocSnap(eventId);
         return documentSnapshot;
     }
-
-
-
-
 }
 

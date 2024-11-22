@@ -9,11 +9,15 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
+
+
+
+/**
+ * Fragment that displays an invalid scanner state and provides a button to return to the scanner.
+ * This fragment allows the user to attempt scanning again after an invalid scan.
+ */
 public class ScannerInvalidFragment extends Fragment {
-
-    private ScannerViewModel scannerViewModel;
     private Button scanButton;
 
     @Override
@@ -24,7 +28,6 @@ public class ScannerInvalidFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        scannerViewModel = new ViewModelProvider(requireActivity()).get(ScannerViewModel.class);
         return inflater.inflate(R.layout.fragment_scanner_invalid, container, false);
     }
 

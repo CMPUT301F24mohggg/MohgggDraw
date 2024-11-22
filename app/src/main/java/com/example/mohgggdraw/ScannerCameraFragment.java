@@ -45,12 +45,6 @@ public class ScannerCameraFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_scanner, container, false);
     }
 
-
-//    @Override
-//    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -127,30 +121,5 @@ public class ScannerCameraFragment extends Fragment {
     private Event returnEvent(DocumentSnapshot document) {
         Event event = waitinglistDB.docSnapshotToEvent(document);
         return event;
-    }
-
-
-    private void displayValid() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("VALID QR Code");
-        builder.setMessage("bighatahe. ");
-        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).show();
-    }
-
-    private void displayInvalid() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Invalid QR Code");
-        builder.setMessage("Please scan a valid QR code. ");
-        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).show();
     }
 }

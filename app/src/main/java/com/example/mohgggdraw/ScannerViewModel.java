@@ -4,6 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+
+
+
+/**
+ * ViewModel for managing the state and data for the Scanner feature.
+ * Handles the scanned QR code text and its validation status.
+ */
 public class ScannerViewModel extends ViewModel {
     private final MutableLiveData<Integer> newPosition = new MutableLiveData<>();
     private final MutableLiveData<Event> scannedEvent = new MutableLiveData<>();

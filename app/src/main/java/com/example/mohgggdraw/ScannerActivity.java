@@ -1,33 +1,31 @@
 package com.example.mohgggdraw;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Paint;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AlertDialogLayout;
 
 import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+/**
+ * Activity for scanning QR codes.
+ * Launches the scanner and handles the scanned results.
+ */
 public class ScannerActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         scanCode();
     }
 
-
+    /**
+     * Launches the QR code scanner with specified options.
+     */
     private void scanCode() {
         scannerLauncher.launch(new ScanOptions()
                 .setPrompt("Scan Event QR Code")
@@ -35,9 +33,10 @@ public class ScannerActivity extends AppCompatActivity {
                 .setCaptureActivity(CaptureAct.class));
     }
 
-
-
-    private ActivityResultLauncher<ScanOptions> scannerLauncher = registerForActivityResult(
+    /**
+     * ActivityResultLauncher for handling scanner results.
+     */
+    private final ActivityResultLauncher<ScanOptions> scannerLauncher = registerForActivityResult(
             new ScanContract(),
             result -> {
                 Intent resultIntent = new Intent();
@@ -45,8 +44,7 @@ public class ScannerActivity extends AppCompatActivity {
                     Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
                     setResult(Activity.RESULT_CANCELED, resultIntent);
                     finish();
-                }
-                else {
+                } else {
                     String qrText = result.getContents();
                     resultIntent.putExtra("qrTextKey", qrText);
                     setResult(Activity.RESULT_OK, resultIntent);
