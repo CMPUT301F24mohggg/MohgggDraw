@@ -9,9 +9,10 @@ package com.example.mohgggdraw;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Event {
+public class Event implements Serializable {
     private String eventId;
     private String title;
     private String location;

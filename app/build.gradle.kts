@@ -101,4 +101,22 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
+
+    // QR Code Scanning dependencies
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation ("androidx.camera:camera-view:1.4.0")
+    implementation ("androidx.camera:camera-core:1.4.0")
+    implementation ("androidx.camera:camera-camera2:1.4.0")
+    implementation ("androidx.camera:camera-lifecycle:1.4.0")
+    implementation ("androidx.camera:camera-video:1.4.0")
+    implementation ("androidx.camera:camera-extensions:1.4.0")
+    implementation("androidx.camera:camera-mlkit-vision:1.4.0")
+
+    // AndroidX and Material dependencies
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 }

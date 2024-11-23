@@ -76,4 +76,5 @@ public class RegistrationDetailsFragment extends Fragment {
 
     public void saveData() {
     }
+
 }
