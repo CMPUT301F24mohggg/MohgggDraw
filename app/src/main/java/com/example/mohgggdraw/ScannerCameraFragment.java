@@ -42,7 +42,7 @@ public class ScannerCameraFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         scannerViewModel = new ViewModelProvider(requireActivity()).get(ScannerViewModel.class);
-        return inflater.inflate(R.layout.fragment_scanner, container, false);
+        return inflater.inflate(R.layout.fragment_scanner_camera, container, false);
     }
 
     @Override
