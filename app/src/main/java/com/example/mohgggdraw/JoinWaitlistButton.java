@@ -36,7 +36,7 @@ public class JoinWaitlistButton extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.join_activity,null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.join_event,null);
         //creating accept button that adds to database
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Button button = view.findViewById(R.id.accept_terms_button);
