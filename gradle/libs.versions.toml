@@ -22,6 +22,8 @@ espressoCoreVersion = "3.4.0"
 core = "1.4.0"
 androidxJunit = "1.1.3"
 monitor = "1.7.1"
+playServicesMaps = "19.0.0"
+junitJupiter = "5.8.1"
 
 [libraries]
 firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
@@ -47,6 +49,8 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 [plugins]
 androidx-monitor = { id = "androidx.test.monitor", version.ref = "monitor" }

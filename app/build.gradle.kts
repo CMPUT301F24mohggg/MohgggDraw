@@ -11,6 +11,15 @@ android {
     viewBinding{
         enable = true
     }
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+
+        )
+        )
+    }
 
     defaultConfig {
         applicationId = "com.example.mohgggdraw"
@@ -53,6 +62,7 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.github.bumptech.glide:glide:4.13.2")
     implementation(libs.play.services.maps)
+    androidTestImplementation(libs.junit.jupiter)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // RecyclerView and Messaging
@@ -98,7 +108,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.1.1")
 
     // Additional testing dependencies
-    androidTestImplementation("androidx.fragment:fragment-testing:1.8.5")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
