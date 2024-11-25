@@ -1,4 +1,6 @@
 package com.example.mohgggdraw;
 
-public class EventCreatedSuccessFragment {
+import androidx.fragment.app.Fragment;
+
+public class EventCreatedSuccessFragment extends Fragment {
 }
