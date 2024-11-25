@@ -50,9 +50,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         NotificationModel notification = notificationList.get(position);
 
         // Set notification title
-        holder.title.setText(notification.getTitle() != null ? notification.getTitle() : "Notification");
-        holder.message.setText(notification.getMessage());
-        holder.details.setText(notification.getEventDetail());
+        holder.notificationTitle.setText(notification.getTitle() != null ? notification.getTitle() : "Notification");
+
+        // Set placeholders for event title and time
+        holder.eventTitle.setText(notification.getEventTitle() != null ? notification.getEventTitle() : "Loading...");
+        holder.eventStartMonth.setText(notification.getStartMonth() != null ? notification.getStartMonth() : "--");
+        holder.eventStartDate.setText(notification.getStartDate() != null ? notification.getStartDate() : "--");
 
         // Dynamically fetch event details and populate UI
         fetchEventDetails(notification.getEventId(), holder);
@@ -63,14 +66,34 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.declineButton.setVisibility(View.VISIBLE);
 
             // Handle decline button click with the listener
-            holder.declineButton.setOnClickListener(v -> declineActionListener.onDecline(notification));
-            holder.acceptButton.setOnClickListener(v -> acceptActionListener.onAccept(notification));
+            holder.declineButton.setOnClickListener(v -> {
+                // Hide the buttons after clicking decline
+                holder.acceptButton.setVisibility(View.GONE);
+                holder.declineButton.setVisibility(View.GONE);
+
+                // Notify the DeclineActionListener
+                declineActionListener.onDecline(notification);
+
+                // Optional: Show a toast message for confirmation
+                Toast.makeText(holder.itemView.getContext(), "You have ", Toast.LENGTH_SHORT).show();
+            });
+
+            // Handle accept button click with the listener
+            holder.acceptButton.setOnClickListener(v -> {
+                // Hide the buttons after clicking accept
+                holder.acceptButton.setVisibility(View.GONE);
+                holder.declineButton.setVisibility(View.GONE);
+
+                // Notify the AcceptActionListener
+                acceptActionListener.onAccept(notification);
+
+            });
         } else {
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
         }
-
     }
+
 
 
     /**
@@ -81,8 +104,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      */
     private void fetchEventDetails(String eventId, NotificationViewHolder holder) {
         if (eventId == null || eventId.isEmpty()) {
-            holder.details.setText("Event details unavailable.");
-            holder.poster.setImageResource(R.drawable.imageplaceholder); // Placeholder image
+            holder.eventDescription.setText("Event details unavailable.");
+            holder.eventPoster.setImageResource(R.drawable.imageplaceholder); // Placeholder image
             return;
         }
 
@@ -90,32 +113,52 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Populate the event details dynamically
-                        String eventDetails = documentSnapshot.getString("eventDetail"); // Example field
-                        String posterUrl = documentSnapshot.getString("imageUrl");  // Example field
+                        String eventDetails = documentSnapshot.getString("eventDetail");
+                        String posterUrl = documentSnapshot.getString("imageUrl");
+                        String startTime = documentSnapshot.getString("startTime");
+                        String eventTitle = documentSnapshot.getString("eventTitle");
 
-                        // Set event details in TextView
-                        holder.details.setText(eventDetails != null ? eventDetails : "No event details available.");
+                        // Set event details
+                        holder.eventDescription.setText(eventDetails != null ? eventDetails : "No event details available.");
 
-                        // Load event image into ImageView using Glide
+                        // Set event title
+                        holder.eventTitle.setText(eventTitle != null ? eventTitle : "Untitled Event");
+
+                        // Set start date and month
+                        if (startTime != null && !startTime.isEmpty()) {
+                            String[] dateParts = startTime.split("/"); // Assuming format is "DD/MM/YYYY"
+                            if (dateParts.length == 3) {
+                                holder.eventStartMonth.setText(getShortMonth(Integer.parseInt(dateParts[1])));
+                                holder.eventStartDate.setText(dateParts[0]);
+                            } else {
+                                holder.eventStartMonth.setText("N/A");
+                                holder.eventStartDate.setText("N/A");
+                            }
+                        } else {
+                            holder.eventStartMonth.setText("N/A");
+                            holder.eventStartDate.setText("N/A");
+                        }
+
+                        // Load event poster image
                         if (posterUrl != null && !posterUrl.isEmpty()) {
-                            Glide.with(holder.poster.getContext())
+                            Glide.with(holder.eventPoster.getContext())
                                     .load(posterUrl)
                                     .placeholder(R.drawable.imageplaceholder)
-                                    .into(holder.poster);
+                                    .into(holder.eventPoster);
                         } else {
-                            holder.poster.setImageResource(R.drawable.imageplaceholder);
+                            holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
                         }
                     } else {
-                        holder.details.setText("Event details unavailable.");
-                        holder.poster.setImageResource(R.drawable.imageplaceholder);
+                        holder.eventDescription.setText("Event details unavailable.");
+                        holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    holder.details.setText("Failed to fetch event details.");
-                    holder.poster.setImageResource(R.drawable.imageplaceholder);
+                    holder.eventDescription.setText("Failed to fetch event details.");
+                    holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
                 });
     }
+
 
     @Override
     public int getItemCount() {
@@ -126,8 +169,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * ViewHolder class for each notification item.
      */
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
-        TextView title, details, message;
-        ImageView poster;
+        TextView notificationTitle, eventTitle, eventDescription, eventStartMonth, eventStartDate;
+        ImageView eventPoster;
         Button acceptButton, declineButton;
 
         /**
@@ -137,17 +180,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
          */
         public NotificationViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.notification_title);
-            message = itemView.findViewById(R.id.notification_message);
 
-            details = itemView.findViewById(R.id.event_details);
-            poster = itemView.findViewById(R.id.event_poster);
+            // Initialize views based on the XML
+            notificationTitle = itemView.findViewById(R.id.notification_title);
+            eventTitle = itemView.findViewById(R.id.tv_event_title);
+            eventDescription = itemView.findViewById(R.id.event_description);
+            eventStartMonth = itemView.findViewById(R.id.event_start_month);
+            eventStartDate = itemView.findViewById(R.id.event_start_date);
+            eventPoster = itemView.findViewById(R.id.event_poster);
             acceptButton = itemView.findViewById(R.id.accept_button);
             declineButton = itemView.findViewById(R.id.decline_button);
-
-            // Initially hide the event details and poster (collapsed state)
-            poster.setVisibility(View.GONE);
         }
+    }
+
+    private String getShortMonth(int month) {
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        return (month >= 1 && month <= 12) ? months[month - 1] : "N/A";
     }
 
     /**
