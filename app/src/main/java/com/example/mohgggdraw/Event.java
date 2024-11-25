@@ -20,7 +20,7 @@ public class Event {
     private String participationSettings;
     private String date = "nov 1";
     private String time = "3:00";
-    private int maxCapacity = 100;
+    private int maxCapacity = -1;
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
@@ -69,6 +69,7 @@ public class Event {
     public void setTime(String time) {
         this.time = time;
     }
+
 
     public int getMaxCapacity() {
         return maxCapacity;
