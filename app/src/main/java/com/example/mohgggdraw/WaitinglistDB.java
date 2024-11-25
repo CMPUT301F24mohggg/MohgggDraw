@@ -177,28 +177,45 @@ public class WaitinglistDB {
     }
 
     //takes doc snapshot of event and turns into event object
-    public Event docSnapshotToEvent(DocumentSnapshot doc){
+    public Event docSnapshotToEvent(DocumentSnapshot doc) {
+        Map<String, Object> map = doc.getData();
+        // String concatenation because the database might have inconsistent values.
+        Event myevent = new Event(doc.getId(),
+                (String) map.get("eventTitle") + " please dont leave eventId empty",
+                (String) map.get("eventLocation") + " please dont leave event location empty",
+                (String) map.get("imageUrl"),
+                (String) map.get("eventDetail") + " please dont leave event detail empty");
 
-
-        Map map = doc.getData();
-        //string concat are because database is very incosistent, many null where there should not be
-        Event myevent= new Event(doc.getId(),(String)map.get("eventTitle")+" please dont leave eventId empty",(String)map.get("eventLocation")+" please dont leave event location empty",(String)map
-                .get("imageUrl"), (String)map.get("eventDetail")+"please dont leave event detail empty");
-        if(map.get("geoLocationEnabled")!=null) {
+        if (map.get("geoLocationEnabled") != null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
         }
-            myevent.setOrgID((String)map.get("organizerId"));
-        if(map.get("EventWaitinglist")!= null) {
-            myevent.setWaitingList((ArrayList<String>) map.get("EventWaitinglist"));
-        }else{
-            myevent.setWaitingList(new ArrayList<String>());
-        }
-        if(map.get("maxEntrants")!=null){
-            myevent.setMaxCapacity((int)map.get("maxEntrants"));
-        }
-        return myevent;
 
+        myevent.setOrgID((String) map.get("organizerId"));
+
+        if (map.get("EventWaitinglist") != null) {
+            myevent.setWaitingList((ArrayList<String>) map.get("EventWaitinglist"));
+        } else {
+            myevent.setWaitingList(new ArrayList<>());
+        }
+
+        // Update for maxEntrants handling
+        if (map.get("maxEntrants") != null) {
+            Object maxEntrantsObj = map.get("maxEntrants");
+            if (maxEntrantsObj instanceof Integer) {
+                myevent.setMaxCapacity((int) maxEntrantsObj);
+            } else if (maxEntrantsObj instanceof String) {
+                try {
+                    myevent.setMaxCapacity(Integer.parseInt((String) maxEntrantsObj));
+                } catch (NumberFormatException e) {
+                    // Handle the case where the String can't be parsed to an Integer
+                    myevent.setMaxCapacity(0); // Default value or handle error appropriately
+                }
+            }
+        }
+
+        return myevent;
     }
+
 
     public void updateLists(Event event, ArrayList selected, ArrayList waitlist) {
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
