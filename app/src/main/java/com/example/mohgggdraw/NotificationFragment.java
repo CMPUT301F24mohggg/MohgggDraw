@@ -119,8 +119,8 @@ public class NotificationFragment extends Fragment {
      */
     private void loadNotifications() {
         db.collection("notification")
+                .orderBy("created_at", Query.Direction.DESCENDING) // Order notifications by timestamp
                 .whereEqualTo("deviceId", deviceId)
-                .orderBy("created_at", Query.Direction.ASCENDING) // Order notifications by timestamp
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
                         Log.w("NotificationFragment", "Listen failed.", e);
@@ -141,24 +141,36 @@ public class NotificationFragment extends Fragment {
                                 });
                             }
                         } else {
-                            // Only handle the latest notification snapshot after initial load
-                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(snapshots.size() - 1);
+                            // Handle only new notifications dynamically
+                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(0); // Get the most recent document
                             NotificationModel newNotification = latestDoc.toObject(NotificationModel.class);
 
-                            fetchEventDetails(newNotification, updatedNotification -> {
-                                // Show the notification with event details
-                                showNotification(
-                                        getContext(),
-                                        newNotification.getTitle(),
-                                        newNotification.getMessage(),
-                                        updatedNotification.getTitle(),
-                                        updatedNotification.getStartTime()
-                                );
+                            // Check if the notification already exists in the list
+                            boolean isDuplicate = false;
+                            for (NotificationModel existingNotification : notificationList) {
+                                if (existingNotification.equals(newNotification)) {
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
 
-                                // Add to notificationList and update the adapter
-                                notificationList.add(updatedNotification);
-                                adapter.notifyDataSetChanged();
-                            });
+                            if (!isDuplicate) {
+                                fetchEventDetails(newNotification, updatedNotification -> {
+                                    // Add the new notification at the top
+                                    notificationList.add(0, updatedNotification);
+                                    adapter.notifyItemInserted(0);
+                                    recyclerView.smoothScrollToPosition(0);
+
+                                    // Show the notification with event details
+                                    showNotification(
+                                            getContext(),
+                                            updatedNotification.getTitle(),
+                                            updatedNotification.getMessage(),
+                                            updatedNotification.getTitle(),
+                                            updatedNotification.getStartTime()
+                                    );
+                                });
+                            }
                         }
                     }
                 });
