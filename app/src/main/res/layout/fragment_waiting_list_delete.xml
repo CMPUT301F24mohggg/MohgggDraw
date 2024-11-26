@@ -87,15 +87,15 @@
 
     </LinearLayout>
 
-    <!-- Draw Button -->
+    <!-- Delete Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/drawButton"
+        android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_draw"
-        android:contentDescription="Draw"
-        app:backgroundTint="@color/purple_500"
+        android:src="@drawable/ic_delete"
+        android:contentDescription="Delete"
+        app:backgroundTint="@color/red_500"
         app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
