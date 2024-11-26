@@ -88,7 +88,9 @@ public class NotificationFragment extends Fragment {
         notificationList = new ArrayList<>();
         adapter = new NotificationAdapter(notificationList,
                 this::handleDeclineAction, // Decline listener
-                this::handleAcceptAction  // Accept listener
+                this::handleAcceptAction,  // Accept listener
+                deviceId
+
         );
         recyclerView.setAdapter(adapter);
 
@@ -209,27 +211,30 @@ public class NotificationFragment extends Fragment {
      */
     private void handleDeclineAction(NotificationModel notification) {
         String eventId = notification.getEventId();
-        String userId = deviceId; // Using deviceId as the user ID
+        String userId = deviceId;
 
         DocumentReference eventRef = db.collection("Events").document(eventId);
         db.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(eventRef);
+
             List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
             List<String> cancelledList = (List<String>) snapshot.get("EventCancelledlist");
 
-            if (selectedList != null && cancelledList != null) {
-                // Check if user is already in cancelledList
-                if (cancelledList.contains(userId)) {
-                    return "already_declined";
-                }
+            // Ensure the lists are not null
+            if (selectedList == null) selectedList = new ArrayList<>();
+            if (cancelledList == null) cancelledList = new ArrayList<>();
 
-                // Remove user from selectedList and add to cancelledList
-                selectedList.remove(userId);
-                cancelledList.add(userId);
-
-                transaction.update(eventRef, "EventSelectedlist", selectedList);
-                transaction.update(eventRef, "EventCancelledlist", cancelledList);
+            if (cancelledList.contains(userId)) {
+                return "already_declined";
             }
+
+            // Remove from selected and add to cancelled
+            selectedList.remove(userId);
+            cancelledList.add(userId);
+
+            transaction.update(eventRef, "EventSelectedlist", selectedList);
+            transaction.update(eventRef, "EventCancelledlist", cancelledList);
+
             return "decline_recorded";
         }).addOnSuccessListener(result -> {
             if ("already_declined".equals(result)) {
@@ -241,6 +246,7 @@ public class NotificationFragment extends Fragment {
             Log.w("NotificationFragment", "Error recording decline action", e);
         });
     }
+
 
 
     /**
@@ -256,20 +262,25 @@ public class NotificationFragment extends Fragment {
         DocumentReference eventRef = db.collection("Events").document(eventId);
         db.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(eventRef);
+
             List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
             List<String> confirmedList = (List<String>) snapshot.get("EventConfirmedlist");
 
-            if (selectedList != null && confirmedList != null) {
-                if (confirmedList.contains(userId)) {
-                    return "already_confirmed";
-                }
+            // Ensure the lists are not null
+            if (selectedList == null) selectedList = new ArrayList<>();
+            if (confirmedList == null) confirmedList = new ArrayList<>();
 
-                selectedList.remove(userId);
-                confirmedList.add(userId);
-
-                transaction.update(eventRef, "EventSelectedlist", selectedList);
-                transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+            if (confirmedList.contains(userId)) {
+                return "already_confirmed";
             }
+
+            // Remove from selected and add to confirmed
+            selectedList.remove(userId);
+            confirmedList.add(userId);
+
+            transaction.update(eventRef, "EventSelectedlist", selectedList);
+            transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+
             return "accept_recorded";
         }).addOnSuccessListener(result -> {
             if ("already_confirmed".equals(result)) {
@@ -281,6 +292,7 @@ public class NotificationFragment extends Fragment {
             Log.w("NotificationFragment", "Error recording accept action", e);
         });
     }
+
 
 
     /**

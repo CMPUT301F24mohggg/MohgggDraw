@@ -22,6 +22,9 @@ public class NotificationModel {
     private String eventTitle;
     private String startMonth;
     private String startDate;
+    private boolean isAccepted;
+    private boolean isDeclined;
+
 
     /**
      * Empty constructor required for Firestore serialization.
@@ -195,5 +198,21 @@ public class NotificationModel {
 
     public void setStartDate(String startDate) {
         this.startDate = startDate;
+    }
+
+    public boolean isAccepted() {
+        return isAccepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
+    }
+
+    public boolean isDeclined() {
+        return isDeclined;
+    }
+
+    public void setDeclined(boolean declined) {
+        isDeclined = declined;
     }
 }
