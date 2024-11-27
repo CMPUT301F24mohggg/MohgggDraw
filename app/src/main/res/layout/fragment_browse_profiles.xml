@@ -55,27 +55,13 @@
             android:background="@drawable/tab_unselected_background" />
     </LinearLayout>
 
-    <!-- Search Bar -->
-    <EditText
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profile_tab_container"
-        android:layout_margin="10dp"
-        android:hint="Search"
-        android:padding="10dp"
-        android:inputType="text"
-        android:background="@drawable/search_bar_background"/>
 
-    <!-- ListView for Profiles -->
-    <ListView
-        android:id="@+id/profile_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/search_bar"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10dp"
-        android:padding="10dp" />
+    <androidx.viewpager2.widget.ViewPager2
+    android:id="@+id/view_pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/profile_tab_container"/>
+
 
     <!-- Floating Action Button -->
     <ImageView
@@ -90,5 +76,7 @@
         app:tint="#FFFFFF"
         android:background="@drawable/delete_button_background"
         android:scaleType="center" />
+
+
 
 </RelativeLayout>
