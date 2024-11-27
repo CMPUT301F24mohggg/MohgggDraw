@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 /***
- This adapter manages the fragments used in the QR scanning process. It:
+ This adapter manages the fragments used in the profile browsing fragment. It:
  - Creates and returns the appropriate fragment for each position
  - Determines the total number of creation steps
  - Handles fragment identification and containment checks

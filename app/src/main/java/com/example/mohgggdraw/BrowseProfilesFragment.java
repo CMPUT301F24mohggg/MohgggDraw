@@ -17,7 +17,7 @@ import com.google.firebase.firestore.CollectionReference;
 
 
 /***
- This fragment manages the scanning process for event QR codes. It:
+ This fragment manages browsing all the user profiles. It:
  - Sets up a ViewPager2 to navigate between different creation steps
  - Handles navigation between steps (back buttons)
  - Updates UI elements
