@@ -25,7 +25,7 @@ public class BrowseUsersFragment extends Fragment {
     private FirebaseFirestore db;
     private ListView userListView;
     private ArrayList<String> userNames;
-    private ArrayList<String> filteredUserNames; // To hold filtered results
+    private ArrayList<String> filteredUserNames;
     private ArrayAdapter<String> adapter;
     private EditText searchBar;
 
@@ -84,11 +84,12 @@ public class BrowseUsersFragment extends Fragment {
                     if (task.isSuccessful()) {
                         // Loop through all documents in the "user" collection
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Get the name field from each document
+                            // Get the name and userType
                             String userName = document.getString("name");
+                            Long userType = document.getLong("userType");
 
-                            if (userName != null) {
-                                // Add the name to the list
+                            // Only add users with userType 0 or 2
+                            if (userName != null && userType != null && (userType == 0 || userType == 2)) {
                                 userNames.add(userName);
                             }
                         }
