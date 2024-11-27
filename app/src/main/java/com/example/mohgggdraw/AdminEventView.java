@@ -26,8 +26,8 @@ public class AdminEventView extends EventListDisplayFragment {
     private ViewPager2 viewPager2;
     private HomeFragment fragment;
 
-    // Constructor
-    public AdminEventListView(User user, HomeFragment page) {
+    // Constructor with corrected name
+    public AdminEventView(User user, HomeFragment page) {
         super(user, page);
         this.fragment = page; // Properly assign the fragment
     }
