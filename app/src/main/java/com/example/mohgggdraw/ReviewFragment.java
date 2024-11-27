@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import android.provider.Settings;
+import com.google.firebase.Timestamp;
+
 
 /***
  This fragment provides a review of all entered event details. It:
@@ -29,6 +31,8 @@ import android.provider.Settings;
  - Allows the user to review and confirm the event details
  - Handles the final step of creating the event in Firebase Firestore
  ***/
+
+
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
@@ -102,8 +106,7 @@ public class ReviewFragment extends Fragment {
         });
     }
 
-
-    private void createEventInFirebase() {
+    void createEventInFirebase() {
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
@@ -113,15 +116,20 @@ public class ReviewFragment extends Fragment {
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
 
+        // Convert the dates to Firestore Timestamps
+        Timestamp registrationOpenTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationOpen().getValue()));
+        Timestamp registrationDeadlineTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationDeadline().getValue()));
+        Timestamp eventStartTimeTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getEventStartTime().getValue()));
+
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
         eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
-        eventData.put("registrationOpen", sharedViewModel.getRegistrationOpen().getValue());
-        eventData.put("registrationDeadline", sharedViewModel.getRegistrationDeadline().getValue());
-        eventData.put("startTime", sharedViewModel.getEventStartTime().getValue());
+        eventData.put("registrationOpen", registrationOpenTimestamp);  // Use Timestamp
+        eventData.put("registrationDeadline", registrationDeadlineTimestamp);  // Use Timestamp
+        eventData.put("startTime", eventStartTimeTimestamp);  // Use Timestamp
         eventData.put("maxPoolingSample", sharedViewModel.getMaxPoolingSample().getValue());
         eventData.put("maxEntrants", sharedViewModel.getMaxEntrants().getValue());
         eventData.put("createDate", System.currentTimeMillis());
@@ -133,7 +141,6 @@ public class ReviewFragment extends Fragment {
         eventData.put("EventSelectedlist", new ArrayList<>());
         eventData.put("EventCancelledlist", new ArrayList<>());
         eventData.put("EventConfirmedlist", new ArrayList<>());
-
 
         // Add the new event data to Firestore
         eventsRef.add(eventData)

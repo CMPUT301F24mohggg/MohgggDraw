@@ -4,27 +4,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /***
- * Fragment to view waitlist
- * ***/
+ * Main fragment to handle TabLayout and ViewPager2 for entrants.
+ */
 public class WaitlistViewEntrantsFragment extends Fragment {
-    private ArrayList<String> dataList;
-    private waitlistEntrantAdapter entrantAdapter;
-    private ListView entrantList;
     private Event event;
-
-    public WaitlistViewEntrantsFragment() {
-        // Required default constructor
-    }
 
     public WaitlistViewEntrantsFragment(Event event) {
         this.event = event;
@@ -32,28 +27,37 @@ public class WaitlistViewEntrantsFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        return inflater.inflate(R.layout.fragment_waiting_list, container, false);
+        return inflater.inflate(R.layout.fragment_manage_list, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        dataList = event.getWaitingList();
 
-        LinearLayout entrantListContainer = view.findViewById(R.id.listContainer);
+        // Initialize TabLayout and ViewPager2
+        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
+        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 
-        // Iterate through dataList and add each item programmatically
-        for (String entrant : dataList) {
-            // Inflate the custom layout for each entrant
-            View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
+        // Create fragments for tabs
+        List<Fragment> fragments = new ArrayList<>();
+        fragments.add(new WaitlistEntrantContentSelectedFragment(event)); // First tab
+        fragments.add(new WaitlistEntrantContentSelectedFragment(event));
+        fragments.add(new WaitlistEntrantContentCancelledFragment(event));
+        fragments.add(new WaitlistEntrantContentRedrawFragment(event));
 
-            // Set entrant's name in the TextView
-            TextView userName = itemView.findViewById(R.id.userName);
-            userName.setText(entrant);
 
-            // Add the inflated itemView to the LinearLayout container
-            entrantListContainer.addView(itemView);
-        }
+        // Tab titles
+        List<String> tabTitles = new ArrayList<>();
+        tabTitles.add("Waiting");
+        tabTitles.add("Selected");
+        tabTitles.add("Cancelled");
+        tabTitles.add("Confirmed");
+
+        // Set up adapter
+        TabFragmentAdapter adapter = new TabFragmentAdapter(this, fragments);
+        viewPager.setAdapter(adapter);
+
+        // Link TabLayout with ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabTitles.get(position))).attach();
     }
 }

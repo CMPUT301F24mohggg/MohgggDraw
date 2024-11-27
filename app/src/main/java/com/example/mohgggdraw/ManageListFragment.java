@@ -24,7 +24,6 @@ public class ManageListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_manage_list, container, false);
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -33,22 +32,25 @@ public class ManageListFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 
-        // Create a list of fragments
+        // Create a list of fragments for the slider
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new WaitlistViewEntrantsFragment());
+        fragments.add(new WaitlistFragment());
+        //fragments.add(new CancelledListFragment());
+        //fragments.add(new SelectedListFragment());
+        //fragments.add(new EntrantListFragment());
 
-        // Titles for tabs
+        // Set up titles for tabs
         List<String> fragmentTitles = new ArrayList<>();
         fragmentTitles.add("Waiting List");
         fragmentTitles.add("Cancelled List");
         fragmentTitles.add("Selected List");
         fragmentTitles.add("Entrant List");
 
-        // Set up the adapter
+        // Set up adapter
         TabFragmentAdapter adapter = new TabFragmentAdapter(this, fragments);
         viewPager.setAdapter(adapter);
 
-        // Attach TabLayout with ViewPager2
+        // Link TabLayout and ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(fragmentTitles.get(position))).attach();
     }
 }
