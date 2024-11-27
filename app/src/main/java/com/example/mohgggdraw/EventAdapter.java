@@ -70,7 +70,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         if (event.getPosterUrl() != null) {
             try {
                 File eventImageFile = File.createTempFile(
-                        event.getTitle() != null ? event.getTitle() : "default_event", // Handle null titles
+                        event.getEventId(), // Handle null titles
                         ".png"
                 );
                 StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());

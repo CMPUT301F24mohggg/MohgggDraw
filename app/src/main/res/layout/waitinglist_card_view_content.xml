@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- Registered Section Title -->
     <TextView
-        android:id="@+id/registeredTitle"
+        android:id="@+id/waitingListTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Registered"
+        android:text="Waiting List"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@android:color/black"
+
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Registered Event Card -->
+    <!-- Waiting List Event Card -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/registeredCard"
+        android:id="@+id/waitingListCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        app:layout_constraintTop_toBottomOf="@id/registeredTitle"
+        app:layout_constraintTop_toBottomOf="@id/waitingListTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -37,25 +37,23 @@
             android:layout_height="wrap_content">
 
             <!-- Event Image -->
-
-            <!-- Event Details Row (Date and Title) -->
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/eventImage"
+                android:id="@+id/waitlistEventImage"
                 android:layout_width="374dp"
                 android:layout_height="175dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_launcher_background"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.4"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:shapeAppearanceOverlay="@style/SpecificCornerRounded" />
 
+            <!-- Event Details Row (Date and Title) -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/eventDetailsContainer"
+                android:id="@+id/waitlistEventDetailsContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/eventImage"
+                app:layout_constraintTop_toBottomOf="@id/waitlistEventImage"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="8dp"
@@ -63,9 +61,10 @@
 
                 <!-- Date Background -->
                 <TextView
-                    android:id="@+id/eventDate"
+                    android:id="@+id/waitlistEventDate"
                     android:layout_width="66dp"
                     android:layout_height="53dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_date_background"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
@@ -73,20 +72,20 @@
                     android:textColor="@color/purple_500"
                     android:textSize="14sp"
                     android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <!-- Event Title -->
                 <TextView
-                    android:id="@+id/eventTitle"
+                    android:id="@+id/waitlistEventTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Event Title"
                     android:textColor="@color/purple_500"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@id/eventDate"
+                    app:layout_constraintStart_toEndOf="@id/waitlistEventDate"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" />
@@ -94,31 +93,29 @@
 
             <!-- Event Time and Description -->
             <TextView
-                android:id="@+id/eventDetails"
+                android:id="@+id/waitlistEventDetails"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Date and Time - Time"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
-                app:layout_constraintTop_toBottomOf="@id/eventDetailsContainer"
+                app:layout_constraintTop_toBottomOf="@id/waitlistEventDetailsContainer"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
-                android:id="@+id/eventDescription"
+                android:id="@+id/waitlistEventDescription"
                 android:layout_width="381dp"
                 android:layout_height="27dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:text="Event Details......."
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/waitlistEventDetails"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/eventDetails" />
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
-    <!-- Waiting List Section Title -->
-
 </androidx.constraintlayout.widget.ConstraintLayout>

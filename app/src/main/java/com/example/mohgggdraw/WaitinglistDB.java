@@ -182,6 +182,20 @@ public class WaitinglistDB {
         // String concatenation because the database might have inconsistent values.
         Event myevent = new Event(
         );
+        myevent.setEventId(doc.getId());
+
+        if (map.get("eventTitle") != null) {
+            myevent.setTitle((String)map.get("eventTitle"));
+        }
+        if (map.get("imageUrl") != null) {
+            myevent.setPosterUrl((String) map.get("imageUrl"));
+        }
+        if (map.get("eventDetail") != null) {
+            myevent.setRegistrationDetails((String)map.get("eventDetail"));
+        }
+        if (map.get("geoLocationEnabled") != null) {
+            myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
+        }
 
         if (map.get("geoLocationEnabled") != null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));

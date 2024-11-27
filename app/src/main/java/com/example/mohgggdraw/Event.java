@@ -8,6 +8,7 @@ package com.example.mohgggdraw;
  ***/
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Event {
     private String eventId;
@@ -18,6 +19,7 @@ public class Event {
     private String participationSettings;
     private String date = "nov 1";
     private String time = "3:00";
+    private Date startTime;
     private int maxCapacity = -1;
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
@@ -148,5 +150,14 @@ public class Event {
 
     public void removeFromWaitingList(User user) {
         waitingList.remove(user.getUid());
+    }
+    public void setStartTime(Date time){
+        this.startTime = time;
+
+
+    }
+    public Date getStartTime(){
+        return this.startTime;
+
     }
 }
