@@ -27,7 +27,7 @@ public class AdminEventView extends EventListDisplayFragment {
     private HomeFragment fragment;
 
     // Constructor
-    public AdminEventView(User user, HomeFragment page) {
+    public AdminEventListView(User user, HomeFragment page) {
         super(user, page);
         this.fragment = page; // Properly assign the fragment
     }
