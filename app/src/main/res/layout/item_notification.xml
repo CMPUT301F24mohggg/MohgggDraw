@@ -112,7 +112,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            >
 
             <!-- Decline Button -->
             <Button
@@ -125,7 +126,8 @@
                 android:textColor="@android:color/white"
                 android:textAllCaps="false"
                 android:textSize="14sp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"/>
 
             <!-- Accept Button -->
             <Button
@@ -137,7 +139,8 @@
                 android:text="Accept"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:visibility="gone"/>
         </LinearLayout>
 
     </LinearLayout>

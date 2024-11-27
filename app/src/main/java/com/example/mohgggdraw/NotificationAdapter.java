@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 /**
@@ -52,35 +54,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationModel notification = notificationList.get(position);
 
-        // Set notification title
+        // Set initial placeholders
         holder.notificationTitle.setText(notification.getTitle() != null ? notification.getTitle() : "Notification");
-
-        // Set placeholders for event title and time
         holder.eventTitle.setText(notification.getEventTitle() != null ? notification.getEventTitle() : "Loading...");
         holder.eventStartMonth.setText(notification.getStartMonth() != null ? notification.getStartMonth() : "--");
         holder.eventStartDate.setText(notification.getStartDate() != null ? notification.getStartDate() : "--");
 
-        // Show or hide buttons based on the notification's current status
-        if ("selected".equals(notification.getStatus())) {
-            // Initially show buttons for "selected" status
-            holder.acceptButton.setVisibility(View.VISIBLE);
-            holder.declineButton.setVisibility(View.VISIBLE);
-        } else {
-            // Hide buttons for other statuses
-            holder.acceptButton.setVisibility(View.GONE);
-            holder.declineButton.setVisibility(View.GONE);
-        }
-
-        // Dynamically fetch event details to confirm button visibility
+        // Dynamically fetch event details
         fetchEventDetails(notification.getEventId(), notification, holder);
 
-        // Handle button actions
+        // Handle accept button action
         holder.acceptButton.setOnClickListener(v -> {
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
             acceptActionListener.onAccept(notification);
         });
 
+        // Handle decline button action
         holder.declineButton.setOnClickListener(v -> {
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
@@ -96,76 +86,168 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * @param holder       The ViewHolder containing the UI components to update.
      */
     private void fetchEventDetails(String eventId, NotificationModel notification, NotificationViewHolder holder) {
+        // Check for invalid or empty event ID
         if (eventId == null || eventId.isEmpty()) {
-            holder.eventDescription.setText("Event details unavailable.");
-            holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
+            updateUIWithDefaultValues(holder, "Event details unavailable.");
             return;
         }
 
+        // Retrieve event details from Firestore
         db.collection("Events").document(eventId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        List<String> eventConfirmedList = (List<String>) documentSnapshot.get("EventConfirmedlist");
-                        List<String> eventCanceledList = (List<String>) documentSnapshot.get("EventCancelledlist");
-
-                        // Update visibility based on lists
-                        boolean isAccepted = eventConfirmedList != null && eventConfirmedList.contains(deviceId);
-                        boolean isDeclined = eventCanceledList != null && eventCanceledList.contains(deviceId);
-
-                        if (isAccepted || isDeclined) {
-                            holder.acceptButton.setVisibility(View.GONE);
-                            holder.declineButton.setVisibility(View.GONE);
-                        } else {
-                            holder.acceptButton.setVisibility(View.VISIBLE);
-                            holder.declineButton.setVisibility(View.VISIBLE);
-                        }
-
-                        // Update notification model for future reference
-                        notification.setAccepted(isAccepted);
-                        notification.setDeclined(isDeclined);
-
-                        // Update other event details in the UI
-                        holder.eventDescription.setText(documentSnapshot.getString("eventDetail") != null
-                                ? documentSnapshot.getString("eventDetail")
-                                : "No event details available.");
-
-                        holder.eventTitle.setText(documentSnapshot.getString("eventTitle") != null
-                                ? documentSnapshot.getString("eventTitle")
-                                : "Untitled Event");
-
-                        String startTime = documentSnapshot.getString("startTime");
-                        if (startTime != null && !startTime.isEmpty()) {
-                            String[] dateParts = startTime.split("/");
-                            if (dateParts.length == 3) {
-                                holder.eventStartMonth.setText(getShortMonth(Integer.parseInt(dateParts[1])));
-                                holder.eventStartDate.setText(dateParts[0]);
-                            } else {
-                                holder.eventStartMonth.setText("N/A");
-                                holder.eventStartDate.setText("N/A");
-                            }
-                        }
-
-                        String posterUrl = documentSnapshot.getString("imageUrl");
-                        if (posterUrl != null && !posterUrl.isEmpty()) {
-                            Glide.with(holder.eventPoster.getContext())
-                                    .load(posterUrl)
-                                    .placeholder(R.drawable.imageplaceholder)
-                                    .into(holder.eventPoster);
-                        } else {
-                            holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
-                        }
+                        // Process event details
+                        processEventDetails(documentSnapshot, notification, holder);
                     } else {
-                        holder.eventDescription.setText("Event details unavailable.");
-                        holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
+                        // Document does not exist
+                        updateUIWithDefaultValues(holder, "Event details unavailable.");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    holder.eventDescription.setText("Failed to fetch event details.");
-                    holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
+                    // Handle fetch failure
+                    updateUIWithDefaultValues(holder, "Failed to fetch event details.");
+
+                    // Optional: Log the error for debugging
+                    Log.e("NotificationAdapter", "Error fetching event details", e);
                 });
     }
 
+    /**
+     * Processes the retrieved event details and updates the UI.
+     *
+     * @param documentSnapshot The Firestore document snapshot containing event details.
+     * @param notification     The current notification model.
+     * @param holder           The ViewHolder to update.
+     */
+    private void processEventDetails(DocumentSnapshot documentSnapshot, NotificationModel notification, NotificationViewHolder holder) {
+        // Check and retrieve event participation lists
+        List<String> eventConfirmedList = (List<String>) documentSnapshot.get("EventConfirmedlist");
+        List<String> eventCanceledList = (List<String>) documentSnapshot.get("EventCancelledlist");
+
+        // Determine user's current participation status
+        boolean isAccepted = eventConfirmedList != null && eventConfirmedList.contains(deviceId);
+        boolean isDeclined = eventCanceledList != null && eventCanceledList.contains(deviceId);
+
+        // Update button visibility based on event status and notification status
+        updateButtonVisibility(notification, holder, isAccepted, isDeclined);
+
+        // Update notification model
+        notification.setAccepted(isAccepted);
+        notification.setDeclined(isDeclined);
+
+        // Update event description
+        String eventDescription = documentSnapshot.getString("eventDetail");
+        holder.eventDescription.setText(eventDescription != null
+                ? eventDescription
+                : "No event details available.");
+
+        // Update event title
+        String eventTitle = documentSnapshot.getString("eventTitle");
+        holder.eventTitle.setText(eventTitle != null
+                ? eventTitle
+                : "Untitled Event");
+
+        // Update event date and time
+        updateEventDateTime(documentSnapshot, holder);
+
+        // Update event poster
+        updateEventPoster(documentSnapshot, holder);
+    }
+
+    /**
+     * Updates button visibility based on event and notification status.
+     *
+     * @param notification The current notification model.
+     * @param holder       The ViewHolder containing the buttons.
+     * @param isAccepted   Whether the user has accepted the event.
+     * @param isDeclined   Whether the user has declined the event.
+     */
+    private void updateButtonVisibility(NotificationModel notification, NotificationViewHolder holder,
+                                        boolean isAccepted, boolean isDeclined) {
+        if (notification.getStatus() == null || isAccepted || isDeclined) {
+            // Hide buttons if no status or user has already responded
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.declineButton.setVisibility(View.GONE);
+        } else if ("selected".equals(notification.getStatus())) {
+            // Show buttons only for "selected" status and if not already responded
+            holder.acceptButton.setVisibility(View.VISIBLE);
+            holder.declineButton.setVisibility(View.VISIBLE);
+        } else {
+            // Hide buttons for other statuses
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.declineButton.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Updates event date and time information in the UI.
+     *
+     * @param documentSnapshot The Firestore document snapshot.
+     * @param holder           The ViewHolder to update.
+     */
+    private void updateEventDateTime(DocumentSnapshot documentSnapshot, NotificationViewHolder holder) {
+        String startTime = documentSnapshot.getString("startTime");
+        if (startTime != null && !startTime.isEmpty()) {
+            String[] dateParts = startTime.split("/");
+            if (dateParts.length == 3) {
+                // Update month and date
+                holder.eventStartMonth.setText(getShortMonth(Integer.parseInt(dateParts[1])));
+                holder.eventStartDate.setText(dateParts[0]);
+            } else {
+                // Fallback if date format is incorrect
+                holder.eventStartMonth.setText("N/A");
+                holder.eventStartDate.setText("N/A");
+            }
+        } else {
+            // No start time provided
+            holder.eventStartMonth.setText("N/A");
+            holder.eventStartDate.setText("N/A");
+        }
+    }
+
+    /**
+     * Updates the event poster image in the UI.
+     *
+     * @param documentSnapshot The Firestore document snapshot.
+     * @param holder           The ViewHolder to update.
+     */
+    private void updateEventPoster(DocumentSnapshot documentSnapshot, NotificationViewHolder holder) {
+        String posterUrl = documentSnapshot.getString("imageUrl");
+        if (posterUrl != null && !posterUrl.isEmpty()) {
+            // Load poster image using Glide
+            Glide.with(holder.eventPoster.getContext())
+                    .load(posterUrl)
+                    .placeholder(R.drawable.imageplaceholder)
+                    .into(holder.eventPoster);
+        } else {
+            // Use default placeholder if no image
+            holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
+        }
+    }
+
+    /**
+     * Updates UI with default values when event details cannot be retrieved.
+     *
+     * @param holder     The ViewHolder to update.
+     * @param message    The message to display in the event description.
+     */
+    private void updateUIWithDefaultValues(NotificationViewHolder holder, String message) {
+        // Set default text for description
+        holder.eventDescription.setText(message);
+
+        // Set default image
+        holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
+
+        // Hide action buttons
+        holder.acceptButton.setVisibility(View.GONE);
+        holder.declineButton.setVisibility(View.GONE);
+
+        // Reset other text fields
+        holder.eventTitle.setText("Untitled Event");
+        holder.eventStartMonth.setText("N/A");
+        holder.eventStartDate.setText("N/A");
+    }
 
 
     @Override

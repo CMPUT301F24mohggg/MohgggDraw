@@ -119,7 +119,7 @@ public class NotificationFragment extends Fragment {
      */
     private void loadNotifications() {
         db.collection("notification")
-                .orderBy("created_at", Query.Direction.DESCENDING) // Order notifications by timestamp
+                .orderBy("created_at", Query.Direction.DESCENDING)
                 .whereEqualTo("deviceId", deviceId)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
@@ -130,22 +130,34 @@ public class NotificationFragment extends Fragment {
                     if (snapshots != null && !snapshots.isEmpty()) {
                         if (initialLoad) {
                             initialLoad = false;
-                            notificationList.clear(); // Clear old data if necessary
+                            notificationList.clear();
 
-                            // Load all notifications initially
                             for (QueryDocumentSnapshot doc : snapshots) {
                                 NotificationModel notification = doc.toObject(NotificationModel.class);
-                                fetchEventDetails(notification, updatedNotification -> {
-                                    notificationList.add(updatedNotification);
-                                    adapter.notifyDataSetChanged();
-                                });
+
+                                // Only add to in-app notifications if status is not null and is related to selected/cancelled events
+                                if (notification.getStatus() != null) {
+                                    fetchEventDetails(notification, updatedNotification -> {
+                                        notificationList.add(updatedNotification);
+                                        adapter.notifyDataSetChanged();
+                                    });
+                                } else {
+                                    // For notifications with null status, only show system notification
+                                    fetchEventDetails(notification, updatedNotification -> {
+                                        showNotification(
+                                                getContext(),
+                                                updatedNotification.getTitle(),
+                                                updatedNotification.getMessage(),
+                                                updatedNotification.getTitle(),
+                                                updatedNotification.getStartTime()
+                                        );
+                                    });
+                                }
                             }
                         } else {
-                            // Handle only new notifications dynamically
-                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(0); // Get the most recent document
+                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(0);
                             NotificationModel newNotification = latestDoc.toObject(NotificationModel.class);
 
-                            // Check if the notification already exists in the list
                             boolean isDuplicate = false;
                             for (NotificationModel existingNotification : notificationList) {
                                 if (existingNotification.equals(newNotification)) {
@@ -156,12 +168,14 @@ public class NotificationFragment extends Fragment {
 
                             if (!isDuplicate) {
                                 fetchEventDetails(newNotification, updatedNotification -> {
-                                    // Add the new notification at the top
-                                    notificationList.add(0, updatedNotification);
-                                    adapter.notifyItemInserted(0);
-                                    recyclerView.smoothScrollToPosition(0);
+                                    // Only add to in-app notifications if status is not null
+                                    if (updatedNotification.getStatus() != null) {
+                                        notificationList.add(0, updatedNotification);
+                                        adapter.notifyItemInserted(0);
+                                        recyclerView.smoothScrollToPosition(0);
+                                    }
 
-                                    // Show the notification with event details
+                                    // Always show system notification for new notifications
                                     showNotification(
                                             getContext(),
                                             updatedNotification.getTitle(),
