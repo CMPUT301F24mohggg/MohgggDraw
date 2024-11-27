@@ -16,9 +16,9 @@
         android:inputType="text"
         android:background="@drawable/search_bar_background"/>
 
-    <!-- ListView for Profiles -->
+    <!-- ListView for Facilities -->
     <ListView
-        android:id="@+id/profile_list_view"
+        android:id="@+id/facilities_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/search_bar"
