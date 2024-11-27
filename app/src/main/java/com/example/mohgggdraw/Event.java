@@ -7,8 +7,6 @@ package com.example.mohgggdraw;
  - Includes a no-arg constructor for Firebase compatibility
  ***/
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.ArrayList;
 
 public class Event {
@@ -26,7 +24,7 @@ public class Event {
     private String orgID = "dasf";
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
-    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails) {
+    public Event() {
         this.eventId = eventId;
         this.title = title;
         this.location = location;

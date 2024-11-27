@@ -180,11 +180,8 @@ public class WaitinglistDB {
     public Event docSnapshotToEvent(DocumentSnapshot doc) {
         Map<String, Object> map = doc.getData();
         // String concatenation because the database might have inconsistent values.
-        Event myevent = new Event(doc.getId(),
-                (String) map.get("eventTitle") + " please dont leave eventId empty",
-                (String) map.get("eventLocation") + " please dont leave event location empty",
-                (String) map.get("imageUrl"),
-                (String) map.get("eventDetail") + " please dont leave event detail empty");
+        Event myevent = new Event(
+        );
 
         if (map.get("geoLocationEnabled") != null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
