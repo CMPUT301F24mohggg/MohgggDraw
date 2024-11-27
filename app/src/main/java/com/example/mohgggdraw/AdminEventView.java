@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdminEventListView extends EventListDisplayFragment {
+public class AdminEventView extends EventListDisplayFragment {
     private ArrayList<Event> dataList;
     private ListView eventList;
     private EventAdapter eventAdapter;
@@ -46,7 +46,6 @@ public class AdminEventListView extends EventListDisplayFragment {
 
         // Pulling all data for test purposes
         dataList = new WaitinglistDB().queryAllWithWaitingList(this);
-
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList = view.findViewById(R.id.eventList);

@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_myEvents, new MyEventsFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
         HomeFragment meowtest = ((HomeFragment)fragmentMap.get(R.id.nav_home));
-        //meowtest.setAdminView();
+        meowtest.setAdminView();
 
         // Set up BottomNavigationView item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {

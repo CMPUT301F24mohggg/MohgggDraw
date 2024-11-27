@@ -35,7 +35,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
                 return new WaitlistViewEntrantsFragment(event);
             default:
                 if (adminView) {
-                    return new AdminEventListView(user,(HomeFragment) fragment);
+                    return new AdminEventView(user,(HomeFragment) fragment);
 
                 }
                 else{

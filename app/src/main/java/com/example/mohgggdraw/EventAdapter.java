@@ -54,32 +54,42 @@ public class EventAdapter extends ArrayAdapter<Event> {
         ImageView eventImage = view.findViewById(R.id.eventImage);
 
         // Set event title
-        eventTitle.setText(event.getTitle());
+        eventTitle.setText(event.getTitle() != null ? event.getTitle() : "Untitled Event");
 
         // Set event date (Month and Day)
-        eventDate.setText(event.getDate()); // Assuming date format is like "Nov 1"
+        eventDate.setText(event.getDate() != null ? event.getDate() : "Unknown Date");
 
         // Set event time details
-        String timeDetails = String.format("Time: %s", event.getTime());
+        String timeDetails = String.format("Time: %s", event.getTime() != null ? event.getTime() : "Unknown Time");
         eventDetails.setText(timeDetails);
 
         // Set event description
-        eventDescription.setText(event.getRegistrationDetails());
+        eventDescription.setText(event.getRegistrationDetails() != null ? event.getRegistrationDetails() : "No Details Available");
 
         // Set event image from Firebase Storage
-        StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
-        try {
-            File eventImageFile = File.createTempFile(event.getTitle(), ".png");
-            myImage.getFile(eventImageFile)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            Bitmap bitmap = BitmapFactory.decodeFile(eventImageFile.getAbsolutePath());
-                            eventImage.setImageBitmap(bitmap);
-                        }
-                    });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (event.getPosterUrl() != null) {
+            try {
+                File eventImageFile = File.createTempFile(
+                        event.getTitle() != null ? event.getTitle() : "default_event", // Handle null titles
+                        ".png"
+                );
+                StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+                myImage.getFile(eventImageFile)
+                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                Bitmap bitmap = BitmapFactory.decodeFile(eventImageFile.getAbsolutePath());
+                                eventImage.setImageBitmap(bitmap);
+                            }
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Optionally set a placeholder image on error
+                eventImage.setImageResource(R.drawable.eventpage_banner_placeholder);
+            }
+        } else {
+            // Set a placeholder image if no URL is provided
+            eventImage.setImageResource(R.drawable.eventpage_banner_placeholder);
         }
 
         return view;
