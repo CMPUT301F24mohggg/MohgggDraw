@@ -1,6 +1,7 @@
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,30 +26,25 @@ public class AdminEventListView extends EventListDisplayFragment {
     private ViewPager2 viewPager2;
     private HomeFragment fragment;
 
-    public AdminEventListView(User user, HomeFragment page){
+    // Constructor
+    public AdminEventView(User user, HomeFragment page) {
         super(user, page);
-        this.user = user;
-        this.fragment = page;
-
+        this.fragment = page; // Properly assign the fragment
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         return inflater.inflate(R.layout.event_adapter_layout, container, false);
     }
-    //return inflater.inflate(R.layout.fragment_home, container, false);
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
-
-
-        dataList = new ArrayList<Event>();
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        dataList = new ArrayList<>();
         TextView title = view.findViewById(R.id.event_view_title);
         title.setText("Admin Event View");
-        //pulling all data for test purpose
+
+        // Pulling all data for test purposes
         dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
 
@@ -57,28 +53,24 @@ public class AdminEventListView extends EventListDisplayFragment {
 
         eventList.setAdapter(eventAdapter);
 
-//onclick per event item
-        eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
+        // OnClickListener for each event item
+        eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> list, View view,
-                                    final int i, long id) {
-
+            public void onItemClick(AdapterView<?> list, View view, final int i, long id) {
                 Event event = (Event) list.getItemAtPosition(i);
-                fragment.goToNextPage(event);
-
-
+                if (fragment != null) {
+                    fragment.goToNextPage(event);
+                } else {
+                    // Log or handle gracefully
+                    Log.e("AdminEventView", "Fragment is null. Cannot navigate to the next page.");
+                }
             }
         });
     }
-    //updates list when data is changed
-    public void dataChange(){
 
+    // Updates the list when data changes
+    public void dataChange() {
         eventAdapter = new EventAdapter(this.getContext(), dataList);
-
         eventList.setAdapter(eventAdapter);
-
     }
-
 }
-
-
