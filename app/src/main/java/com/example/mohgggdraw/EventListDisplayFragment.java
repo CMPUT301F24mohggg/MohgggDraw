@@ -30,7 +30,7 @@ import java.util.Map;
  * ***/
 public class EventListDisplayFragment extends Fragment {
 
-    private ArrayList dataList;
+    private ArrayList<Event> dataList;
     private ListView eventList;
     private EventAdapter eventAdapter;
     private User user = new User();
@@ -56,16 +56,10 @@ public class EventListDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
 
-    dataList = new ArrayList();
-    ArrayList mylist = new ArrayList();
+    dataList = new ArrayList<Event>();
 
         //pulling all data for test purpose
-        dataList = new WaitinglistDB().queryAllWithWaitingList(this);
-
-//        dataList.add(new Event());
-//        dataList.add("waitinglist");
-//        dataList.add(new Event());
-
+        //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList = view.findViewById(R.id.eventList);

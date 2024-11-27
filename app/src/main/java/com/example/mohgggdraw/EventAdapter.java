@@ -25,9 +25,9 @@ import java.util.ArrayList;
  * Event adapter for listview
  * takes arraylist of events to display according to event array content
  ***/
-public class EventAdapter extends ArrayAdapter {
+public class EventAdapter extends ArrayAdapter<Event> {
 
-    public EventAdapter(Context context, ArrayList events) {
+    public EventAdapter(Context context, ArrayList<Event> events) {
         super(context, 0, events);
     }
 
@@ -41,12 +41,7 @@ public class EventAdapter extends ArrayAdapter {
         }
 
         // Get the current event
-        if (getItem(position) instanceof String){
-            return view = LayoutInflater.from(getContext()).inflate(R.layout.event_display_list_titles,parent,false);
-
-        }
-
-        Event event = (Event)getItem(position);
+        Event event = getItem(position);
         if (event == null) {
             return view;
         }
