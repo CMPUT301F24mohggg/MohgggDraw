@@ -13,6 +13,7 @@
         android:layout_height="24dp"
         android:layout_margin="16dp"
         android:src="@drawable/lefticon"
+        android:visibility="invisible"
         android:contentDescription="Back"
         app:tint="#7257FF" />
 
@@ -38,9 +39,9 @@
             android:gravity="center"
             android:text="Facilities"
             android:tag="selected"
-        android:textColor="#7257FF"
-        android:textStyle="bold"
-        android:background="@drawable/tab_selected_background" />
+            android:textColor="#7257FF"
+            android:textStyle="bold"
+            android:background="@drawable/tab_selected_background" />
 
         <!-- Users Tab -->
         <TextView
@@ -52,14 +53,14 @@
             android:gravity="center"
             android:text="Users"
             android:tag="unselected"
-        android:textColor="#A8A8A8"
-        android:textStyle="normal"
-        android:background="@drawable/tab_unselected_background" />
+            android:textColor="#A8A8A8"
+            android:textStyle="bold"
+            android:background="@drawable/tab_unselected_background" />
     </LinearLayout>
 
     <!-- ViewPager2 -->
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+        android:id="@+id/browse_profiles_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/profile_tab_container" />
