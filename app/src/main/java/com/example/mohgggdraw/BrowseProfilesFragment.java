@@ -50,19 +50,6 @@ public class BrowseProfilesFragment extends Fragment {
 
 
 
-        // Whenever page changes to do something
-//        viewPager2.registerOnPageChangeCallback(pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                super.onPageSelected(position);
-//                if (position == 0) {
-//                    scannerViewModel.setScanStatus(1);
-//                }
-//                updateUIForPosition(position);
-//            }
-//        });
-
-
         facilitiesTab.setOnClickListener(v -> {
             if (viewPager2.getCurrentItem() != 0) {
                 updateTabBarFacilities();
@@ -88,13 +75,6 @@ public class BrowseProfilesFragment extends Fragment {
         super.onResume();
         swapToFragment(0);
     }
-
-    // Unregister to prevent memory leaks
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        viewPager2.unregisterOnPageChangeCallback(pageChangeCallback);
-//    }
 
 
     public void swapToFragment(int position) {
