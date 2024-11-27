@@ -13,17 +13,22 @@ import java.util.ArrayList;
 
 public class Event {
     private String eventId;
-    private String title;
-    private String location;
+    private String title="s";
+    private String location="";
     private String posterUrl;
-    private String registrationDetails;
-    private String participationSettings;
+    private String registrationDetails="";
+    private String participationSettings ="";
     private String date = "nov 1";
     private String time = "3:00";
     private int maxCapacity = -1;
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
+    public Event(){
+        this.title  ="empty";
+        this.posterUrl = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
+
+    }
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails) {

@@ -18,13 +18,14 @@ import java.util.ArrayList;
  * ***/
 public class WaitlistViewEntrantsFragment extends Fragment {
     private ArrayList<String> dataList;
-    private waitlistEntrantAdapter entrantAdapter;
+    private UserAdapter entrantAdapter;
     private ListView entrantList;
     private Event event;
 
     public WaitlistViewEntrantsFragment(Event event) {
         this.event = event;
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

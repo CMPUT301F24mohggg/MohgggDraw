@@ -14,9 +14,9 @@ import java.util.ArrayList;
 /***
  * Array adapter for waitlist entrants
  * ***/
-public class waitlistEntrantAdapter extends ArrayAdapter<String> {
+public class UserAdapter extends ArrayAdapter<String> {
 
-    public waitlistEntrantAdapter(@NonNull Context context, ArrayList<String> waitlist) {
+    public UserAdapter(@NonNull Context context, ArrayList<String> waitlist) {
         super(context, 0, waitlist);
     }
 
