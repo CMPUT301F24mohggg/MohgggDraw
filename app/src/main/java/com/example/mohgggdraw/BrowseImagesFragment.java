@@ -14,7 +14,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class BrowseImages extends Fragment {
+public class BrowseImagesFragment extends Fragment {
 
     private GridView gridView;
     private FirebaseFirestore db;
