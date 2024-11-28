@@ -29,6 +29,7 @@ public class BrowseProfilesFragment extends Fragment {
 
     private TextView facilitiesTab;
     private TextView usersTab;
+    private TextView imagesTab;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class BrowseProfilesFragment extends Fragment {
         // Link Buttons
         facilitiesTab = view.findViewById(R.id.tab_facilities);
         usersTab = view.findViewById(R.id.tab_users);
+        imagesTab = view.findViewById(R.id.tab_images);
 
         // Set up adapter for ViewPager2
         viewPager2 = view.findViewById(R.id.browse_profiles_viewpager);
@@ -61,6 +63,13 @@ public class BrowseProfilesFragment extends Fragment {
             if (viewPager2.getCurrentItem() != 1) {
                 updateTabBarUsers();
                 swapToFragment(1);
+            }
+        });
+
+        imagesTab.setOnClickListener(v -> { // Handle Images tab click
+            if (viewPager2.getCurrentItem() != 2) {
+                updateTabBarImages();
+                swapToFragment(2);
             }
         });
 
@@ -84,6 +93,8 @@ public class BrowseProfilesFragment extends Fragment {
     }
 
 
+
+
     private void updateTabBarFacilities() {
         // Set Facilities tab as selected
         facilitiesTab.setBackgroundResource(R.drawable.tab_selected_background);
@@ -92,6 +103,9 @@ public class BrowseProfilesFragment extends Fragment {
         // Set Users tab as unselected
         usersTab.setBackgroundResource(R.drawable.tab_unselected_background);
         usersTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        imagesTab.setBackgroundResource(R.drawable.tab_unselected_background); // Unselect Images tab
+        imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
 
 
@@ -104,7 +118,22 @@ public class BrowseProfilesFragment extends Fragment {
         // Set Facilities tab as unselected
         facilitiesTab.setBackgroundResource(R.drawable.tab_unselected_background);
         facilitiesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        imagesTab.setBackgroundResource(R.drawable.tab_unselected_background); // Unselect Images tab
+        imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
+
+    private void updateTabBarImages() {
+        imagesTab.setBackgroundResource(R.drawable.tab_selected_background);
+        imagesTab.setTextColor(getResources().getColor(R.color.tab_selector_text_color, null));
+
+        facilitiesTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        facilitiesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        usersTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        usersTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+    }
+
 }
 
 

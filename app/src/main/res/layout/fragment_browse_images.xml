@@ -6,16 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title TextView -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Collections"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingBottom="16dp" />
 
     <!-- GridView -->
     <GridView

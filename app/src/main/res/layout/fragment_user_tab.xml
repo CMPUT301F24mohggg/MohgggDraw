@@ -5,24 +5,25 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- Search Bar -->
-    <EditText
-        android:id="@+id/search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:hint="Search"
-        android:padding="10dp"
-        android:inputType="text"
-        android:background="@drawable/search_bar_background"/>
 
     <!-- ListView for Users -->
     <ListView
         android:id="@+id/user_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_bar"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
         android:padding="10dp" />
 </RelativeLayout>
+
+
+    <!-- Search Bar -->
+<!--<EditText-->
+<!--android:id="@+id/search_bar"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_margin="10dp"-->
+<!--android:hint="Search"-->
+<!--android:padding="10dp"-->
+<!--android:inputType="text"-->
+<!--android:background="@drawable/search_bar_background"/>-->

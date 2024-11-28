@@ -24,6 +24,8 @@ public class BrowseProfilesPagerAdapter extends FragmentStateAdapter {
                 return new BrowseFacilitiesFragment();
             case 1:
                 return new BrowseUsersFragment();
+            case 2:
+                return new BrowseImagesFragment();
             default:
                 return new BrowseFacilitiesFragment();
         }
@@ -33,7 +35,7 @@ public class BrowseProfilesPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 2; // Total number of pages
+        return 3; // Total number of pages
     }
 
     @Override

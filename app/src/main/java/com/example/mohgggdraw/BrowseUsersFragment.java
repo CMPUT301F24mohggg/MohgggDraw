@@ -1,13 +1,10 @@
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,15 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BrowseUsersFragment extends Fragment {
     private FirebaseFirestore db;
     private ListView userListView;
     private ArrayList<String> userNames;
-    private ArrayList<String> filteredUserNames;
     private ArrayAdapter<String> adapter;
-    private EditText searchBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,26 +40,24 @@ public class BrowseUsersFragment extends Fragment {
 
         // Initialize views
         userListView = view.findViewById(R.id.user_list_view);
-        searchBar = view.findViewById(R.id.search_bar);
 
         // Initialize Firestore and ListView
         db = FirebaseFirestore.getInstance();
         userNames = new ArrayList<>();
-        filteredUserNames = new ArrayList<>();
 
         // Create ArrayAdapter to populate the ListView
-        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, filteredUserNames);
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userNames);
         userListView.setAdapter(adapter);
 
-        // Fetch user names from Firestore
+        // Fetch all user names from Firestore
         fetchUserNames();
 
-        // Set up search listener
+        // Commented-out search functionality
+        /*
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
 
-            // Refilters the user list after text changed
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 filterUsers(charSequence.toString());
@@ -74,6 +66,7 @@ public class BrowseUsersFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {}
         });
+        */
     }
 
     private void fetchUserNames() {
@@ -93,8 +86,6 @@ public class BrowseUsersFragment extends Fragment {
                                 userNames.add(userName);
                             }
                         }
-                        // Initially show all users in the ListView
-                        filteredUserNames.addAll(userNames);
                         // Notify the adapter to update the ListView
                         adapter.notifyDataSetChanged();
                     } else {
@@ -103,13 +94,10 @@ public class BrowseUsersFragment extends Fragment {
                 });
     }
 
-
+    // Commented-out filtering functionality
+    /*
     private void filterUsers(String query) {
-        /***
-         * Filters the user list with string query
-         */
-
-        // Clear the filtered list
+        // Filters the user list with string query
         filteredUserNames.clear();
 
         // If the query is empty, show all users
@@ -127,4 +115,5 @@ public class BrowseUsersFragment extends Fragment {
         // Notify the adapter to update the ListView with the filtered data
         adapter.notifyDataSetChanged();
     }
+    */
 }
