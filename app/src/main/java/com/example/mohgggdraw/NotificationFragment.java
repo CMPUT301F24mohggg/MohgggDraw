@@ -51,6 +51,8 @@ public class NotificationFragment extends Fragment {
     private FirebaseFirestore db;
     private String deviceId;
     private Boolean initialLoad;
+    private Context preContext = null;
+    private Context actualContext;
 
     /**
      * Inflates the fragment's view and initializes the RecyclerView and Firestore instance.
@@ -100,6 +102,43 @@ public class NotificationFragment extends Fragment {
     }
 
     /**
+     * Pre-loads notifications in the background.
+     * This method can be called during app initialization to prepare notifications.
+     */
+    public void preLoadNotifications(Context context) {
+        if (context == null) {
+            Log.e("NotificationFragment", "Context is null, cannot preload notifications");
+            return;
+        }
+        if (preContext == null){
+            preContext = context;
+        }
+
+        // Ensure lists and adapter are initialized
+        if (notificationList == null) {
+            notificationList = new ArrayList<>();
+        }
+
+        if (adapter == null) {
+            adapter = new NotificationAdapter(notificationList,
+                    this::handleDeclineAction,
+                    this::handleAcceptAction,
+                    deviceId
+            );
+            if (recyclerView != null) {
+                recyclerView.setAdapter(adapter);
+            }
+        }
+
+        deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        db = FirebaseFirestore.getInstance();
+
+        initialLoad = true;
+        loadNotifications();
+    }
+
+
+    /**
      * Callback interface for fetching event details.
      */
     public interface EventDetailsCallback {
@@ -118,6 +157,11 @@ public class NotificationFragment extends Fragment {
      * On the first load, it fetches all notifications; subsequent updates only fetch the latest ones.
      */
     private void loadNotifications() {
+        if (getContext() == null){
+            actualContext = preContext;
+        } else {
+            actualContext = getContext();
+        }
         db.collection("notification")
                 .orderBy("created_at", Query.Direction.DESCENDING)
                 .whereEqualTo("deviceId", deviceId)
@@ -145,7 +189,7 @@ public class NotificationFragment extends Fragment {
                                     // For notifications with null status, only show system notification
                                     fetchEventDetails(notification, updatedNotification -> {
                                         showNotification(
-                                                getContext(),
+                                                actualContext,
                                                 updatedNotification.getTitle(),
                                                 updatedNotification.getMessage(),
                                                 updatedNotification.getTitle(),
@@ -172,12 +216,12 @@ public class NotificationFragment extends Fragment {
                                     if (updatedNotification.getStatus() != null) {
                                         notificationList.add(0, updatedNotification);
                                         adapter.notifyItemInserted(0);
-                                        recyclerView.smoothScrollToPosition(0);
+//                                        recyclerView.smoothScrollToPosition(0);
                                     }
 
                                     // Always show system notification for new notifications
                                     showNotification(
-                                            getContext(),
+                                            actualContext,
                                             updatedNotification.getTitle(),
                                             updatedNotification.getMessage(),
                                             updatedNotification.getTitle(),
@@ -189,7 +233,6 @@ public class NotificationFragment extends Fragment {
                     }
                 });
     }
-
 
 
     /**
@@ -332,12 +375,11 @@ public class NotificationFragment extends Fragment {
      */
     public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
         Log.e("showNotification: ", "it ran thru here");
-        createNotificationChannel(context); // Ensure the channel is created first
-
-        if (getContext() == null) {
+        if (context == null) {
             Log.e("NotificationFragment", "Context is null, cannot show notification.");
             return;
         }
+        createNotificationChannel(context); // Ensure the channel is created first
 
         // Create PendingIntent to open the main activity
         Intent intent = new Intent(context, MainActivity.class);
@@ -380,6 +422,10 @@ public class NotificationFragment extends Fragment {
      * @param context The context used to create the notification channel.
      */
     public void createNotificationChannel(Context context) {
+        if (context == null) {
+            Log.e("NotificationFragment", "Context is null. Cannot create notification channel.");
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Notification Channel Name";
             String description = "Channel Description";

@@ -1,5 +1,7 @@
 package com.example.mohgggdraw;
 
+import com.google.firebase.Timestamp;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,6 +26,7 @@ public class NotificationModel {
     private String startDate;
     private boolean isAccepted;
     private boolean isDeclined;
+    private Timestamp created_at;
 
 
     /**
@@ -214,5 +217,13 @@ public class NotificationModel {
 
     public void setDeclined(boolean declined) {
         isDeclined = declined;
+    }
+
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -102,12 +103,31 @@ public class MainActivity extends AppCompatActivity {
         signupLayout.setVisibility(View.GONE);
         bottomNavigationView.setVisibility(View.VISIBLE);
 
-        // Check if we need to navigate to the home fragment directly
-        boolean navigateToHomeFragment = getIntent().getBooleanExtra("navigateToHomeFragment", false);
-        if (navigateToHomeFragment || activeFragment == null) {
-            // Set default fragment to HomeFragment
-            switchFragment(fragmentMap.get(R.id.nav_home));
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // Set default fragment to HomeFragment
+        Fragment homeFragment = fragmentMap.get(R.id.nav_home);
+        if (homeFragment == null) {
+            homeFragment = new HomeFragment();
+            fragmentMap.put(R.id.nav_home, homeFragment);
+        }
+        switchFragment(homeFragment);
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+
+        // Pre-load notifications after navigation is set up
+        preLoadNotifications();
+    }
+
+    private void preLoadNotifications() {
+        Fragment notificationFragment = fragmentMap.get(R.id.nav_notifications);
+        if (notificationFragment == null) {
+            notificationFragment = new NotificationFragment();
+            fragmentMap.put(R.id.nav_notifications, notificationFragment);
+        }
+
+        // Call preLoadNotifications if it's a NotificationFragment
+        if (notificationFragment instanceof NotificationFragment) {
+            // Use getSupportFragmentManager() to get the attached context
+            Context context = getApplicationContext();
+            ((NotificationFragment) notificationFragment).preLoadNotifications(context);
         }
     }
 
