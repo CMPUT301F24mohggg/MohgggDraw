@@ -3,8 +3,6 @@ package com.example.mohgggdraw;
 import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,8 +22,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 /***
  This fragment starts an Intent for QR scanner. It:
@@ -34,7 +33,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
  ***/
 public class ScannerCameraFragment extends Fragment {
     private ScannerViewModel scannerViewModel;
-    private String eventId;
+    private String qrHash;
     private WaitinglistDB waitinglistDB = new WaitinglistDB();
     private CollectionReference eventRef = waitinglistDB.getWaitlistRef();
 
@@ -61,62 +60,69 @@ public class ScannerCameraFragment extends Fragment {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent resultIntent = result.getData();
-                        eventId = resultIntent.getStringExtra("qrTextKey");
+                        qrHash = resultIntent.getStringExtra("qrTextKey");
 
-                        // Validate ID
-                        validEventId(eventId);
+                        // Validate and retrieve event by QR hash
+                        validQrHash(qrHash);
                     }
                 }
             });
 
-
-    private void validEventId(String eventId) {
-        // Validate the event ID format: no spaces, only alphanumeric characters
-        if (eventId == null || !eventId.matches("^[a-zA-Z0-9]+$")) {
-            setToPage(1);
+    private void validQrHash(String qrHash) {
+        // Validate the QR hash format: numeric characters, optionally starting with a "-"
+        if (qrHash == null || !qrHash.matches("^-?[0-9]+$")) {
+            setToPage(1); // Invalid QR code, go to error page
             return;
         }
 
+        qrHash = qrHash.trim(); // Ensure there are no leading/trailing spaces
 
-        try {
-            DocumentReference docRef = eventRef.document((String) eventId);
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
+        // Query Firestore to find the document with the matching QR hash
+        Query query = eventRef.whereEqualTo("QRhash", qrHash);
+        query.get().addOnCompleteListener(new OnCompleteListener<com.google.firebase.firestore.QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<com.google.firebase.firestore.QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    if (!task.getResult().isEmpty()) {
+                        // Retrieve the first matching DocumentSnapshot
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
 
+                        // Check if the document has data
                         if (document.exists()) {
-                            // If exists return event
+                            // Convert the document into an Event object
                             Event event = returnEvent(document);
-                            scannerViewModel.setSharedEvent(event);   // Send Event obj
+
+                            // Pass the event to the ViewModel
+                            scannerViewModel.setSharedEvent(event);
+
+                            // Navigate to the event details page
                             setToPage(2);
                         } else {
-                            setToPage(1);
+                            // Document exists in the result set but has no data
+                            Log.d(TAG, "Document exists but has no data");
+                            setToPage(1); // Navigate to the error page
                         }
                     } else {
-                        Log.d(TAG, "get failed with ", task.getException());
+                        // No matching documents found
+                        setToPage(1); // Navigate to the error page
                     }
+                } else {
+                    // Log query failure
+                    Log.d(TAG, "Query failed with ", task.getException());
                 }
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+            }
+        });
     }
 
     private void setToPage(int position) {
         ((ScannerFragment) requireParentFragment()).swapToFragment(position);
     }
 
-
     private void startScanner() {
         // Start QR scanner Activity
         Intent intent = new Intent(getActivity(), ScannerActivity.class);
         ScannerActivityResultLauncher.launch(intent);
     }
-
-
 
     private Event returnEvent(DocumentSnapshot document) {
         Event event = waitinglistDB.docSnapshotToEvent(document);

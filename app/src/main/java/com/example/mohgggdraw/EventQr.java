@@ -15,18 +15,20 @@ import java.io.Serializable;
 public class EventQr implements Serializable {
 
     private String eventId;
+    private String eventTitle;
     private Bitmap qrBitmap;
-    private int qrHash;
+    private String qrHash;
 
     /**
      * Constructs an EventQr object with the specified event ID.
      *
      * @param eventId the unique identifier for the event
      */
-    public EventQr(String eventId) {
+    public EventQr(String eventId, String eventTitle) {
         this.eventId = eventId;
+        this.eventTitle = eventTitle;
         this.qrBitmap = null;
-        this.qrHash = 0;
+        this.qrHash = generateHash();
     }
 
     /**
@@ -34,8 +36,9 @@ public class EventQr implements Serializable {
      */
     public void generateQr() {
         MultiFormatWriter writer = new MultiFormatWriter();
+
         try {
-            BitMatrix matrix = writer.encode(eventId, BarcodeFormat.QR_CODE, 600, 600);
+            BitMatrix matrix = writer.encode(this.qrHash, BarcodeFormat.QR_CODE, 600, 600);
             BarcodeEncoder encoder = new BarcodeEncoder();
             qrBitmap = encoder.createBitmap(matrix);
             this.setQrBitmap(qrBitmap);
@@ -48,65 +51,34 @@ public class EventQr implements Serializable {
      * Hashes the QR code bitmap and stores the hash value.
      * If the QR code bitmap doesn't exist, it will be generated first.
      */
-    public void hashQr() {
-        if (this.qrBitmap == null) {
-            generateQr();
-        }
-        try {
-            int hashedQrcode = 37 * this.qrBitmap.hashCode();
-            this.setQrHash(hashedQrcode);
-        } catch (Exception e) {
-            throw new RuntimeException("Error hashing QR code", e);
-        }
+    private String generateHash() {
+        int hash = 37 * (this.eventId.hashCode() + this.eventTitle.hashCode());
+        return String.valueOf(hash); // Ensure the hash is positive
     }
 
-    // Getters and Setters
 
-    /**
-     * @return the event ID associated with this QR code
-     */
+    // Getters and Setters
     public String getEventId() {
         return eventId;
     }
 
-    /**
-     * Updates the event ID.
-     *
-     * @param eventId the new event ID
-     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
-    /**
-     * @return the QR code bitmap
-     */
     public Bitmap getQrBitmap() {
         return qrBitmap;
     }
 
-    /**
-     * Updates the QR code bitmap.
-     *
-     * @param qrBitmap the new QR code bitmap
-     */
     private void setQrBitmap(Bitmap qrBitmap) {
         this.qrBitmap = qrBitmap;
     }
 
-    /**
-     * @return the hash of the QR code bitmap
-     */
-    public int getQrHash() {
+    public String getQrHash() {
         return qrHash;
     }
 
-    /**
-     * Updates the QR code hash value.
-     *
-     * @param qrHash the new QR code hash
-     */
-    private void setQrHash(int qrHash) {
+    private void setQrHash(String qrHash) {
         this.qrHash = qrHash;
     }
 }
