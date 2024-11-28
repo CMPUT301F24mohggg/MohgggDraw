@@ -1,11 +1,5 @@
-/**
- * Fragment that handles the display and interaction with notifications in the app.
- * Handles the loading of notifications from Firestore, displaying them, and handling actions
- * like accepting or declining events.
- */
 package com.example.mohgggdraw;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,15 +8,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -32,19 +29,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
+import java.util.Objects;
 
 public class NotificationFragment extends Fragment {
+    private static final String TAG = "NotificationFragment";
+
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
     private List<NotificationModel> notificationList;
@@ -53,6 +48,9 @@ public class NotificationFragment extends Fragment {
     private Boolean initialLoad;
     private Context preContext = null;
     private Context actualContext;
+    private ProgressBar loadingProgressBar;
+    private TextView emptyStateTextView;
+    private Boolean inFragment = false;
 
     /**
      * Inflates the fragment's view and initializes the RecyclerView and Firestore instance.
@@ -66,7 +64,11 @@ public class NotificationFragment extends Fragment {
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+        View view = inflater.inflate(R.layout.fragment_notification, container, false);
+        // Initialize views
+        loadingProgressBar = view.findViewById(R.id.loadingProgressBar);
+        emptyStateTextView = view.findViewById(R.id.emptyStateTextView);
+        return view;
     }
 
 
@@ -87,6 +89,7 @@ public class NotificationFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        inFragment = true;
         adapter = new NotificationAdapter(notificationList,
                 this::handleDeclineAction, // Decline listener
                 this::handleAcceptAction,  // Accept listener
@@ -102,10 +105,11 @@ public class NotificationFragment extends Fragment {
      */
     public void preLoadNotifications(Context context) {
         if (context == null) {
-            Log.e("NotificationFragment", "Context is null, cannot preload notifications");
+            Log.e(TAG, "Context is null, cannot preload notifications");
             return;
         }
-        if (preContext == null){
+
+        if (preContext == null) {
             preContext = context;
         }
 
@@ -115,11 +119,13 @@ public class NotificationFragment extends Fragment {
         }
 
         if (adapter == null) {
-            adapter = new NotificationAdapter(notificationList,
+            adapter = new NotificationAdapter(
+                    notificationList,
                     this::handleDeclineAction,
                     this::handleAcceptAction,
                     deviceId
             );
+
             if (recyclerView != null) {
                 recyclerView.setAdapter(adapter);
             }
@@ -134,35 +140,29 @@ public class NotificationFragment extends Fragment {
 
 
     /**
-     * Callback interface for fetching event details.
-     */
-    public interface EventDetailsCallback {
-        /**
-         * Called when event details have been fetched and the notification has been updated.
-         *
-         * @param notification The updated notification with event details.
-         */
-        void onEventDetailsFetched(NotificationModel notification);
-    }
-
-
-    /**
      * Loads notifications from Firestore and listens for updates in real-time.
      * Notifications are filtered by device ID and ordered by the creation timestamp.
      * On the first load, it fetches all notifications; subsequent updates only fetch the latest ones.
      */
     private void loadNotifications() {
-        if (getContext() == null){
+        if (getContext() == null) {
             actualContext = preContext;
         } else {
             actualContext = getContext();
+        }
+
+        // Show loading progress
+        if(inFragment) {
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            emptyStateTextView.setVisibility(View.GONE);
         }
         db.collection("notification")
                 .orderBy("created_at", Query.Direction.DESCENDING)
                 .whereEqualTo("deviceId", deviceId)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.w("NotificationFragment", "Listen failed.", e);
+                        Log.w(TAG, "Listen failed.", e);
+                        updateUIState();
                         return;
                     }
 
@@ -174,7 +174,7 @@ public class NotificationFragment extends Fragment {
                             for (QueryDocumentSnapshot doc : snapshots) {
                                 NotificationModel notification = doc.toObject(NotificationModel.class);
 
-                                // Only add to in-app notifications if status is not null and is related to selected/cancelled events
+                                // Only add to in-app notifications if status is not null
                                 if (notification.getStatus() != null) {
                                     fetchEventDetails(notification, updatedNotification -> {
                                         notificationList.add(updatedNotification);
@@ -211,7 +211,6 @@ public class NotificationFragment extends Fragment {
                                     if (updatedNotification.getStatus() != null) {
                                         notificationList.add(0, updatedNotification);
                                         adapter.notifyItemInserted(0);
-//                                        recyclerView.smoothScrollToPosition(0);
                                     }
 
                                     // Always show system notification for new notifications
@@ -226,9 +225,23 @@ public class NotificationFragment extends Fragment {
                             }
                         }
                     }
+                    if(inFragment) {
+                        updateUIState();
+                    }
                 });
     }
 
+    private void updateUIState() {
+        loadingProgressBar.setVisibility(View.GONE);
+
+        if (notificationList == null || notificationList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyStateTextView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyStateTextView.setVisibility(View.GONE);
+        }
+    }
 
     /**
      * Fetches event details from the Firestore database for a specific notification.
@@ -240,7 +253,8 @@ public class NotificationFragment extends Fragment {
     private void fetchEventDetails(NotificationModel notification, EventDetailsCallback callback) {
         String eventId = notification.getEventId();
         if (eventId == null || eventId.isEmpty()) {
-            Log.w("NotificationFragment", "Notification has no event ID.");
+            Log.w(TAG, "Notification has no event ID.");
+            callback.onEventDetailsFetched(notification);
             return;
         }
 
@@ -253,6 +267,7 @@ public class NotificationFragment extends Fragment {
                         notification.setTitle(notification.getTitle());
                         notification.setEventDetail("Event: " + eventName + " starts at: " + startTime);
                         notification.setMessage(notification.getMessage());
+                        notification.setStartTime(startTime);
                     } else {
                         notification.setMessage("Event details unavailable.");
                     }
@@ -261,7 +276,8 @@ public class NotificationFragment extends Fragment {
                     callback.onEventDetailsFetched(notification);
                 })
                 .addOnFailureListener(e -> {
-                    Log.w("NotificationFragment", "Failed to fetch event details for event ID: " + eventId, e);
+                    Log.w(TAG, "Failed to fetch event details for event ID: " + eventId, e);
+                    callback.onEventDetailsFetched(notification);
                 });
     }
 
@@ -307,7 +323,7 @@ public class NotificationFragment extends Fragment {
                 Toast.makeText(getContext(), "Decline action recorded successfully.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
-            Log.w("NotificationFragment", "Error recording decline action", e);
+            Log.w(TAG, "Error recording decline action", e);
         });
     }
 
@@ -353,7 +369,7 @@ public class NotificationFragment extends Fragment {
                 Toast.makeText(getContext(), "Accept action recorded successfully.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
-            Log.w("NotificationFragment", "Error recording accept action", e);
+            Log.w(TAG, "Error recording accept action", e);
         });
     }
 
@@ -369,12 +385,12 @@ public class NotificationFragment extends Fragment {
      * @param startTime The start time of the event.
      */
     public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
-        Log.e("showNotification: ", "it ran thru here");
         if (context == null) {
-            Log.e("NotificationFragment", "Context is null, cannot show notification.");
+            Log.e(TAG, "Context is null, cannot show notification.");
             return;
         }
-        createNotificationChannel(context); // Ensure the channel is created first
+
+        createNotificationChannel(context);
 
         // Create PendingIntent to open the main activity
         Intent intent = new Intent(context, MainActivity.class);
@@ -385,7 +401,6 @@ public class NotificationFragment extends Fragment {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
-
 
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notification_channel_id")
@@ -400,7 +415,7 @@ public class NotificationFragment extends Fragment {
         // Check for notification permission (API 33 and above)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("NotificationFragment", "Notification permission not granted.");
+            Log.e(TAG, "Notification permission not granted.");
             return;
         }
 
@@ -418,7 +433,7 @@ public class NotificationFragment extends Fragment {
      */
     public void createNotificationChannel(Context context) {
         if (context == null) {
-            Log.e("NotificationFragment", "Context is null. Cannot create notification channel.");
+            Log.e(TAG, "Context is null. Cannot create notification channel.");
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -434,7 +449,17 @@ public class NotificationFragment extends Fragment {
                 notificationManager.createNotificationChannel(channel);
             }
         }
-
     }
 
+    /**
+     * Callback interface for fetching event details.
+     */
+    public interface EventDetailsCallback {
+        /**
+         * Called when event details have been fetched and the notification has been updated.
+         *
+         * @param notification The updated notification with event details.
+         */
+        void onEventDetailsFetched(NotificationModel notification);
+    }
 }
