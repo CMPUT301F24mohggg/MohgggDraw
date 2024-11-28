@@ -12,6 +12,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     Event event;
     User user;
     Fragment fragment;
+    boolean adminView;
 
     public WaitlistPagerAdapter(@NonNull Fragment fragment, User user) {
         super(fragment.getChildFragmentManager(), fragment.getLifecycle());
@@ -33,7 +34,14 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
             case 2:
                 return new WaitlistViewEntrantsFragment(event);
             default:
-                return new EventListDisplayFragment(user, (HomeFragment) fragment);
+                if (adminView) {
+                    return new AdminEventView(user,(HomeFragment) fragment);
+
+                }else {
+
+
+                    return new EventListDisplayFragment(user, (HomeFragment) fragment);
+                }
         }
 //
     }
@@ -45,4 +53,9 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     public void setEvent(Event event){
         this.event = event;
     }
+    public void setAdminView() {
+        adminView = true;
+    }
 }
+
+

@@ -22,6 +22,7 @@ public class HomeFragment extends Fragment {
     private ImageView backButton;
     private User user = new User();
     private WaitlistPagerAdapter waitlistAdapter;
+    private boolean adminView = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +39,11 @@ public class HomeFragment extends Fragment {
         organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
         viewPager2 = view.findViewById(R.id.waitlist_viewpage);
         backButton = view.findViewById(R.id.waitlist_back_button);
+        if(adminView){
+            waitlistAdapter.setAdminView();
+        }
+
+
 
 
         viewPager2.setAdapter(waitlistAdapter);
@@ -75,4 +81,10 @@ public class HomeFragment extends Fragment {
         backButton.setVisibility(View.VISIBLE);
 
     }
+
+    public void setAdminView(){
+        adminView = true;
+
+    }
+
 }

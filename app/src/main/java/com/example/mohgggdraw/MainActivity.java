@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         fragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         fragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
+        HomeFragment mewo=(HomeFragment) fragmentMap.get(R.id.nav_home);
+        mewo.setAdminView();
 
         // Set up BottomNavigationView item selection listener
         bottomNavigationView.setOnItemSelectedListener(item -> {

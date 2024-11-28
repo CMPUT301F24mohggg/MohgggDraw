@@ -6,7 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".EventListDisplayFragment">
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event view"
+        android:id="@+id/event_view_title"
+        ></TextView>
 
     <ListView
         android:layout_width="match_parent"
