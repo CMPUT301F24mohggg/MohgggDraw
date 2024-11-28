@@ -87,7 +87,6 @@ public class NotificationFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        notificationList = new ArrayList<>();
         adapter = new NotificationAdapter(notificationList,
                 this::handleDeclineAction, // Decline listener
                 this::handleAcceptAction,  // Accept listener
@@ -95,10 +94,6 @@ public class NotificationFragment extends Fragment {
 
         );
         recyclerView.setAdapter(adapter);
-
-        db = FirebaseFirestore.getInstance();
-        initialLoad = true;
-        loadNotifications();
     }
 
     /**
