@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         organizerFragmentMap.put(R.id.nav_home, new HomeFragment());
         organizerFragmentMap.put(R.id.nav_create, new CreateFragment());
+        organizerFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         organizerFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         organizerFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
 

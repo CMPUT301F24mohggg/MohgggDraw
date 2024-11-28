@@ -35,7 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         });
 
         buttonFacility.setOnClickListener(view -> {
-            navigateToFormScreen("facility");
+            navigateToFormScreen("organizer");
         });
 
         buttonAdmin.setOnClickListener(view -> {
