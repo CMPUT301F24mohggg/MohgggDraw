@@ -38,7 +38,7 @@ public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
     private EventQr eventQr;
-    private int qrHash;
+    private String qrHash;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -112,6 +112,8 @@ public class ReviewFragment extends Fragment {
 
 
     private void createEventInFirebase() {
+        String eventTitle = sharedViewModel.getEventTitle().getValue();
+
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
@@ -124,7 +126,7 @@ public class ReviewFragment extends Fragment {
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
-        eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
+        eventData.put("eventTitle", eventTitle);
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
         eventData.put("registrationOpen", sharedViewModel.getRegistrationOpen().getValue());
@@ -148,8 +150,8 @@ public class ReviewFragment extends Fragment {
                     String eventId = documentReference.getId();  // Get the documentId
 
                     // Generate QR code and put QR hash
-                    eventQr = new EventQr(eventId);
-                    eventQr.hashQr();
+                    eventQr = new EventQr(eventId, eventTitle);
+                    eventQr.generateQr();
                     qrHash = eventQr.getQrHash();
                     documentReference.update("QRhash", qrHash);
                     sharedViewModel.setEventQr(eventQr);
