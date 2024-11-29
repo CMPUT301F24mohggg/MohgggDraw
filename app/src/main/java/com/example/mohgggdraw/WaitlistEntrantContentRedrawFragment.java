@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 /***
- * Content fragment to display entrants for the second tab (redraw).
+ * Content fragment to display
  */
 public class WaitlistEntrantContentRedrawFragment extends Fragment {
     private ArrayList<String> dataList;

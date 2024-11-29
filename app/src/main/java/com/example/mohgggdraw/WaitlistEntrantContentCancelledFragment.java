@@ -25,7 +25,7 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_waiting_list, container, false);
+        return inflater.inflate(R.layout.fragment_waiting_list_cancelled, container, false);
     }
 
     @Override
