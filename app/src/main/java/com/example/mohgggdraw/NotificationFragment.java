@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,8 +32,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class NotificationFragment extends Fragment {
     private static final String TAG = "NotificationFragment";
@@ -173,25 +171,11 @@ public class NotificationFragment extends Fragment {
 
                             for (QueryDocumentSnapshot doc : snapshots) {
                                 NotificationModel notification = doc.toObject(NotificationModel.class);
-
-                                // Only add to in-app notifications if status is not null
-                                if (notification.getStatus() != null) {
-                                    fetchEventDetails(notification, updatedNotification -> {
-                                        notificationList.add(updatedNotification);
-                                        adapter.notifyDataSetChanged();
-                                    });
-                                } else {
-                                    // For notifications with null status, only show system notification
-                                    fetchEventDetails(notification, updatedNotification -> {
-                                        showNotification(
-                                                actualContext,
-                                                updatedNotification.getTitle(),
-                                                updatedNotification.getMessage(),
-                                                updatedNotification.getTitle(),
-                                                updatedNotification.getStartTime()
-                                        );
-                                    });
-                                }
+                                fetchEventDetails(notification, updatedNotification -> {
+                                    notificationList.add(updatedNotification);
+                                    sortNotificationList();
+                                    adapter.notifyDataSetChanged();
+                                });
                             }
                         } else {
                             DocumentSnapshot latestDoc = snapshots.getDocuments().get(0);
@@ -209,7 +193,8 @@ public class NotificationFragment extends Fragment {
                                 fetchEventDetails(newNotification, updatedNotification -> {
                                     // Only add to in-app notifications if status is not null
                                     if (updatedNotification.getStatus() != null) {
-                                        notificationList.add(0, updatedNotification);
+                                        notificationList.add(updatedNotification);
+                                        sortNotificationList();
                                         adapter.notifyItemInserted(0);
                                     }
 
@@ -230,7 +215,12 @@ public class NotificationFragment extends Fragment {
                     }
                 });
     }
-
+    /**
+     * Sorts the notificationList in descending order by the created_at field.
+     */
+    private void sortNotificationList() {
+        Collections.sort(notificationList, (n1, n2) -> n2.getCreated_at().compareTo(n1.getCreated_at()));
+    }
     private void updateUIState() {
         loadingProgressBar.setVisibility(View.GONE);
 

@@ -5,12 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
@@ -54,11 +54,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationModel notification = notificationList.get(position);
 
+        // Reset visibility of buttons and status
+        holder.acceptButton.setVisibility(View.VISIBLE);
+        holder.declineButton.setVisibility(View.VISIBLE);
+        holder.eventStatus.setVisibility(View.GONE);
+
         // Set initial placeholders
-        holder.notificationTitle.setText(notification.getTitle() != null ? notification.getTitle() : "Notification");
+        holder.notificationTitle.setText(notification.getTitle() != null ? notification.getTitle() : "Notification Title");
+        holder.notificationMessage.setText(notification.getMessage() != null ? notification.getMessage() : "Notification Message");
         holder.eventTitle.setText(notification.getEventTitle() != null ? notification.getEventTitle() : "Loading...");
         holder.eventStartMonth.setText(notification.getStartMonth() != null ? notification.getStartMonth() : "--");
         holder.eventStartDate.setText(notification.getStartDate() != null ? notification.getStartDate() : "--");
+
+        // Check the current status of the notification and update UI accordingly
+        updateNotificationStatusUI(notification, holder);
 
         // Dynamically fetch event details
         fetchEventDetails(notification.getEventId(), notification, holder);
@@ -68,6 +77,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
             acceptActionListener.onAccept(notification);
+
+            // Update notification status
+            notification.setStatus("ACCEPTED");
+            holder.eventStatus.setText("You have joined!");
+            holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_success));
+            holder.eventStatus.setVisibility(View.VISIBLE);
         });
 
         // Handle decline button action
@@ -75,7 +90,30 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
             declineActionListener.onDecline(notification);
+
+            // Update notification status
+            notification.setStatus("DECLINED");
+            holder.eventStatus.setText("You have declined/canceled!");
+            holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_error));
+            holder.eventStatus.setVisibility(View.VISIBLE);
         });
+    }
+
+    // Add this method to handle initial status display
+    private void updateNotificationStatusUI(NotificationModel notification, NotificationViewHolder holder) {
+        if ("ACCEPTED".equals(notification.getStatus())) {
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.declineButton.setVisibility(View.GONE);
+            holder.eventStatus.setText("You have joined!");
+            holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_success));
+            holder.eventStatus.setVisibility(View.VISIBLE);
+        } else if ("DECLINED".equals(notification.getStatus())) {
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.declineButton.setVisibility(View.GONE);
+            holder.eventStatus.setText("You have declined/canceled!");
+            holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_error));
+            holder.eventStatus.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -151,8 +189,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // Update event date and time
         updateEventDateTime(documentSnapshot, holder);
 
-        // Update event poster
-        updateEventPoster(documentSnapshot, holder);
     }
 
     /**
@@ -169,6 +205,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             // Hide buttons if no status or user has already responded
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
+
+            // Show the status based on the conditions
+            if(notification.getStatus() != null) {
+                if (isAccepted) {
+                    holder.eventStatus.setText("You have joined!");
+                    holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_success)); // Green color
+                    holder.eventStatus.setVisibility(View.VISIBLE);
+                } else if (isDeclined) {
+                    holder.eventStatus.setText("You have declined/canceled!");
+                    holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_error)); // Red color
+                    holder.eventStatus.setVisibility(View.VISIBLE);
+                }
+            }
         } else if ("selected".equals(notification.getStatus())) {
             // Show buttons only for "selected" status and if not already responded
             holder.acceptButton.setVisibility(View.VISIBLE);
@@ -206,25 +255,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
-    /**
-     * Updates the event poster image in the UI.
-     *
-     * @param documentSnapshot The Firestore document snapshot.
-     * @param holder           The ViewHolder to update.
-     */
-    private void updateEventPoster(DocumentSnapshot documentSnapshot, NotificationViewHolder holder) {
-        String posterUrl = documentSnapshot.getString("imageUrl");
-        if (posterUrl != null && !posterUrl.isEmpty()) {
-            // Load poster image using Glide
-            Glide.with(holder.eventPoster.getContext())
-                    .load(posterUrl)
-                    .placeholder(R.drawable.imageplaceholder)
-                    .into(holder.eventPoster);
-        } else {
-            // Use default placeholder if no image
-            holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
-        }
-    }
 
     /**
      * Updates UI with default values when event details cannot be retrieved.
@@ -235,9 +265,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private void updateUIWithDefaultValues(NotificationViewHolder holder, String message) {
         // Set default text for description
         holder.eventDescription.setText(message);
-
-        // Set default image
-        holder.eventPoster.setImageResource(R.drawable.imageplaceholder);
 
         // Hide action buttons
         holder.acceptButton.setVisibility(View.GONE);
@@ -259,8 +286,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * ViewHolder class for each notification item.
      */
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
-        TextView notificationTitle, eventTitle, eventDescription, eventStartMonth, eventStartDate;
-        ImageView eventPoster;
+        TextView notificationTitle, notificationMessage, eventTitle, eventDescription,
+                eventStartMonth, eventStartDate, eventStatus;
         Button acceptButton, declineButton;
 
         /**
@@ -272,12 +299,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             super(itemView);
 
             // Initialize views based on the XML
+            eventStatus = itemView.findViewById(R.id.event_status_text);
             notificationTitle = itemView.findViewById(R.id.notification_title);
+            notificationMessage = itemView.findViewById(R.id.notification_message);
             eventTitle = itemView.findViewById(R.id.tv_event_title);
             eventDescription = itemView.findViewById(R.id.event_description);
             eventStartMonth = itemView.findViewById(R.id.event_start_month);
             eventStartDate = itemView.findViewById(R.id.event_start_date);
-            eventPoster = itemView.findViewById(R.id.event_poster);
             acceptButton = itemView.findViewById(R.id.accept_button);
             declineButton = itemView.findViewById(R.id.decline_button);
         }
