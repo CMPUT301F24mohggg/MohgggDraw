@@ -27,9 +27,11 @@ public class AdminEventView extends EventListDisplayFragment {
     private HomeFragment fragment;
 
     // Constructor with corrected name
-    public AdminEventView(User user, HomeFragment page) {
-        super(user, page);
-        this.fragment = page; // Properly assign the fragment
+    public AdminEventView() {
+
+    }
+    public void setFragment(HomeFragment homeFragment){
+        this.fragment = homeFragment;
     }
 
     @Override
@@ -45,8 +47,8 @@ public class AdminEventView extends EventListDisplayFragment {
         title.setText("Admin Event View");
 
         // Pulling all data for test purposes
-        dataList = new WaitinglistDB().queryAllWithWaitingList(this);
-        //dataList = new WaitinglistDB().queryWithName(this, "Organizer");
+        //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        dataList = new WaitinglistDB().queryWithName(this, "Organizer");
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList = view.findViewById(R.id.eventList);
@@ -74,3 +76,4 @@ public class AdminEventView extends EventListDisplayFragment {
         eventList.setAdapter(eventAdapter);
     }
 }
+

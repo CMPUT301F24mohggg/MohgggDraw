@@ -27,23 +27,21 @@ import java.util.Objects;
  ***/
 public class WaitlistFragment extends Fragment {
 
-    private Event event = new Event("olKgM5GAgkLRUqo97eVS", "testname", "testname", "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd", "testname", "testname", "testname", "testname", "testname", true);
+    private Event event = new Event();//for running tests
     private User user = new User();
     private Bitmap bmp;
     private ImageView iv;
     private TextView joinButton;
     private HomeFragment home;
 
-    public WaitlistFragment() {
-        super();
-    }
+    TextView name;
+    TextView time;
+    TextView day;
+    TextView capacity;
+    TextView location;
+    // = new Event("olKgM5GAgkLRUqo97eVS", "testname", "testname", "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd", "testname", "testname", "testname", "testname", "testname", true);
 
-    public WaitlistFragment(Event event, User user, HomeFragment home) {
-        super();
-        this.event = event;
-        this.user = user;
-        this.home = home;
-    }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,51 +77,51 @@ public class WaitlistFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView name = view.findViewById(R.id.eventtitle);
-        TextView time = view.findViewById(R.id.eventInfoTime);
-        TextView day = view.findViewById(R.id.eventInfoDay);
-        TextView capacity = view.findViewById(R.id.eventInfoPeople);
-        TextView location = view.findViewById(R.id.eventInfoLocation);
+         name = view.findViewById(R.id.eventtitle);
+         time = view.findViewById(R.id.eventInfoTime);
+         day = view.findViewById(R.id.eventInfoDay);
+         capacity = view.findViewById(R.id.eventInfoPeople);
+         location = view.findViewById(R.id.eventInfoLocation);
+        if(home !=null) {
+            name.setText(event.getTitle());
+            time.setText(event.getTime());
+            day.setText(event.getDate());
+            capacity.setText(String.valueOf(event.getMaxCapacity()));
+            location.setText(event.getLocation());
 
-        name.setText(event.getTitle());
-        time.setText(event.getTime());
-        day.setText(event.getDate());
-        capacity.setText(String.valueOf(event.getMaxCapacity()));
-        location.setText(event.getLocation());
-
-        // Pulling and creating image
-        iv = view.findViewById(R.id.organizer_event_poster);
-        if (iv != null) {
-            StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
-            try {
-                File eventImage = File.createTempFile(event.getTitle(), ".png");
-                myImage.getFile(eventImage).addOnSuccessListener(taskSnapshot -> {
-                    Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
-                    iv.setImageBitmap(bitmap);
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            // Pulling and creating image
+            iv = view.findViewById(R.id.organizer_event_poster);
+            if (iv != null) {
+                StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+                try {
+                    File eventImage = File.createTempFile(event.getTitle(), ".png");
+                    myImage.getFile(eventImage).addOnSuccessListener(taskSnapshot -> {
+                        Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
+                        iv.setImageBitmap(bitmap);
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // Log or handle the case where ImageView is null
+                System.err.println("ImageView is null, make sure the layout contains the correct ID.");
             }
-        } else {
-            // Log or handle the case where ImageView is null
-            System.err.println("ImageView is null, make sure the layout contains the correct ID.");
-        }
 
-        // Logic to decide if button is join, leave, or view waitlist
-        joinButton = view.findViewById(R.id.eventInfoButton);
-        if (Objects.equals(event.getOrgID(), "Uaf")) {
-            // If organizer, view waitlist
-            joinButton.setText("View waitlist");
-            joinButton.setOnClickListener(v -> home.goToWaitlistView(event));
-        } else {
-            updateJoinButton();
+            // Logic to decide if button is join, leave, or view waitlist
+            joinButton = view.findViewById(R.id.eventInfoButton);
+            if (Objects.equals(event.getOrgID(), "Uaf")) {
+                // If organizer, view waitlist
+                joinButton.setText("View waitlist");
+                joinButton.setOnClickListener(v -> home.goToWaitlistView(event));
+            } else {
+                updateJoinButton();
+            }
         }
     }
 
-    private void startPage(Event event, HomeFragment home){
-
-
-
+    public void setImportant(Event event, HomeFragment home){
+        this.event = event;
+        this.home = home;
     }
 
     private void updateJoinButton() {

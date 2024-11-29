@@ -21,7 +21,11 @@ import java.util.List;
 public class WaitlistViewEntrantsFragment extends Fragment {
     private Event event;
 
-    public WaitlistViewEntrantsFragment(Event event) {
+    public WaitlistViewEntrantsFragment() {
+
+    }
+
+    public void setEvent(Event event) {
         this.event = event;
     }
 
@@ -41,9 +45,11 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         // Create fragments for tabs
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new WaitlistEntrantContentFragment(event)); // First tab waitlist
-        fragments.add(new WaitlistEntrantContentSelectedFragment(event)); //selected
+        fragments.add(new WaitlistEntrantContentSelectedFragment()); //selected
         fragments.add(new WaitlistEntrantContentCancelledFragment(event)); //cancelled
-        fragments.add(new WaitlistEntrantContentRedrawFragment(event));//confirmed
+        fragments.add(new WaitlistEntrantContentConfirmedFragment(event));//confirmed
+
+        ((WaitlistEntrantContentSelectedFragment)fragments.get(1)).startList(event);
 
 
         // Tab titles

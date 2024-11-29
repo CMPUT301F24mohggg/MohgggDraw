@@ -38,11 +38,9 @@ public class EventListDisplayFragment extends Fragment {
     private ViewPager2 viewPager2;
     private HomeFragment fragment;
 
-    public EventListDisplayFragment(User user, HomeFragment page){
-        this.user =user;
-        this.fragment = page;
+    public void setFragment(HomeFragment fragment) {
+        this.fragment = fragment;
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

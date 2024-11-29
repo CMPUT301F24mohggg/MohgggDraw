@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -29,10 +30,7 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
     private ArrayList<String> dataList;
     private Event event;
     private LinearLayout entrantListContainer;
-
-    public WaitlistEntrantContentSelectedFragment(Event event) {
-        this.event = event;
-    }
+   boolean viewCreated=false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,7 +42,11 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
         super.onViewCreated(view, savedInstanceState);
         //dataList = event.getWaitingList();
         entrantListContainer = view.findViewById(R.id.listContainer);
-        new WaitinglistDB().setListFromDB("EventConfirmedlist",this,event);
+
+        viewCreated = true;
+        if(event!=null) {
+            new WaitinglistDB().setListFromDB("EventConfirmedlist", this, event);
+        }
 
 
 
@@ -52,8 +54,7 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
 
     }
     public void startList(Event event){
-        
-
+        this.event = event;
 
     }
 
