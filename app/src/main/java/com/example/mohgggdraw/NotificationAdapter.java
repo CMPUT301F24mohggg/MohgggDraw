@@ -20,10 +20,30 @@ import java.util.List;
  * for accepting or declining the notification. This adapter supports fetching event details dynamically from Firestore.
  */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
+    /**
+     * List of notifications to be displayed in the RecyclerView.
+     */
     private List<NotificationModel> notificationList;
+
+    /**
+     * Listener for handling decline actions on notifications.
+     */
     private DeclineActionListener declineActionListener;
+
+    /**
+     * Listener for handling accept actions on notifications.
+     */
     private AcceptActionListener acceptActionListener;
-    private FirebaseFirestore db; // Firebase instance to fetch event details dynamically
+
+    /**
+     * Firebase Firestore instance for retrieving event details.
+     */
+    private FirebaseFirestore db;
+
+    /**
+     * Unique identifier for the current device.
+     * Used to track device-specific event participation.
+     */
     private String deviceId;
 
     /**
@@ -42,6 +62,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.deviceId = deviceId; // Initialize deviceId
     }
 
+    /**
+     * Creates a new ViewHolder for notification items.
+     *
+     * @param parent   The parent ViewGroup into which the new View will be added
+     * @param viewType The view type of the new View
+     * @return A new NotificationViewHolder that holds the View for each notification item
+     */
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,6 +77,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return new NotificationViewHolder(view);
     }
 
+    /**
+     * Binds notification data to the ViewHolder and sets up interaction listeners.
+     *
+     * This method:
+     * - Sets notification title and message
+     * - Fetches and displays event details
+     * - Sets up accept and decline button actions
+     * - Updates UI based on notification status
+     *
+     * @param holder   The ViewHolder to bind data to
+     * @param position The position of the item in the RecyclerView
+     */
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationModel notification = notificationList.get(position);
@@ -99,7 +138,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         });
     }
 
-    // Add this method to handle initial status display
+    /**
+     * Updates the UI to reflect the initial status of a notification.
+     *
+     * Handles display of accepted and declined notification statuses.
+     *
+     * @param notification The notification whose status needs to be displayed
+     * @param holder       The ViewHolder to update
+     */
     private void updateNotificationStatusUI(NotificationModel notification, NotificationViewHolder holder) {
         if ("ACCEPTED".equals(notification.getStatus())) {
             holder.acceptButton.setVisibility(View.GONE);
@@ -276,7 +322,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.eventStartDate.setText("N/A");
     }
 
-
+    /**
+     * Returns the total number of notification items in the list.
+     *
+     * @return The number of notifications in the list
+     */
     @Override
     public int getItemCount() {
         return notificationList.size();
@@ -311,6 +361,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
+    /**
+     * Converts a month number to its abbreviated string representation.
+     *
+     * @param month The month number (1-12)
+     * @return Abbreviated month name or "N/A" for invalid month numbers
+     */
     private String getShortMonth(int month) {
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         return (month >= 1 && month <= 12) ? months[month - 1] : "N/A";
