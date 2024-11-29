@@ -24,15 +24,12 @@ import java.util.Map;
 import android.provider.Settings;
 import com.google.firebase.Timestamp;
 
-
 /***
  This fragment provides a review of all entered event details. It:
  - Displays a summary of all event information
  - Allows the user to review and confirm the event details
  - Handles the final step of creating the event in Firebase Firestore
  ***/
-
-
 public class ReviewFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private static final String TAG = "ReviewFragment";
@@ -87,6 +84,11 @@ public class ReviewFragment extends Fragment {
             if (startTime != null) startTimeView.setText(startTime);
         });
 
+        sharedViewModel.getEventEndTime().observe(getViewLifecycleOwner(), endTime -> {
+            TextView endTimeView = view.findViewById(R.id.text_event_end_date);
+            if (endTime != null) endTimeView.setText(endTime);
+        });
+
         // Max Pooling Sample
         sharedViewModel.getMaxPoolingSample().observe(getViewLifecycleOwner(), maxSample -> {
             TextView maxSampleTextView = view.findViewById(R.id.text_max_pooling_sample);
@@ -107,6 +109,22 @@ public class ReviewFragment extends Fragment {
     }
 
     void createEventInFirebase() {
+        // Validate that all fields are filled before proceeding
+        if (sharedViewModel.getEventTitle().getValue() == null ||
+                sharedViewModel.getEventLocation().getValue() == null ||
+                sharedViewModel.getEventDetail().getValue() == null ||
+                sharedViewModel.getRegistrationOpen().getValue() == null ||
+                sharedViewModel.getRegistrationDeadline().getValue() == null ||
+                sharedViewModel.getEventStartTime().getValue() == null ||
+                sharedViewModel.getEventEndTime().getValue() == null ||
+                sharedViewModel.getMaxPoolingSample().getValue() == null ||
+                sharedViewModel.getMaxEntrants().getValue() == null ||
+                sharedViewModel.getImageUrl().getValue() == null) {
+
+            Toast.makeText(getContext(), "Please ensure all fields are filled before creating the event.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
 
@@ -120,6 +138,23 @@ public class ReviewFragment extends Fragment {
         Timestamp registrationOpenTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationOpen().getValue()));
         Timestamp registrationDeadlineTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationDeadline().getValue()));
         Timestamp eventStartTimeTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getEventStartTime().getValue()));
+        Timestamp eventEndTimeTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getEventEndTime().getValue()));
+
+        // Convert maxPoolingSample and maxEntrants to integers
+        int maxPoolingSampleValue = 0;
+        int maxEntrantsValue = 0;
+
+        try {
+            maxPoolingSampleValue = Integer.parseInt(sharedViewModel.getMaxPoolingSample().getValue());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error parsing maxPoolingSample, defaulting to 0", e);
+        }
+
+        try {
+            maxEntrantsValue = Integer.parseInt(sharedViewModel.getMaxEntrants().getValue());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error parsing maxEntrants, defaulting to 0", e);
+        }
 
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
@@ -130,8 +165,9 @@ public class ReviewFragment extends Fragment {
         eventData.put("registrationOpen", registrationOpenTimestamp);  // Use Timestamp
         eventData.put("registrationDeadline", registrationDeadlineTimestamp);  // Use Timestamp
         eventData.put("startTime", eventStartTimeTimestamp);  // Use Timestamp
-        eventData.put("maxPoolingSample", sharedViewModel.getMaxPoolingSample().getValue());
-        eventData.put("maxEntrants", sharedViewModel.getMaxEntrants().getValue());
+        eventData.put("endTime", eventEndTimeTimestamp);  // Use Timestamp
+        eventData.put("maxPoolingSample", maxPoolingSampleValue);
+        eventData.put("maxEntrants", maxEntrantsValue);
         eventData.put("createDate", System.currentTimeMillis());
         eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());

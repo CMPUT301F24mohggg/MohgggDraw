@@ -13,19 +13,19 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 /***
- * Content fragment to display entrants for the second tab (redraw).
+ * Content fragment to display
  */
-public class WaitlistEntrantContentRedrawFragment extends Fragment {
+public class WaitlistEntrantContentConfirmedFragment extends Fragment {
     private ArrayList<String> dataList;
     private Event event;
 
-    public WaitlistEntrantContentRedrawFragment(Event event) {
+    public WaitlistEntrantContentConfirmedFragment(Event event) {
         this.event = event;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_waiting_list_redraw, container, false);
+        return inflater.inflate(R.layout.fragment_waiting_list_confirmed, container, false);
     }
 
     @Override
