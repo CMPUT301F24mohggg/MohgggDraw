@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -11,16 +12,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 /***
  * Content fragment to display entrants for the first tab.
  */
-public class WaitlistEntrantContentFragment extends Fragment {
+public class WaitlistEntrantContentFragment extends Fragment implements SetListView {
     private ArrayList<String> dataList;
     private Event event;
+    LinearLayout entrantListContainer;
 
-    public WaitlistEntrantContentFragment(Event event) {
-        this.event = event;
+    public void setEvent(Event event){
+        this.event=event;
     }
 
     @Override
@@ -33,14 +37,31 @@ public class WaitlistEntrantContentFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         dataList = event.getWaitingList();
 
-        LinearLayout entrantListContainer = view.findViewById(R.id.listContainer);
+        entrantListContainer = view.findViewById(R.id.listContainer);
 
         // Populate entrant list dynamically
-        for (String entrant : dataList) {
+        if(event!=null) {
+            setList(dataList);
+        }
+    }
+    @Override
+    public void setList(ArrayList<String> myList) {
+        for (String entrant : myList) {
+
+
             View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
             TextView userName = itemView.findViewById(R.id.userName);
-            userName.setText(entrant);
+            ImageView image = itemView.findViewById(R.id.profile_placeholder);
+            Map user = new UserDB().getUserMapFromID(entrant,userName,image);
+
+
+            //expand image
+
+
             entrantListContainer.addView(itemView);
+            //
+
         }
+
     }
 }

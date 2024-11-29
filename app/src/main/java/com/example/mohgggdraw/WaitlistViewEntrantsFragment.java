@@ -44,12 +44,15 @@ public class WaitlistViewEntrantsFragment extends Fragment {
 
         // Create fragments for tabs
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new WaitlistEntrantContentFragment(event)); // First tab waitlist
+        fragments.add(new WaitlistEntrantContentFragment()); // First tab waitlist
         fragments.add(new WaitlistEntrantContentSelectedFragment()); //selected
-        fragments.add(new WaitlistEntrantContentCancelledFragment(event)); //cancelled
-        fragments.add(new WaitlistEntrantContentConfirmedFragment(event));//confirmed
+        fragments.add(new WaitlistEntrantContentCancelledFragment()); //cancelled
+        fragments.add(new WaitlistEntrantContentConfirmedFragment());//confirmed
+        ((WaitlistEntrantContentFragment)fragments.get(0)).setEvent(event);
+        ((WaitlistEntrantContentSelectedFragment)fragments.get(1)).setEvent(event);
+        ((WaitlistEntrantContentCancelledFragment)fragments.get(2)).setEvent(event);
+        ((WaitlistEntrantContentConfirmedFragment)fragments.get(3)).setEvent(event);
 
-        ((WaitlistEntrantContentSelectedFragment)fragments.get(1)).startList(event);
 
 
         // Tab titles

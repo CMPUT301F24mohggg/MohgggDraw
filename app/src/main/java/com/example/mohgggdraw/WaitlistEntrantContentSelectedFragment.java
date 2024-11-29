@@ -1,8 +1,5 @@
 package com.example.mohgggdraw;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.StorageReference;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -45,7 +36,7 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
 
         viewCreated = true;
         if(event!=null) {
-            new WaitinglistDB().setListFromDB("EventConfirmedlist", this, event);
+            new WaitinglistDB().setListFromDB("EventSelectedlist", this, event);
         }
 
 
@@ -53,7 +44,7 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
         // Populate entrant list dynamically
 
     }
-    public void startList(Event event){
+    public void setEvent(Event event){
         this.event = event;
 
     }
