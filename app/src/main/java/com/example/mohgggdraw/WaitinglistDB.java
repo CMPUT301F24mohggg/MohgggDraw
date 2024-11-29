@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -35,13 +36,13 @@ public class WaitinglistDB {
     private CollectionReference waitlistRef;
     private String name;
     private DocumentReference myDoc;
-    private Map<String,Object> docData;
+    private Map<String, Object> docData;
     private Event event;
 
     public WaitinglistDB() {
 
         db = FirebaseFirestore.getInstance();
-         waitlistRef= db.collection("Events");
+        waitlistRef = db.collection("Events");
 
     }
 
@@ -66,7 +67,7 @@ public class WaitinglistDB {
     }
 
     //updates event doc waitlist field with new user
-    public void addToDB(User user,Event event){
+    public void addToDB(User user, Event event) {
         // Check if UID is set, if not, set it to device ID
         if (user.getUid() == null || user.getUid().isEmpty()) {
             @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(
@@ -80,10 +81,10 @@ public class WaitinglistDB {
 
     }
 
-    public Map<String ,ArrayList<String>> getOtherLists(Event event){
+    public Map<String, ArrayList<String>> getOtherLists(Event event) {
         //reason not pulled with event is because only needed for some admin stuff
-        Map<String ,ArrayList<String>> myMap = new HashMap<String ,ArrayList<String>>(3);
-        myMap.put("Accepted",new ArrayList<>());
+        Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>(3);
+        myMap.put("Accepted", new ArrayList<>());
         myMap.put("Cancelled", new ArrayList<>());
         myMap.put("Selected", new ArrayList<>());
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
@@ -92,16 +93,16 @@ public class WaitinglistDB {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Map data = documentSnapshot.getData();
-                if(data.get("EventCancelledlist")!=null){
-                    myMap.put("Accepted",(ArrayList<String>) data.get("EventCancelledlist"));
+                if (data.get("EventCancelledlist") != null) {
+                    myMap.put("Accepted", (ArrayList<String>) data.get("EventCancelledlist"));
 
                 }
 
-                if(data.get("EventConfirmedlist")!=null){
-                    myMap.put("Cancelled", (ArrayList<String>)data.get("EventConfirmedlist"));
+                if (data.get("EventConfirmedlist") != null) {
+                    myMap.put("Cancelled", (ArrayList<String>) data.get("EventConfirmedlist"));
                 }
 
-                if(data.get("EventSelectedlist")!=null){
+                if (data.get("EventSelectedlist") != null) {
                     myMap.put("Selected", (ArrayList<String>) data.get("EventSelectedlist"));
 
                 }
@@ -111,14 +112,31 @@ public class WaitinglistDB {
 
         return myMap;
     }
-// removes event doc waitlist user
-    public void removeFromDB(User user, Event event){
-        myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
-        myDoc.update("EventWaitinglist",FieldValue.arrayRemove(user.getUid()));
+
+    public void setListFromDB(String name, SetListView fragment,Event event){
+        DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                ArrayList list = (ArrayList<String>) data.get(name);
+                fragment.setList(list);
+
+            }
+        });
+
+
     }
+
+    // removes event doc waitlist user
+    public void removeFromDB(User user, Event event) {
+        myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
+        myDoc.update("EventWaitinglist", FieldValue.arrayRemove(user.getUid()));
+    }
+
     //gets image from path in firebase
-    public StorageReference getImage(String path){
-        if(path==null){
+    public StorageReference getImage(String path) {
+        if (path == null) {
             path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
         }
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -128,7 +146,7 @@ public class WaitinglistDB {
     }
 
     //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
-    public void updateWaitlistInEvent(Event event){
+    public void updateWaitlistInEvent(Event event) {
 
 
         boolean present = false;
@@ -136,18 +154,17 @@ public class WaitinglistDB {
             @Override
 
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Log.d(TAG,"do i get here");
+                Log.d(TAG, "do i get here");
 
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
 
-                    docData =document.getData();
-                    if(docData!= null){
+                    docData = document.getData();
+                    if (docData != null) {
                         ArrayList myWaitlist = (ArrayList) docData.get("EventWaitinglist");
                         event.setWaitingList(myWaitlist);
 
                     }
-
 
 
                 } else {
@@ -159,19 +176,20 @@ public class WaitinglistDB {
     }
     //query to pull all events into arraylist with the field eventwaitinglist mainly for test purpose
 
-    public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment){
-        ArrayList<Event> myArray= new ArrayList<>();
-        Task query= waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment) {
+        ArrayList<Event> myArray = new ArrayList<>();
+        Task query = waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
 
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
 
                     myArray.add(docSnapshotToEvent(doc));
                 }
                 fragment.dataChange();
             }
-        });;
+        });
+        ;
 
         return myArray;
     }
@@ -185,13 +203,13 @@ public class WaitinglistDB {
         myevent.setEventId(doc.getId());
 
         if (map.get("eventTitle") != null) {
-            myevent.setTitle((String)map.get("eventTitle"));
+            myevent.setTitle((String) map.get("eventTitle"));
         }
         if (map.get("imageUrl") != null) {
             myevent.setPosterUrl((String) map.get("imageUrl"));
         }
         if (map.get("eventDetail") != null) {
-            myevent.setRegistrationDetails((String)map.get("eventDetail"));
+            myevent.setRegistrationDetails((String) map.get("eventDetail"));
         }
         if (map.get("geoLocationEnabled") != null) {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
@@ -230,10 +248,26 @@ public class WaitinglistDB {
 
     public void updateLists(Event event, ArrayList selected, ArrayList waitlist) {
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
-        myDoc.update("EventWaitinglist",waitlist);
-        myDoc.update("EventSelectedlist",selected);
+        myDoc.update("EventWaitinglist", waitlist);
+        myDoc.update("EventSelectedlist", selected);
 
 
+    }
 
+    public ArrayList<Event> queryWithName(AdminEventView adminEventView, String name) {
+        ArrayList<Event> myArray = new ArrayList<>();
+        Query query = waitlistRef.whereEqualTo("eventTitle", "Organizer");
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
+
+                    myArray.add(docSnapshotToEvent(doc));
+                }
+                adminEventView.dataChange();
+            }
+        });
+
+        return myArray;
     }
 }

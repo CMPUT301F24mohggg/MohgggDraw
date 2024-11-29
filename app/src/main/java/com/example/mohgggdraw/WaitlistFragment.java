@@ -120,6 +120,12 @@ public class WaitlistFragment extends Fragment {
         }
     }
 
+    private void startPage(Event event, HomeFragment home){
+
+
+
+    }
+
     private void updateJoinButton() {
         if (event.getWaitingList().contains(user.getUid())) {
             // If in event, leave waitlist

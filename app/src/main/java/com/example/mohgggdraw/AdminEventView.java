@@ -46,6 +46,7 @@ public class AdminEventView extends EventListDisplayFragment {
 
         // Pulling all data for test purposes
         dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        //dataList = new WaitinglistDB().queryWithName(this, "Organizer");
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList = view.findViewById(R.id.eventList);
