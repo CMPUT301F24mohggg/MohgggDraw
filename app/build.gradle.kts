@@ -58,6 +58,7 @@ dependencies {
     // Kotlin and Glide
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    implementation(libs.play.services.location)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // RecyclerView and Messaging
