@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WaitlistEntrantContentCancelledFragment">
+    tools:context=".WaitlistEntrantContentConfirmedFragment">
 
     <!-- List Container -->
     <LinearLayout
@@ -92,10 +92,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_draw"
+        android:src="@drawable/wishlist_ic"
         android:contentDescription="Draw"
-        app:backgroundTint="@color/purple_500"
-        app:tint="@android:color/white"
+        app:backgroundTint="@color/purple_200"
+        app:tint="@android:color/holo_purple"
+        app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
