@@ -14,4 +14,6 @@ public interface SetListView {
     public void updateButton();
 
     public void updateList(ArrayAdapter adapter);
+
+    public void updateSelectedList(String entrant);
 }

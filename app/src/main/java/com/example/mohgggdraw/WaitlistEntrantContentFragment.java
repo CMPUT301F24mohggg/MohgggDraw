@@ -2,6 +2,7 @@ package com.example.mohgggdraw;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,8 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
     private ArrayList<String> dataList;
     private Event event;
     ListView entrantListContainer;
+    FloatingActionButton deleteButton;
+    private ArrayList<String> selectedList = new ArrayList<String>();
 
     public void setEvent(Event event){
         this.event=event;
@@ -33,7 +38,7 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_waiting_list, container, false);
+        return inflater.inflate(R.layout.fragment_waiting_list_selected, container, false);
     }
 
     @Override
@@ -42,13 +47,48 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
         dataList = event.getWaitingList();
 
         entrantListContainer = view.findViewById(R.id.listContainer);
+        deleteButton = view.findViewById(R.id.deleteButton);
+        deleteButton.setVisibility(View.INVISIBLE);
 
         // Populate entrant list dynamically
         if(event!=null) {
-            WaitlistEntrantContentAdapter adapter = new WaitlistEntrantContentAdapter(getContext(),dataList,this);
+            WaitlistEntrantContentSelectedAdapter adapter = new WaitlistEntrantContentSelectedAdapter(getContext(),dataList,this);
             updateList(adapter);
         }
+        deleteButton.setOnClickListener(v->{
+            new WaitinglistDB().removeFromList("EventWaitinglist",selectedList, event);
+            new WaitinglistDB().setListFromDBSelected("EventWaitinglist", this, event);
+            selectedList = new ArrayList<String>();
+            new WaitinglistDB().updateWaitlistInEvent(event);
+            updateButton();
+
+        });
+
     }
+    public void updateSelectedList(String entrant){
+        if (!selectedList.contains(entrant)) {
+            selectedList.add(entrant);
+            Log.d("dsaf", "i got here!!" + selectedList.toString());
+            updateButton();
+        } else {
+            selectedList.remove(entrant);
+            updateButton();
+        }
+
+    }
+
+
+
+
+    public void updateButton(){
+        if(selectedList.size()>0){
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
 
 
 
@@ -57,10 +97,6 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
         return getContext();
     }
 
-    @Override
-    public void updateButton() {
-
-    }
 
     @Override
     public void updateList(ArrayAdapter adapter) {

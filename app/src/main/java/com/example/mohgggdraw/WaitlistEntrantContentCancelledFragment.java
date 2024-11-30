@@ -36,7 +36,7 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment implements
         entrantListContainer = view.findViewById(R.id.listContainer);
 
         if(event!=null) {
-            new WaitinglistDB().setListFromDB("EventCancelledlist", this, event);
+            new WaitinglistDB().setListFromDBSelected("EventCancelledlist", this, event);
         }
 
 
@@ -60,6 +60,11 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment implements
     @Override
     public void updateList(ArrayAdapter adapter) {
         entrantListContainer.setAdapter(adapter);
+
+    }
+
+    @Override
+    public void updateSelectedList(String entrant) {
 
     }
 }

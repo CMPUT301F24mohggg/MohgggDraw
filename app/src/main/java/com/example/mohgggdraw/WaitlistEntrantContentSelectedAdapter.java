@@ -38,7 +38,7 @@ public class WaitlistEntrantContentSelectedAdapter extends ArrayAdapter<String> 
         ImageView image = view.findViewById(R.id.profile_placeholder);
         CheckBox button = view.findViewById(R.id.selectCheckBox);
         button.setOnClickListener(v -> {
-            ((WaitlistEntrantContentSelectedFragment)fragment).updateSelectedList(entrant);
+            (fragment).updateSelectedList(entrant);
 
         });
         Map user = new UserDB().getUserMapFromID(entrant, userName, image);

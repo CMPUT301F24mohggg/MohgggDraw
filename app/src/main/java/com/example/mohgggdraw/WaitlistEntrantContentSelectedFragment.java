@@ -48,6 +48,8 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
         deleteButton.setOnClickListener(v->{
             new WaitinglistDB().removeFromList("EventSelectedlist",selectedList, event);
             new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
+            selectedList = new ArrayList<String>();
+            updateButton();
 
         });
 

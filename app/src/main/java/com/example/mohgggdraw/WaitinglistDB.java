@@ -174,9 +174,8 @@ public class WaitinglistDB {
 
     //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
     public void updateWaitlistInEvent(Event event) {
-
-
         boolean present = false;
+        myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
 
