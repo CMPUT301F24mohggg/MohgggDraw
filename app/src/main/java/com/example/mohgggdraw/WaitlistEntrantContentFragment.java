@@ -1,17 +1,21 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +25,7 @@ import java.util.Set;
 public class WaitlistEntrantContentFragment extends Fragment implements SetListView {
     private ArrayList<String> dataList;
     private Event event;
-    LinearLayout entrantListContainer;
+    ListView entrantListContainer;
 
     public void setEvent(Event event){
         this.event=event;
@@ -41,27 +45,27 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
 
         // Populate entrant list dynamically
         if(event!=null) {
-            setList(dataList);
+            WaitlistEntrantContentAdapter adapter = new WaitlistEntrantContentAdapter(getContext(),dataList,this);
+            updateList(adapter);
         }
     }
+
+
+
     @Override
-    public void setList(ArrayList<String> myList) {
-        for (String entrant : myList) {
+    public Context retContext() {
+        return getContext();
+    }
 
+    @Override
+    public void updateButton() {
 
-            View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
-            TextView userName = itemView.findViewById(R.id.userName);
-            ImageView image = itemView.findViewById(R.id.profile_placeholder);
-            Map user = new UserDB().getUserMapFromID(entrant,userName,image);
+    }
 
+    @Override
+    public void updateList(ArrayAdapter adapter) {
+        entrantListContainer.setAdapter(adapter);
 
-            //expand image
-
-
-            entrantListContainer.addView(itemView);
-            //
-
-        }
 
     }
 }

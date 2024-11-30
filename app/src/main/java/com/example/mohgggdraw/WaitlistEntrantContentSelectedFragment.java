@@ -1,18 +1,20 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
-import java.util.Map;
 
 /***
  * Content fragment to display.
@@ -20,8 +22,11 @@ import java.util.Map;
 public class WaitlistEntrantContentSelectedFragment extends Fragment implements SetListView{
     private ArrayList<String> dataList;
     private Event event;
-    private LinearLayout entrantListContainer;
+    private ListView entrantListContainer;
    boolean viewCreated=false;
+    private ArrayList<String> selectedList = new ArrayList<String>();
+    FloatingActionButton deleteButton;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,41 +38,60 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
         super.onViewCreated(view, savedInstanceState);
         //dataList = event.getWaitingList();
         entrantListContainer = view.findViewById(R.id.listContainer);
+        deleteButton = view.findViewById(R.id.deleteButton);
+        deleteButton.setVisibility(View.INVISIBLE);
 
         viewCreated = true;
         if(event!=null) {
-            new WaitinglistDB().setListFromDB("EventSelectedlist", this, event);
+            new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
         }
+        deleteButton.setOnClickListener(v->{
+            new WaitinglistDB().removeFromList("EventSelectedlist",selectedList, event);
+            new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
 
-
-
-        // Populate entrant list dynamically
+        });
 
     }
+
+
     public void setEvent(Event event){
         this.event = event;
 
     }
 
+    public void updateSelectedList(String entrant){
+        if (!selectedList.contains(entrant)) {
+            selectedList.add(entrant);
+            Log.d("dsaf", "i got here!!" + selectedList.toString());
+            updateButton();
+        } else {
+            selectedList.remove(entrant);
+            updateButton();
+        }
+
+    }
+
+
 
     @Override
-    public void setList(ArrayList<String> myList) {
-        for (String entrant : myList) {
+    public Context retContext(){
+        return getContext();
+    }
 
 
-            View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
-            TextView userName = itemView.findViewById(R.id.userName);
-            ImageView image = itemView.findViewById(R.id.profile_placeholder);
-            Map user = new UserDB().getUserMapFromID(entrant,userName,image);
 
-
-            //expand image
-
-
-            entrantListContainer.addView(itemView);
-            //
-
+    public void updateButton(){
+        if(selectedList.size()>0){
+            deleteButton.setVisibility(View.VISIBLE);
         }
+        else {
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void updateList(ArrayAdapter adapter) {
+        entrantListContainer.setAdapter(adapter);
 
     }
 }

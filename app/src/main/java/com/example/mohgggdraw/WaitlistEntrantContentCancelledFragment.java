@@ -1,19 +1,17 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 /***
  * Content fragment to display entrants for the first tab.
@@ -21,7 +19,7 @@ import java.util.Set;
 public class WaitlistEntrantContentCancelledFragment extends Fragment implements SetListView {
     private ArrayList<String> dataList;
     private Event event;
-    LinearLayout entrantListContainer;
+    ListView entrantListContainer;
 
     public void setEvent(Event event){
         this.event = event;
@@ -46,30 +44,22 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment implements
         // Populate entrant list dynamically
 
     }
-    public void startList(Event event){
-        this.event = event;
 
-    }
 
 
     @Override
-    public void setList(ArrayList<String> myList) {
-        for (String entrant : myList) {
+    public Context retContext() {
+        return getContext();
+    }
 
+    @Override
+    public void updateButton() {
 
-            View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
-            TextView userName = itemView.findViewById(R.id.userName);
-            ImageView image = itemView.findViewById(R.id.profile_placeholder);
-            Map user = new UserDB().getUserMapFromID(entrant,userName,image);
+    }
 
-
-            //expand image
-
-
-            entrantListContainer.addView(itemView);
-            //
-
-        }
+    @Override
+    public void updateList(ArrayAdapter adapter) {
+        entrantListContainer.setAdapter(adapter);
 
     }
 }

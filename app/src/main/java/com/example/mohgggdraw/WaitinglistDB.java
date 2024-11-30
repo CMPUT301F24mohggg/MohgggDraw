@@ -7,6 +7,7 @@ import static androidx.test.InstrumentationRegistry.getContext;
 import android.annotation.SuppressLint;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
@@ -113,19 +114,45 @@ public class WaitinglistDB {
         return myMap;
     }
 
-    public void setListFromDB(String name, SetListView fragment,Event event){
+
+    public void removeFromList(String listName, ArrayList<String> removeList, Event event){
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
+        for (String id:removeList
+             ) {
+            mydoc.update(listName,FieldValue.arrayRemove(id));
+        }
+
+
+
+
+    }
+
+    public void setListFromDBSelected(String name, SetListView fragment, Event event){
+        DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
+
         Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Map data = documentSnapshot.getData();
                 ArrayList list = (ArrayList<String>) data.get(name);
-                fragment.setList(list);
-
+                ArrayAdapter adapter= new WaitlistEntrantContentSelectedAdapter(fragment.retContext(), list,fragment);
+                fragment.updateList(adapter);
             }
         });
+    }
 
+    public void setListFromDB(String name, SetListView fragment, Event event){
+        DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
 
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                ArrayList list = (ArrayList<String>) data.get(name);
+                ArrayAdapter adapter= new WaitlistEntrantContentAdapter(fragment.retContext(), list,fragment);
+                fragment.updateList(adapter);
+            }
+        });
     }
 
     // removes event doc waitlist user

@@ -7,7 +7,7 @@
     tools:context=".WaitlistEntrantContentSelectedFragment">
 
     <!-- List Container -->
-    <LinearLayout
+    <ListView
         android:id="@+id/listContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -23,7 +23,7 @@
 
 
 
-    </LinearLayout>
+    </ListView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/drawButton"
