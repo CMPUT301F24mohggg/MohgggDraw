@@ -1,5 +1,12 @@
 package com.example.mohgggdraw;
 
+import com.google.firebase.Timestamp;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Represents a notification with details related to an event.
  * This model is used for displaying notification data and for storing/retrieving
@@ -14,6 +21,13 @@ public class NotificationModel {
     private String notificationId;
     private String deviceId;
     private String startTime;
+    private String eventTitle;
+    private String startMonth;
+    private String startDate;
+    private boolean isAccepted;
+    private boolean isDeclined;
+    private Timestamp created_at;
+
 
     /**
      * Empty constructor required for Firestore serialization.
@@ -83,65 +97,8 @@ public class NotificationModel {
         this.message = message;
     }
 
-    /**
-     * Sets the status of the notification.
-     *
-     * @param status The notification status to set.
-     */
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
-    /**
-     * Sets the ID of the related event.
-     *
-     * @param eventId The event ID to set.
-     */
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
 
-    /**
-     * Returns the unique ID of the notification.
-     *
-     * @return The notification ID.
-     */
-    public String getNotificationId() {
-        return notificationId;
-    }
-
-    /**
-     * Sets the unique ID of the notification.
-     *
-     * @param notificationId The notification ID to set.
-     */
-    public void setNotificationId(String notificationId) {
-        this.notificationId = notificationId;
-    }
-
-    /**
-     * Returns the device ID associated with the notification.
-     *
-     * @return The device ID.
-     */
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    /**
-     * Sets the device ID associated with the notification.
-     *
-     * @param deviceId The device ID to set.
-     */
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    /**
-     * Returns the start time of the event associated with the notification.
-     *
-     * @return The event start time.
-     */
     public String getStartTime() {
         return startTime;
     }
@@ -153,8 +110,8 @@ public class NotificationModel {
      */
     public void setStartTime(String startTime) {
         this.startTime = startTime;
+        splitStartTime(startTime); // Update startMonth and startDate when startTime changes
     }
-
     /**
      * Returns additional details of the event associated with the notification.
      *
@@ -171,5 +128,102 @@ public class NotificationModel {
      */
     public void setEventDetail(String eventDetail) {
         this.eventDetail = eventDetail;
+    }
+
+    /**
+     * Splits the startTime into startMonth and startDate.
+     *
+     * @param startTime The start time in the format "dd/MM/yyyy".
+     */
+    private void splitStartTime(String startTime) {
+        if (startTime == null || startTime.isEmpty()) return;
+
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+            Date date = inputFormat.parse(startTime);
+
+            // Extract short month and day
+            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
+            SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
+
+            this.startMonth = monthFormat.format(date); // Example: "Nov"
+            this.startDate = dayFormat.format(date); // Example: "21"
+        } catch (ParseException e) {
+            e.printStackTrace();
+            this.startMonth = "";
+            this.startDate = "";
+        }
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getEventTitle() {
+        return eventTitle;
+    }
+
+    public void setEventTitle(String eventTitle) {
+        this.eventTitle = eventTitle;
+    }
+
+    public String getStartMonth() {
+        return startMonth;
+    }
+
+    public void setStartMonth(String startMonth) {
+        this.startMonth = startMonth;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public boolean isAccepted() {
+        return isAccepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
+    }
+
+    public boolean isDeclined() {
+        return isDeclined;
+    }
+
+    public void setDeclined(boolean declined) {
+        isDeclined = declined;
+    }
+
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
     }
 }

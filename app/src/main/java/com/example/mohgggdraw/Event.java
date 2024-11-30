@@ -10,7 +10,7 @@ package com.example.mohgggdraw;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Event {
+public class Event{
     private String eventId;
     private String title;
     private String location;

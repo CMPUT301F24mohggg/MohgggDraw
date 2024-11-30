@@ -24,6 +24,12 @@
         android:layout_height="wrap_content"
         android:text="Facility" />
 
+    <Button
+        android:id="@+id/buttonAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Admin" />
+
 </LinearLayout>
 
 

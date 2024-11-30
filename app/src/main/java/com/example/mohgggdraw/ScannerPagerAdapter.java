@@ -2,16 +2,17 @@ package com.example.mohgggdraw;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 /***
- This adapter manages the fragments used in the event creation process. It:
+ This adapter manages the fragments used in the QR scanning process. It:
  - Creates and returns the appropriate fragment for each position
  - Determines the total number of creation steps
  - Handles fragment identification and containment checks
  ***/
-public class CreatePagerAdapter extends FragmentStateAdapter {
+public class ScannerPagerAdapter extends FragmentStateAdapter {
 
-    public CreatePagerAdapter(@NonNull Fragment fragment) {
+    public ScannerPagerAdapter(@NonNull Fragment fragment) {
         super(fragment.getChildFragmentManager(), fragment.getLifecycle());
     }
 
@@ -20,26 +21,21 @@ public class CreatePagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                return new BasicInformationFragment();
+                return new ScannerCameraFragment();
             case 1:
-                return new RegistrationDetailsFragment();
+                return new ScannerInvalidFragment();
             case 2:
-                return new ParticipationSettingsFragment();
-            case 3:
-                return new ReviewFragment();
-            case 4:
-                return new QrCreatedFragment();
-            case 5:
-                return new QrWaitlistFragment(1);
+                return new QrWaitlistFragment(0);
             default:
-                return new EventCreatedSuccessFragment();
-
+                return new ScannerCameraFragment();
         }
     }
 
+
+
     @Override
     public int getItemCount() {
-        return 7; // Total number of pages
+        return 4; // Total number of pages
     }
 
     @Override

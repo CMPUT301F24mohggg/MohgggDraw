@@ -1,13 +1,28 @@
 package com.example.mohgggdraw;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +37,9 @@ public class UserFormActivity extends AppCompatActivity {
     private Button buttonSubmit;
     private String userType; // The type of user: "entrant", "organizer", or "admin"
     private FirebaseFirestore db;
+    private FusedLocationProviderClient fusedLocationClient;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
+    private static final int REQUEST_CHECK_SETTINGS = 2000;
 
     /**
      * Initializes the activity, setting up Firestore, UI elements, and button listeners.
@@ -35,6 +53,9 @@ public class UserFormActivity extends AppCompatActivity {
 
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
+
+        // Initialize FusedLocationProviderClient
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         editTextName = findViewById(R.id.editTextName);
         editTextPhone = findViewById(R.id.editTextPhone);
@@ -54,8 +75,107 @@ public class UserFormActivity extends AppCompatActivity {
             editTextName.setHint("Entrant Name");
         }
 
+        // Request location permission
+        requestLocationPermission();
+
         // Set up the submit button listener
         buttonSubmit.setOnClickListener(view -> submitUserData());
+    }
+
+    /**
+     * Requests the user's location permission.
+     */
+    private void requestLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            checkLocationSettings();
+        }
+    }
+
+    /**
+     * Handles the result of the location permission request.
+     *
+     * @param requestCode  The request code passed in requestPermissions().
+     * @param permissions  The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkLocationSettings();
+            } else {
+                Toast.makeText(this, "Location permission is required to proceed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /**
+     * Checks if the required location settings are enabled.
+     */
+    private void checkLocationSettings() {
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10000)
+                .setFastestInterval(5000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(locationSettingsResponse -> {
+            // All location settings are satisfied, continue to request location updates
+            getUserLocation();
+        }).addOnFailureListener(exception -> {
+            if (exception instanceof ResolvableApiException) {
+                // Location settings are not satisfied, prompt user to enable it
+                try {
+                    ResolvableApiException resolvable = (ResolvableApiException) exception;
+                    resolvable.startResolutionForResult(UserFormActivity.this, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error
+                }
+            }
+        });
+    }
+
+    /**
+     * Handles the result of the location settings resolution.
+     *
+     * @param requestCode The request code passed in startResolutionForResult().
+     * @param resultCode  The result code returned by the child activity.
+     * @param data        An Intent that carries the result data.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                // User agreed to make required location settings changes
+                getUserLocation();
+            } else {
+                Toast.makeText(this, "Location settings must be enabled to proceed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /**
+     * Gets the user's current location and updates the location EditText field.
+     */
+    private void getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        String locationString = location.getLatitude() + ", " + location.getLongitude();
+                        editTextLocation.setText(locationString);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -84,7 +204,7 @@ public class UserFormActivity extends AppCompatActivity {
         userDetails.put("email", email);
         userDetails.put("location", location);
         userDetails.put("name", name);
-        userDetails.put("userType", getUserTypeCode(userType));
+        userDetails.put("userType", getUserTypeCode(userType)); // Store the userType as a numeric code
 
         db.collection("user").document(deviceID)
                 .set(userDetails)

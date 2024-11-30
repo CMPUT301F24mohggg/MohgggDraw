@@ -47,6 +47,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/androidx.cardview_cardview.version"
+        }
+    }
+
 }
 
 dependencies {
@@ -63,6 +69,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.13.2")
     implementation(libs.play.services.maps)
     androidTestImplementation(libs.junit.jupiter)
+    implementation(libs.play.services.location)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // RecyclerView and Messaging
@@ -88,6 +95,7 @@ dependencies {
     implementation("com.google.android.material:material:1.7.0") // Check for latest version
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation (libs.cardview.v7)
 
     // Additional libraries from libs
     implementation(libs.appcompat)
@@ -112,4 +120,22 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
+
+    // QR Code Scanning dependencies
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation ("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation ("androidx.camera:camera-view:1.4.0")
+    implementation ("androidx.camera:camera-core:1.4.0")
+    implementation ("androidx.camera:camera-camera2:1.4.0")
+    implementation ("androidx.camera:camera-lifecycle:1.4.0")
+    implementation ("androidx.camera:camera-video:1.4.0")
+    implementation ("androidx.camera:camera-extensions:1.4.0")
+    implementation("androidx.camera:camera-mlkit-vision:1.4.0")
+
+    // AndroidX and Material dependencies
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 }

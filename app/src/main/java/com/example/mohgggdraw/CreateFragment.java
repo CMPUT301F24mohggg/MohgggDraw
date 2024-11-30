@@ -26,7 +26,6 @@ public class CreateFragment extends Fragment {
     private Button nextButton;
     private ImageView backButton;
     private ProgressBar progressBar;
-    private OrganizerViewModel organizerViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,7 +37,7 @@ public class CreateFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
+
         viewPager2 = view.findViewById(R.id.view_pager);
         backButton = view.findViewById(R.id.back_button);
         nextButton = view.findViewById(R.id.next_button);
@@ -63,7 +62,12 @@ public class CreateFragment extends Fragment {
 
         // Back button click listener
         backButton.setOnClickListener(v -> {
-            if (viewPager2.getCurrentItem() > 0) {
+            // If clicking back button from the QR code go back to first page and reset
+            if (viewPager2.getCurrentItem() == 4) {
+                // Reset data if returning to create after already creating
+//                resetFirstPageData();
+                viewPager2.setCurrentItem(0);
+            } else if (viewPager2.getCurrentItem() > 0) {
                 viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 1);
             }
         });
@@ -75,6 +79,12 @@ public class CreateFragment extends Fragment {
                 viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
             }
         });
+    }
+
+    public void swapToFragment(int position) {
+        if (viewPager2 != null) {
+            viewPager2.setCurrentItem(position);
+        }
     }
 
     private void updateUIForPosition(int position, TextView pageTitle) {
@@ -98,6 +108,14 @@ public class CreateFragment extends Fragment {
                 title = "Review";
                 isNextButtonVisible = false;
                 break;
+            case 4:
+                title = "";
+                isBackButtonVisible = true;
+                isNextButtonVisible = false;
+            case 5:
+                title = "";
+                isBackButtonVisible = true;
+                isNextButtonVisible = false;
             default:
                 title = "";
                 break;
@@ -122,5 +140,16 @@ public class CreateFragment extends Fragment {
             ((ParticipationSettingsFragment) currentFragment).saveData();
         }
         // Add other fragments as needed
+    }
+
+    private void resetFirstPageData() {
+        // Get the current fragment in the ViewPager2
+        Fragment currentFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager2.getCurrentItem());
+
+        // Check the type of the current fragment and call their respective save methods
+        if (currentFragment instanceof BasicInformationFragment) {
+            ((BasicInformationFragment) currentFragment).resetData();
+        // Add other fragments as needed
+        }
     }
 }

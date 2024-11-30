@@ -6,12 +6,12 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * SignupActivity class handles the selection of user type (Entrant or Facility) and navigates
+ * SignupActivity class handles the selection of user type (Entrant, Facility, or Admin) and navigates
  * to the appropriate form screen based on the user's choice.
  */
 public class SignupActivity extends AppCompatActivity {
 
-    private Button buttonEntrant, buttonFacility;
+    private Button buttonEntrant, buttonFacility, buttonAdmin;
 
     /**
      * Called when the activity is first created.
@@ -28,20 +28,25 @@ public class SignupActivity extends AppCompatActivity {
 
         buttonEntrant = findViewById(R.id.buttonEntrant);
         buttonFacility = findViewById(R.id.buttonFacility);
+        buttonAdmin = findViewById(R.id.buttonAdmin);
 
         buttonEntrant.setOnClickListener(view -> {
             navigateToFormScreen("entrant");
         });
 
         buttonFacility.setOnClickListener(view -> {
-            navigateToFormScreen("facility");
+            navigateToFormScreen("organizer");
+        });
+
+        buttonAdmin.setOnClickListener(view -> {
+            navigateToFormScreen("admin");
         });
     }
 
     /**
      * Navigates to the UserFormActivity, passing in the user type as an extra parameter.
      *
-     * @param userType The type of user selected (either "entrant" or "facility").
+     * @param userType The type of user selected (either "entrant", "facility", or "admin").
      */
     void navigateToFormScreen(String userType) {
         Intent intent = new Intent(SignupActivity.this, UserFormActivity.class);
