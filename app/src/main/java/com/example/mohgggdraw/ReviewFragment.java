@@ -167,7 +167,7 @@ public class ReviewFragment extends Fragment {
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
-        eventData.put("eventTitle", eventTitle);
+        eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
         eventData.put("registrationOpen", registrationOpenTimestamp);  // Use Timestamp
@@ -191,7 +191,7 @@ public class ReviewFragment extends Fragment {
                     String eventId = documentReference.getId();  // Get the documentId
 
                     // Generate QR code and put QR hash
-                    eventQr = new EventQr(eventId, eventTitle);
+                    eventQr = new EventQr(eventId, sharedViewModel.getEventTitle().getValue());
                     eventQr.generateQr();
                     qrHash = eventQr.getQrHash();
                     documentReference.update("QRhash", qrHash);
