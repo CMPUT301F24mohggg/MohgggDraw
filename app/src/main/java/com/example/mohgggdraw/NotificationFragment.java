@@ -1,11 +1,5 @@
-/**
- * Fragment that handles the display and interaction with notifications in the app.
- * Handles the loading of notifications from Firestore, displaying them, and handling actions
- * like accepting or declining events.
- */
 package com.example.mohgggdraw;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,10 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -32,25 +27,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 
-
 public class NotificationFragment extends Fragment {
+    private static final String TAG = "NotificationFragment";
+
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
     private List<NotificationModel> notificationList;
     private FirebaseFirestore db;
     private String deviceId;
     private Boolean initialLoad;
+    private Context preContext = null;
+    private Context actualContext;
+    private ProgressBar loadingProgressBar;
+    private TextView emptyStateTextView;
+    private Boolean inFragment = false;
 
     /**
      * Inflates the fragment's view and initializes the RecyclerView and Firestore instance.
@@ -64,7 +62,11 @@ public class NotificationFragment extends Fragment {
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+        View view = inflater.inflate(R.layout.fragment_notification, container, false);
+        // Initialize views
+        loadingProgressBar = view.findViewById(R.id.loadingProgressBar);
+        emptyStateTextView = view.findViewById(R.id.emptyStateTextView);
+        return view;
     }
 
 
@@ -85,28 +87,53 @@ public class NotificationFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerViewNotifications);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        notificationList = new ArrayList<>();
+        inFragment = true;
         adapter = new NotificationAdapter(notificationList,
                 this::handleDeclineAction, // Decline listener
-                this::handleAcceptAction  // Accept listener
+                this::handleAcceptAction,  // Accept listener
+                deviceId
+
         );
         recyclerView.setAdapter(adapter);
-
-        db = FirebaseFirestore.getInstance();
-        initialLoad = true;
-        loadNotifications();
     }
 
     /**
-     * Callback interface for fetching event details.
+     * Pre-loads notifications in the background.
+     * This method can be called during app initialization to prepare notifications.
      */
-    public interface EventDetailsCallback {
-        /**
-         * Called when event details have been fetched and the notification has been updated.
-         *
-         * @param notification The updated notification with event details.
-         */
-        void onEventDetailsFetched(NotificationModel notification);
+    public void preLoadNotifications(Context context) {
+        if (context == null) {
+            Log.e(TAG, "Context is null, cannot preload notifications");
+            return;
+        }
+
+        if (preContext == null) {
+            preContext = context;
+        }
+
+        // Ensure lists and adapter are initialized
+        if (notificationList == null) {
+            notificationList = new ArrayList<>();
+        }
+
+        if (adapter == null) {
+            adapter = new NotificationAdapter(
+                    notificationList,
+                    this::handleDeclineAction,
+                    this::handleAcceptAction,
+                    deviceId
+            );
+
+            if (recyclerView != null) {
+                recyclerView.setAdapter(adapter);
+            }
+        }
+
+        deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        db = FirebaseFirestore.getInstance();
+
+        initialLoad = true;
+        loadNotifications();
     }
 
 
@@ -116,53 +143,95 @@ public class NotificationFragment extends Fragment {
      * On the first load, it fetches all notifications; subsequent updates only fetch the latest ones.
      */
     private void loadNotifications() {
+        if (getContext() == null) {
+            actualContext = preContext;
+        } else {
+            actualContext = getContext();
+        }
+
+        // Show loading progress
+        if(inFragment) {
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            emptyStateTextView.setVisibility(View.GONE);
+        }
         db.collection("notification")
+                .orderBy("created_at", Query.Direction.DESCENDING)
                 .whereEqualTo("deviceId", deviceId)
-                .orderBy("created_at", Query.Direction.ASCENDING) // Order notifications by timestamp
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.w("NotificationFragment", "Listen failed.", e);
+                        Log.w(TAG, "Listen failed.", e);
+                        updateUIState();
                         return;
                     }
 
                     if (snapshots != null && !snapshots.isEmpty()) {
                         if (initialLoad) {
                             initialLoad = false;
-                            notificationList.clear(); // Clear old data if necessary
+                            notificationList.clear();
 
-                            // Load all notifications initially
                             for (QueryDocumentSnapshot doc : snapshots) {
                                 NotificationModel notification = doc.toObject(NotificationModel.class);
                                 fetchEventDetails(notification, updatedNotification -> {
                                     notificationList.add(updatedNotification);
+                                    sortNotificationList();
                                     adapter.notifyDataSetChanged();
                                 });
                             }
                         } else {
-                            // Only handle the latest notification snapshot after initial load
-                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(snapshots.size() - 1);
+                            DocumentSnapshot latestDoc = snapshots.getDocuments().get(0);
                             NotificationModel newNotification = latestDoc.toObject(NotificationModel.class);
 
-                            fetchEventDetails(newNotification, updatedNotification -> {
-                                // Show the notification with event details
-                                showNotification(
-                                        getContext(),
-                                        newNotification.getTitle(),
-                                        newNotification.getMessage(),
-                                        updatedNotification.getTitle(),
-                                        updatedNotification.getStartTime()
-                                );
+                            boolean isDuplicate = false;
+                            for (NotificationModel existingNotification : notificationList) {
+                                if (existingNotification.equals(newNotification)) {
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
 
-                                // Add to notificationList and update the adapter
-                                notificationList.add(updatedNotification);
-                                adapter.notifyDataSetChanged();
-                            });
+                            if (!isDuplicate) {
+                                fetchEventDetails(newNotification, updatedNotification -> {
+                                    // Only add to in-app notifications if status is not null
+                                    if (updatedNotification.getStatus() != null) {
+                                        notificationList.add(updatedNotification);
+                                        sortNotificationList();
+                                        adapter.notifyItemInserted(0);
+                                    }
+
+                                    // Always show system notification for new notifications
+                                    showNotification(
+                                            actualContext,
+                                            updatedNotification.getTitle(),
+                                            updatedNotification.getMessage(),
+                                            updatedNotification.getTitle(),
+                                            updatedNotification.getStartTime()
+                                    );
+                                });
+                            }
                         }
+                    }
+                    if(inFragment) {
+                        updateUIState();
                     }
                 });
     }
+    /**
+     * Sorts the notificationList in descending order by the created_at field.
+     */
+    private void sortNotificationList() {
+        Collections.sort(notificationList, (n1, n2) -> n2.getCreated_at().compareTo(n1.getCreated_at()));
+    }
+    private void updateUIState() {
+        loadingProgressBar.setVisibility(View.GONE);
 
-
+        if (notificationList == null || notificationList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyStateTextView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyStateTextView.setVisibility(View.GONE);
+        }
+    }
 
     /**
      * Fetches event details from the Firestore database for a specific notification.
@@ -174,7 +243,8 @@ public class NotificationFragment extends Fragment {
     private void fetchEventDetails(NotificationModel notification, EventDetailsCallback callback) {
         String eventId = notification.getEventId();
         if (eventId == null || eventId.isEmpty()) {
-            Log.w("NotificationFragment", "Notification has no event ID.");
+            Log.w(TAG, "Notification has no event ID.");
+            callback.onEventDetailsFetched(notification);
             return;
         }
 
@@ -187,6 +257,7 @@ public class NotificationFragment extends Fragment {
                         notification.setTitle(notification.getTitle());
                         notification.setEventDetail("Event: " + eventName + " starts at: " + startTime);
                         notification.setMessage(notification.getMessage());
+                        notification.setStartTime(startTime);
                     } else {
                         notification.setMessage("Event details unavailable.");
                     }
@@ -195,7 +266,8 @@ public class NotificationFragment extends Fragment {
                     callback.onEventDetailsFetched(notification);
                 })
                 .addOnFailureListener(e -> {
-                    Log.w("NotificationFragment", "Failed to fetch event details for event ID: " + eventId, e);
+                    Log.w(TAG, "Failed to fetch event details for event ID: " + eventId, e);
+                    callback.onEventDetailsFetched(notification);
                 });
     }
 
@@ -209,27 +281,30 @@ public class NotificationFragment extends Fragment {
      */
     private void handleDeclineAction(NotificationModel notification) {
         String eventId = notification.getEventId();
-        String userId = deviceId; // Using deviceId as the user ID
+        String userId = deviceId;
 
         DocumentReference eventRef = db.collection("Events").document(eventId);
         db.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(eventRef);
+
             List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
             List<String> cancelledList = (List<String>) snapshot.get("EventCancelledlist");
 
-            if (selectedList != null && cancelledList != null) {
-                // Check if user is already in cancelledList
-                if (cancelledList.contains(userId)) {
-                    return "already_declined";
-                }
+            // Ensure the lists are not null
+            if (selectedList == null) selectedList = new ArrayList<>();
+            if (cancelledList == null) cancelledList = new ArrayList<>();
 
-                // Remove user from selectedList and add to cancelledList
-                selectedList.remove(userId);
-                cancelledList.add(userId);
-
-                transaction.update(eventRef, "EventSelectedlist", selectedList);
-                transaction.update(eventRef, "EventCancelledlist", cancelledList);
+            if (cancelledList.contains(userId)) {
+                return "already_declined";
             }
+
+            // Remove from selected and add to cancelled
+            selectedList.remove(userId);
+            cancelledList.add(userId);
+
+            transaction.update(eventRef, "EventSelectedlist", selectedList);
+            transaction.update(eventRef, "EventCancelledlist", cancelledList);
+
             return "decline_recorded";
         }).addOnSuccessListener(result -> {
             if ("already_declined".equals(result)) {
@@ -238,9 +313,10 @@ public class NotificationFragment extends Fragment {
                 Toast.makeText(getContext(), "Decline action recorded successfully.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
-            Log.w("NotificationFragment", "Error recording decline action", e);
+            Log.w(TAG, "Error recording decline action", e);
         });
     }
+
 
 
     /**
@@ -256,20 +332,25 @@ public class NotificationFragment extends Fragment {
         DocumentReference eventRef = db.collection("Events").document(eventId);
         db.runTransaction(transaction -> {
             DocumentSnapshot snapshot = transaction.get(eventRef);
+
             List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
             List<String> confirmedList = (List<String>) snapshot.get("EventConfirmedlist");
 
-            if (selectedList != null && confirmedList != null) {
-                if (confirmedList.contains(userId)) {
-                    return "already_confirmed";
-                }
+            // Ensure the lists are not null
+            if (selectedList == null) selectedList = new ArrayList<>();
+            if (confirmedList == null) confirmedList = new ArrayList<>();
 
-                selectedList.remove(userId);
-                confirmedList.add(userId);
-
-                transaction.update(eventRef, "EventSelectedlist", selectedList);
-                transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+            if (confirmedList.contains(userId)) {
+                return "already_confirmed";
             }
+
+            // Remove from selected and add to confirmed
+            selectedList.remove(userId);
+            confirmedList.add(userId);
+
+            transaction.update(eventRef, "EventSelectedlist", selectedList);
+            transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+
             return "accept_recorded";
         }).addOnSuccessListener(result -> {
             if ("already_confirmed".equals(result)) {
@@ -278,9 +359,10 @@ public class NotificationFragment extends Fragment {
                 Toast.makeText(getContext(), "Accept action recorded successfully.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
-            Log.w("NotificationFragment", "Error recording accept action", e);
+            Log.w(TAG, "Error recording accept action", e);
         });
     }
+
 
 
     /**
@@ -293,13 +375,12 @@ public class NotificationFragment extends Fragment {
      * @param startTime The start time of the event.
      */
     public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
-        Log.e("showNotification: ", "it ran thru here");
-        createNotificationChannel(context); // Ensure the channel is created first
-
-        if (getContext() == null) {
-            Log.e("NotificationFragment", "Context is null, cannot show notification.");
+        if (context == null) {
+            Log.e(TAG, "Context is null, cannot show notification.");
             return;
         }
+
+        createNotificationChannel(context);
 
         // Create PendingIntent to open the main activity
         Intent intent = new Intent(context, MainActivity.class);
@@ -310,7 +391,6 @@ public class NotificationFragment extends Fragment {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
-
 
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notification_channel_id")
@@ -325,7 +405,7 @@ public class NotificationFragment extends Fragment {
         // Check for notification permission (API 33 and above)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("NotificationFragment", "Notification permission not granted.");
+            Log.e(TAG, "Notification permission not granted.");
             return;
         }
 
@@ -342,6 +422,10 @@ public class NotificationFragment extends Fragment {
      * @param context The context used to create the notification channel.
      */
     public void createNotificationChannel(Context context) {
+        if (context == null) {
+            Log.e(TAG, "Context is null. Cannot create notification channel.");
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Notification Channel Name";
             String description = "Channel Description";
@@ -355,7 +439,17 @@ public class NotificationFragment extends Fragment {
                 notificationManager.createNotificationChannel(channel);
             }
         }
-
     }
 
+    /**
+     * Callback interface for fetching event details.
+     */
+    public interface EventDetailsCallback {
+        /**
+         * Called when event details have been fetched and the notification has been updated.
+         *
+         * @param notification The updated notification with event details.
+         */
+        void onEventDetailsFetched(NotificationModel notification);
+    }
 }

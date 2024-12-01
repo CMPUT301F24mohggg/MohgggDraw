@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -21,6 +22,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/***
+ This activity serves as the main entry point of the application. It:
+ - Initializes Firebase
+ - Sets up the bottom navigation view
+ - Manages fragment transactions for different navigation items
+ - Handles the display of notification badges
+ ***/
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout signupLayout;
@@ -179,80 +187,105 @@ public class MainActivity extends AppCompatActivity {
         if (activeFragment == null || !defaultFragment.equals(activeFragment)) {
             switchFragment(defaultFragment);
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            // Set default fragment to HomeFragment
+            Fragment homeFragment = activeFragmentMap.get(R.id.nav_home);
+            if (homeFragment == null) {
+                homeFragment = new HomeFragment();
+                activeFragmentMap.put(R.id.nav_home, homeFragment);
+            }
+            switchFragment(homeFragment);
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
+        // Pre-load notifications after navigation is set up
+        preLoadNotifications();
     }
 
-    private void switchFragment(@NonNull Fragment fragment) {
-        if (activeFragment != null && activeFragment.equals(fragment)) {
-            Log.d("MainActivity", "Fragment is already active: " + fragment.getClass().getSimpleName());
-            return; // Avoid replacing the fragment if it's already active
+        private void preLoadNotifications () {
+            Fragment notificationFragment = activeFragmentMap.get(R.id.nav_notifications);
+            if (notificationFragment == null) {
+                notificationFragment = new NotificationFragment();
+                activeFragmentMap.put(R.id.nav_notifications, notificationFragment);
+            }
+
+            // Call preLoadNotifications if it's a NotificationFragment
+            if (notificationFragment instanceof NotificationFragment) {
+                // Use getSupportFragmentManager() to get the attached context
+                Context context = getApplicationContext();
+                ((NotificationFragment) notificationFragment).preLoadNotifications(context);
+            }
         }
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setReorderingAllowed(true);
+        private void switchFragment(@NonNull Fragment fragment){
+            if (activeFragment != null && activeFragment.equals(fragment)) {
+                Log.d("MainActivity", "Fragment is already active: " + fragment.getClass().getSimpleName());
+                return; // Avoid replacing the fragment if it's already active
+            }
 
-        if (activeFragment != null) {
-            // Hide the currently active fragment
-            transaction.hide(activeFragment);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setReorderingAllowed(true);
+
+            if (activeFragment != null) {
+                // Hide the currently active fragment
+                transaction.hide(activeFragment);
+            }
+
+            String tag = fragment.getClass().getSimpleName();
+            Fragment existingFragment = getSupportFragmentManager().findFragmentByTag(tag);
+
+            if (existingFragment != null) {
+                // If fragment already exists, simply show it
+                transaction.show(existingFragment);
+                activeFragment = existingFragment;
+            } else {
+                // If fragment does not exist, add it and tag it
+                transaction.add(R.id.fragment_container, fragment, tag);
+                activeFragment = fragment;
+            }
+
+            // Commit the transaction
+            transaction.commitNowAllowingStateLoss();
         }
 
-        String tag = fragment.getClass().getSimpleName();
-        Fragment existingFragment = getSupportFragmentManager().findFragmentByTag(tag);
-
-        if (existingFragment != null) {
-            // If fragment already exists, simply show it
-            transaction.show(existingFragment);
-            activeFragment = existingFragment;
-        } else {
-            // If fragment does not exist, add it and tag it
-            transaction.add(R.id.fragment_container, fragment, tag);
-            activeFragment = fragment;
+        private boolean isClickAllowed () {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastClickTime > 500) { // Allow clicks only after 500ms
+                lastClickTime = currentTime;
+                return true;
+            }
+            return false;
         }
 
-        // Commit the transaction
-        transaction.commitNowAllowingStateLoss();
-    }
-
-    private boolean isClickAllowed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastClickTime > 500) { // Allow clicks only after 500ms
-            lastClickTime = currentTime;
-            return true;
+        @Override
+        protected void onSaveInstanceState (@NonNull Bundle outState){
+            super.onSaveInstanceState(outState);
+            if (activeFragment != null) {
+                getSupportFragmentManager().putFragment(outState, "activeFragment", activeFragment);
+            }
         }
-        return false;
-    }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (activeFragment != null) {
-            getSupportFragmentManager().putFragment(outState, "activeFragment", activeFragment);
+        @Override
+        protected void onRestoreInstanceState (@NonNull Bundle savedInstanceState){
+            super.onRestoreInstanceState(savedInstanceState);
+            if (savedInstanceState.containsKey("activeFragment")) {
+                activeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "activeFragment");
+                switchFragment(activeFragment);
+            }
         }
-    }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState.containsKey("activeFragment")) {
-            activeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "activeFragment");
-            switchFragment(activeFragment);
-        }
-    }
+        @Override
+        protected void onNewIntent (Intent intent){
+            super.onNewIntent(intent);
+            setIntent(intent);
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
+            if (!isClickAllowed()) return; // Prevent rapid interactions
 
-        if (!isClickAllowed()) return; // Prevent rapid interactions
-
-        boolean navigateToHomeFragment = intent.getBooleanExtra("navigateToHomeFragment", false);
-        if (navigateToHomeFragment && activeFragmentMap != null) {
-            Fragment homeFragment = activeFragmentMap.getOrDefault(R.id.nav_home, new HomeFragment());
-            if (homeFragment != null && !homeFragment.equals(activeFragment)) {
-                switchFragment(homeFragment);
-                bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            boolean navigateToHomeFragment = intent.getBooleanExtra("navigateToHomeFragment", false);
+            if (navigateToHomeFragment && activeFragmentMap != null) {
+                Fragment homeFragment = activeFragmentMap.getOrDefault(R.id.nav_home, new HomeFragment());
+                if (homeFragment != null && !homeFragment.equals(activeFragment)) {
+                    switchFragment(homeFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.nav_home);
+                }
             }
         }
     }
-}

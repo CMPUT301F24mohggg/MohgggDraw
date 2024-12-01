@@ -23,6 +23,8 @@ public class NotificationAdapterTest {
     private boolean acceptButtonClicked = false;
     private boolean declineButtonClicked = false;
 
+    private String mockDeviceId = "c7dc1ae4a545d5a2";
+
     @Before
     public void setUp() {
         // Reset button click flags
@@ -35,7 +37,7 @@ public class NotificationAdapterTest {
 
         // Initialize the adapter with custom listeners that set flags when clicked
         adapter = new NotificationAdapter(notificationList, notification -> declineButtonClicked = true,
-                notification -> acceptButtonClicked = true);
+                notification -> acceptButtonClicked = true, mockDeviceId);
     }
 
 

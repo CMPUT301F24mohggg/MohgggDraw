@@ -38,6 +38,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/androidx.cardview_cardview.version"
+        }
+    }
+
 }
 
 dependencies {
@@ -78,6 +84,7 @@ dependencies {
     implementation("com.google.android.material:material:1.7.0") // Check for latest version
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation (libs.cardview.v7)
 
     // Additional libraries from libs
     implementation(libs.appcompat)
