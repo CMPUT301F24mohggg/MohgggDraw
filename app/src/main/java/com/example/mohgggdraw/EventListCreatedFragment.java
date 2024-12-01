@@ -1,24 +1,18 @@
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
-
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 
-/***
- * Fragment to display Array of lists
- * used to display list of user events
- * ***/
-public class EventListDisplayFragment extends Fragment implements EventListView{
+public class EventListCreatedFragment extends Fragment implements EventListView{
 
     private ArrayList<Event> dataList;
     private ListView eventList;
@@ -46,19 +40,19 @@ public class EventListDisplayFragment extends Fragment implements EventListView{
 
         return inflater.inflate(R.layout.event_adapter_layout, container, false);
     }
-        //return inflater.inflate(R.layout.fragment_home, container, false);
+    //return inflater.inflate(R.layout.fragment_home, container, false);
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
 
-    dataList = new ArrayList<Event>();
+        dataList = new ArrayList<Event>();
 
         //pulling all data for test purpose
         //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
 
         eventList = view.findViewById(R.id.eventList);
-        new UserDB().queryList("waitList",this,deviceID);
+        new UserDB().queryList("createdList",this,deviceID);
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList.setAdapter(eventAdapter);
 

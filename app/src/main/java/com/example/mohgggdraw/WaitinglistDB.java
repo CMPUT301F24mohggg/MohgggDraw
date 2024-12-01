@@ -304,4 +304,24 @@ public class WaitinglistDB {
 
         return myArray;
     }
+
+    ArrayList<Event> events = new ArrayList<>();
+    public void createEventListFromStringList(ArrayList<String> list, EventListView fragment){
+
+        for (String eventId:list
+             ) {
+            waitlistRef.document(eventId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                    Event event = docSnapshotToEvent(documentSnapshot);
+                    events.add(event);
+                    fragment.setEventList(events);
+                }
+            });
+
+        }
+
+    }
+
 }

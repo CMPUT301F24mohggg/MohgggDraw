@@ -16,6 +16,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class UserDB {
@@ -69,4 +70,25 @@ public class UserDB {
         });
         return data;
     }
+
+    public void queryList(String listName, EventListView frag,String id){
+        myDoc = waitlistRef.document((String.valueOf(id)));
+        Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                Map data = documentSnapshot.getData();
+                if(data!= null) {
+                    ArrayList<String> list = (ArrayList) data.get(listName);
+                    new WaitinglistDB().createEventListFromStringList(list, frag);
+                }
+            }
+        });
+
+
+
+
+
+    }
+
 }

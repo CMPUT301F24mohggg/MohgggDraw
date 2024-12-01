@@ -46,9 +46,9 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
                 }
                 else{
 
-                    EventListDisplayFragment eventListDisplayFragment = new EventListDisplayFragment();
-                    eventListDisplayFragment.setFragment((HomeFragment) fragment);
-                    return eventListDisplayFragment;
+                    EventListTabViewFragment fragment1 = new EventListTabViewFragment();
+                    fragment1.setHomeFragment((HomeFragment) fragment);
+                    return fragment1;
 
                 }
         }
