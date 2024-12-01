@@ -1,63 +1,89 @@
 package com.example.mohgggdraw;
 
+import android.graphics.PointF;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+public class MapFragment extends Fragment {
 
-import java.util.List;
+    private static final int LOCATION_PERMISSION_REQUEST = 100;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
-    private GoogleMap mMap;
-    private List entrants;
+    private com.example.mohgggdraw.TouchImageView mapImage;
+    private FrameLayout markerContainer;
+    private LocationManager locationManager;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        return inflater.inflate(R.layout.fragment_map, container, false);
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+        super.onCreate(savedInstanceState);
 
-        return rootView;
+        mapImage = view.findViewById(R.id.map);
+        markerContainer = view.findViewById(R.id.marker_container);
+
+        // Example marker placement
+        addMarker(53.5232, -113.5263, "Edmonton");
+        addMarker(51.0447, -114.0719, "Calgary");
+        addMarker(43.651070, -79.347015, "Toronto");
+
+
     }
 
+    /**
+     * Adds a marker to the map and zooms into it.
+     */
+    private void addMarker(double latitude, double longitude, String title) {
+        // Convert lat/lng to x/y coordinates
+        PointF point = latLngToPoint(latitude, longitude);
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        // Create a marker view
+        TextView marker = new TextView(getContext());
+        marker.setText("📍");
+        marker.setTextSize(24);
+        marker.setX(point.x);
+        marker.setY(point.y);
+        marker.setOnClickListener(v -> Toast.makeText(getContext(), title, Toast.LENGTH_SHORT).show());
 
-        LatLng edmontonMeow = new LatLng(53.5232,-113.5263);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(edmontonMeow,10));
-        googleMap.addMarker(new MarkerOptions()
-                .position(edmontonMeow)
-                .title("Marker"));
+        // Add the marker to the container
+        markerContainer.addView(marker);
 
-        // Example data retrieval from database:
-        //List<Entrant> entrants = WaitinglistDB.getEntrantsForEvent(eventId);
-        Log.d("sad;fasd","asdfas");
-//        for (Entrant entrant : entrants) {
-//            LatLng location = new LatLng(entrant.getLatitude(), entrant.getLongitude());
-//            mMap.addMarker(new MarkerOptions().position(location).title(entrant.getName()));
-//        }
+        // Zoom into the marker
+        mapImage.zoomToPoint(point.x, point.y, 2f); // Adjust scaleFactor as needed (e.g., 2x zoom)
+    }
 
-        // Move camera to the first entrant
-//        if (!entrants.isEmpty()) {
-//            LatLng firstLocation = new LatLng(entrants.get(0).getLatitude(), entrants.get(0).getLongitude());
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 10));
-//        }
+    /**
+     * Converts latitude and longitude to pixel coordinates on the map image.
+     */
+    private PointF latLngToPoint(double latitude, double longitude) {
+        // Map dimensions (adjust these to match your map image size)
+        float mapWidth = 1920;  // Replace with your map's width
+        float mapHeight = 960; // Replace with your map's height
+
+        // Latitude/longitude range
+        double lonRange = 360.0; // Longitude range [-180, 180]
+        double latRange = 180.0; // Latitude range [-90, 90]
+
+        // Convert lat/lng to x/y
+        float x = (float) ((longitude + 180.0) / lonRange * mapWidth);
+        float y = (float) ((90.0 - latitude) / latRange * mapHeight);
+
+        return new PointF(x, y);
     }
 }

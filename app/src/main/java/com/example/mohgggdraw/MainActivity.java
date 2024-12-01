@@ -95,11 +95,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeFragments() {
-        entrantFragmentMap.put(R.id.nav_home, new HomeFragment());
+        entrantFragmentMap.put(R.id.nav_home, new MapFragment());
         entrantFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         entrantFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         entrantFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
-        ((HomeFragment)entrantFragmentMap.get(R.id.nav_home)).setAdminView();
+        //((HomeFragment)entrantFragmentMap.get(R.id.nav_home)).setAdminView();
 
         organizerFragmentMap.put(R.id.nav_home, new HomeFragment());
         organizerFragmentMap.put(R.id.nav_create, new CreateFragment());

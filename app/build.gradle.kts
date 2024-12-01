@@ -97,6 +97,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation (libs.cardview.v7)
 
+    //map
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.android.material:material:1.9.0")
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
+
     // Additional libraries from libs
     implementation(libs.appcompat)
     implementation(libs.material)
