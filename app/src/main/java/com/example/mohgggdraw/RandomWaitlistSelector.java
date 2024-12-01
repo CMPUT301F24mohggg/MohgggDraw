@@ -1,5 +1,7 @@
 package com.example.mohgggdraw;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -8,6 +10,8 @@ public class RandomWaitlistSelector {
     WaitinglistController controller;
     Event event;
     Random rand;
+    ArrayList<String> selected;
+    ArrayList<String> accepted;
 
 
     public RandomWaitlistSelector(Event event) {
@@ -15,19 +19,18 @@ public class RandomWaitlistSelector {
         this.event = event;
         controller = new WaitinglistController(event);
         rand = new Random();
+
     }
 
     public ArrayList<String> pickFromWaitlist(){
         //roll function
         //collect event waitinglist
         //roll into
+        //selected should be null check when called
         ArrayList<String> selected;
         ArrayList<String> cancelled;
-        Map<String, ArrayList<String>> data = new WaitinglistDB().getOtherLists(event);
-        selected = data.get("Selected");
-        if(selected == null){
-            selected = new ArrayList<String>();
-        }
+
+        selected = new ArrayList<String>();
 
         if(event.getMaxCapacity()!=-1 &&(event.getWaitingList().size()>event.getMaxCapacity())){
 
@@ -55,15 +58,19 @@ public class RandomWaitlistSelector {
 
     }
 
-    public ArrayList<String> pickRemaining(){
+    public void fillSelected(WaitlistViewEntrantsFragment frag){
+
+       new WaitinglistDB().getOtherLists(event,this,frag);
+
+    }
+
+    public ArrayList<String> pickRemaining(Map<String,ArrayList<String>> data, WaitlistViewEntrantsFragment frag){
         //how to reroll
         //selected accepted cancelled
         //selected + accepted = total taken
         //total spots - total taken = amount to reroll
-        ArrayList<String> selected;
-        ArrayList<String> accepted;
 
-        Map<String, ArrayList<String>> data = new WaitinglistDB().getOtherLists(event);
+
         accepted = data.get("Accepted");
         selected = data.get("Selected");
         int totalCap = event.getMaxCapacity();
@@ -79,6 +86,8 @@ public class RandomWaitlistSelector {
             event.setWaitingList(new ArrayList<String>());
         }
         controller.updateLists(selected,event.getWaitingList());
+        Log.d("tag",selected.toString());
+        frag.updateFragments();
         return selected;
     }
 }

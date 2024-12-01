@@ -47,7 +47,7 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
         }
         deleteButton.setOnClickListener(v->{
             new WaitinglistDB().removeFromList("EventSelectedlist",selectedList, event);
-            new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
+            refreshAdapter();
             selectedList = new ArrayList<String>();
             updateButton();
 
@@ -94,6 +94,10 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
     @Override
     public void updateList(ArrayAdapter adapter) {
         entrantListContainer.setAdapter(adapter);
+
+    }
+    public void refreshAdapter(){
+        new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
 
     }
 }

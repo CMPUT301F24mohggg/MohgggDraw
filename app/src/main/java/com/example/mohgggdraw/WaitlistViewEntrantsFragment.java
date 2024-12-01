@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class WaitlistViewEntrantsFragment extends Fragment {
     private Event event;
+    List<Fragment> fragments = new ArrayList<>();
 
     public WaitlistViewEntrantsFragment() {
 
@@ -43,7 +44,6 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 
         // Create fragments for tabs
-        List<Fragment> fragments = new ArrayList<>();
         fragments.add(new WaitlistEntrantContentFragment()); // First tab waitlist
         fragments.add(new WaitlistEntrantContentSelectedFragment()); //selected
         fragments.add(new WaitlistEntrantContentCancelledFragment()); //cancelled
@@ -52,6 +52,7 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         ((WaitlistEntrantContentSelectedFragment)fragments.get(1)).setEvent(event);
         ((WaitlistEntrantContentCancelledFragment)fragments.get(2)).setEvent(event);
         ((WaitlistEntrantContentConfirmedFragment)fragments.get(3)).setEvent(event);
+        ((WaitlistEntrantContentCancelledFragment)fragments.get(2)).setFragment(this);
 
 
 
@@ -68,5 +69,10 @@ public class WaitlistViewEntrantsFragment extends Fragment {
 
         // Link TabLayout with ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabTitles.get(position))).attach();
+    }
+
+    public void updateFragments(){
+        ((WaitlistEntrantContentFragment)fragments.get(0)).refreshAdapter();
+        ((WaitlistEntrantContentSelectedFragment)fragments.get(1)).refreshAdapter();
     }
 }

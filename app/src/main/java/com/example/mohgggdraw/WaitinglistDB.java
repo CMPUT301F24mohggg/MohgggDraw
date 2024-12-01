@@ -39,6 +39,7 @@ public class WaitinglistDB {
     private DocumentReference myDoc;
     private Map<String, Object> docData;
     private Event event;
+    ArrayList list;
 
     public WaitinglistDB() {
 
@@ -82,7 +83,7 @@ public class WaitinglistDB {
 
     }
 
-    public Map<String, ArrayList<String>> getOtherLists(Event event) {
+    public ArrayList<String> getOtherLists(Event event, RandomWaitlistSelector randomWaitlistSelector, WaitlistViewEntrantsFragment frag) {
         //reason not pulled with event is because only needed for some admin stuff
         Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>(3);
         myMap.put("Accepted", new ArrayList<>());
@@ -90,28 +91,31 @@ public class WaitinglistDB {
         myMap.put("Selected", new ArrayList<>());
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
+
         Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Map data = documentSnapshot.getData();
-                if (data.get("EventCancelledlist") != null) {
-                    myMap.put("Accepted", (ArrayList<String>) data.get("EventCancelledlist"));
+                if (data.get("EventConfirmedlist") != null) {
+                    myMap.put("Accepted", (ArrayList<String>) data.get("EventConfirmedlist"));
 
                 }
 
-                if (data.get("EventConfirmedlist") != null) {
-                    myMap.put("Cancelled", (ArrayList<String>) data.get("EventConfirmedlist"));
+                if (data.get("EventCancelledlist") != null) {
+                    myMap.put("Cancelled", (ArrayList<String>) data.get("EventCancelledlist"));
                 }
 
                 if (data.get("EventSelectedlist") != null) {
                     myMap.put("Selected", (ArrayList<String>) data.get("EventSelectedlist"));
 
                 }
+                list = randomWaitlistSelector.pickRemaining(myMap,frag);
+
             }
         });
 
 
-        return myMap;
+        return list;
     }
 
 
@@ -258,7 +262,11 @@ public class WaitinglistDB {
             Object maxEntrantsObj = map.get("maxEntrants");
             if (maxEntrantsObj instanceof Integer) {
                 myevent.setMaxCapacity((int) maxEntrantsObj);
-            } else if (maxEntrantsObj instanceof String) {
+            } else if (maxEntrantsObj instanceof Long) {
+                myevent.setMaxCapacity(((Long) maxEntrantsObj).intValue());
+
+
+        } else if (maxEntrantsObj instanceof String) {
                 try {
                     myevent.setMaxCapacity(Integer.parseInt((String) maxEntrantsObj));
                 } catch (NumberFormatException e) {

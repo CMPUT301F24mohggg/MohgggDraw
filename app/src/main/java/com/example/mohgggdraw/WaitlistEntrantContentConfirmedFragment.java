@@ -100,4 +100,5 @@ public class WaitlistEntrantContentConfirmedFragment extends Fragment implements
 
 
     }
+
 }
