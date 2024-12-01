@@ -36,7 +36,14 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
             case 2:
                 WaitlistViewEntrantsFragment waitlistViewEntrantsFragment = new WaitlistViewEntrantsFragment();
                 waitlistViewEntrantsFragment.setEvent(event);
+                waitlistViewEntrantsFragment.setHome((HomeFragment) fragment);
                 return waitlistViewEntrantsFragment;
+
+            case 3:
+                MapFragment map = new MapFragment();
+                return map;
+
+
             default:
                 if (adminView) {
                     AdminEventView adminEventView = new AdminEventView();

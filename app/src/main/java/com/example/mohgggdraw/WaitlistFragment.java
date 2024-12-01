@@ -20,6 +20,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 /***
@@ -90,7 +91,7 @@ public class WaitlistFragment extends Fragment {
          location = view.findViewById(R.id.eventInfoLocation);
         if(home !=null) {
             name.setText(event.getTitle());
-            time.setText(event.getTime());
+            time.setText(event.getStartTime().toString());
             day.setText(event.getDate());
             capacity.setText(String.valueOf(event.getMaxCapacity()));
             location.setText(event.getLocation());
@@ -144,6 +145,7 @@ public class WaitlistFragment extends Fragment {
                     new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
                 } else {
                     new WaitinglistController(event).addUser(user);
+                    new UserDB().addEventToUserList(event.getEventId(),deviceId);
                     onDialogueFinished();
                 }
             });

@@ -37,6 +37,7 @@ public class leaveEventButton extends DialogFragment {
         Button button = view.findViewById(R.id.leaveButton);
         button.setOnClickListener(v ->{
             new WaitinglistController(event).removeUser(user);
+            new UserDB().removeEventToUserList(event.getEventId(),user.getUid());
             waitlistFragment.onDialogueFinished();
             dismiss();
         });

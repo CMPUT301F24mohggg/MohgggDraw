@@ -10,10 +10,12 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.test.services.events.TimeStamp;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -245,8 +248,10 @@ public class WaitinglistDB {
             myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
         }
 
-        if (map.get("geoLocationEnabled") != null) {
-            myevent.setGeolocation((boolean) map.get("geoLocationEnabled"));
+        if (map.get("startTime") != null) {
+            if(map.get("startTime") instanceof Timestamp) {
+                myevent.setStartTime(((Timestamp) map.get("startTime")).toDate());
+            }
         }
 
         myevent.setOrgID((String) map.get("organizerId"));
@@ -326,5 +331,17 @@ public class WaitinglistDB {
                 }
             }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
         }
+    }
+
+    public void drawEvent(Event event){
+        waitlistRef.document(event.getEventId()).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Map doc = documentSnapshot.getData();
+                if (((ArrayList)doc.get("EventConfirmedlist")).isEmpty() &&((ArrayList)doc.get("EventCancelledlist")).isEmpty() &&((ArrayList)doc.get("EventSelectedlist")).isEmpty()){
+                    new RandomWaitlistSelector(event).pickFromWaitlist();
+
+                }
+            }
+        });
     }
 }

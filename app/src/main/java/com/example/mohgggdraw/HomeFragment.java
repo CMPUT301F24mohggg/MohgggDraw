@@ -65,6 +65,7 @@ public class HomeFragment extends Fragment {
     }
     //goes to eventview
     public void goToNextPage(Event event){
+        waitlistAdapter = new WaitlistPagerAdapter(this, user);
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
         viewPager2.setCurrentItem(1);
@@ -73,6 +74,7 @@ public class HomeFragment extends Fragment {
     }
     //waitlist view
     public void goToWaitlistView(Event event){
+        waitlistAdapter = new WaitlistPagerAdapter(this, user);
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
         viewPager2.setCurrentItem(2);
@@ -84,4 +86,6 @@ public class HomeFragment extends Fragment {
         adminView = true;
 
     }
+
+
 }

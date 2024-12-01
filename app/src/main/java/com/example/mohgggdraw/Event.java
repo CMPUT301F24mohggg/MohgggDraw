@@ -19,7 +19,7 @@ public class Event{
     private String participationSettings;
     private String date = "nov 1";
     private String time = "3:00";
-    private Date startTime;
+    private Date startTime = new Date();
     private int maxCapacity = -1;
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();

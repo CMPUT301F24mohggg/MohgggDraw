@@ -7,10 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,9 +15,6 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /***
  * Content fragment to display entrants for the first tab.
@@ -29,39 +23,45 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
     private ArrayList<String> dataList;
     private Event event;
     ListView entrantListContainer;
-    FloatingActionButton deleteButton;
+    FloatingActionButton mapButton;
     private ArrayList<String> selectedList = new ArrayList<String>();
+    WaitlistViewEntrantsFragment waitlistViewEntrantsFragment;
 
     public void setEvent(Event event){
         this.event=event;
     }
+    public void setFragment(WaitlistViewEntrantsFragment waitlistViewEntrantsFragment){
+        this.waitlistViewEntrantsFragment = waitlistViewEntrantsFragment;
+
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_waiting_list_selected, container, false);
+        return inflater.inflate(R.layout.fragment_waiting_list, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        dataList = event.getWaitingList();
+
 
         entrantListContainer = view.findViewById(R.id.listContainer);
-        deleteButton = view.findViewById(R.id.deleteButton);
-        deleteButton.setVisibility(View.INVISIBLE);
+        mapButton = view.findViewById(R.id.mapButton);
+        mapButton.setVisibility(View.VISIBLE);
 
         // Populate entrant list dynamically
         if(event!=null) {
-            WaitlistEntrantContentSelectedAdapter adapter = new WaitlistEntrantContentSelectedAdapter(getContext(),dataList,this);
+            dataList = event.getWaitingList();
+            WaitlistEntrantContentAdapter adapter = new WaitlistEntrantContentAdapter(getContext(),dataList,this);
             updateList(adapter);
+        }else{
+            new WaitinglistDB().setListFromDB("EventWaitinglist", this, event);
         }
-        deleteButton.setOnClickListener(v->{
-            new WaitinglistDB().removeFromList("EventWaitinglist",selectedList, event);
-           refreshAdapter();
-
-            selectedList = new ArrayList<String>();
-            new WaitinglistDB().updateWaitlistInEvent(event);
-            updateButton();
+        mapButton.setOnClickListener(v->{
+            if(waitlistViewEntrantsFragment!=null){
+                waitlistViewEntrantsFragment.switchToMap();
+            }
+           
 
         });
 
@@ -83,10 +83,10 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
 
     public void updateButton(){
         if(selectedList.size()>0){
-            deleteButton.setVisibility(View.VISIBLE);
+            mapButton.setVisibility(View.VISIBLE);
         }
         else {
-            deleteButton.setVisibility(View.INVISIBLE);
+            mapButton.setVisibility(View.INVISIBLE);
         }
     }
 

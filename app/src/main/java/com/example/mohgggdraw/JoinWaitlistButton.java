@@ -42,6 +42,7 @@ public class JoinWaitlistButton extends DialogFragment {
         Button button = view.findViewById(R.id.accept_terms_button);
         button.setOnClickListener(v ->{
             new WaitinglistController(event).addUser(user);
+            new UserDB().addEventToUserList(event.getEventId(),user.getUid());
             waitlistFragment.onDialogueFinished();
             dismiss();
         });

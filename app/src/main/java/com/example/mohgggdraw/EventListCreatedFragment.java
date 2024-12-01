@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EventListCreatedFragment extends Fragment implements EventListView{
 
@@ -55,6 +56,7 @@ public class EventListCreatedFragment extends Fragment implements EventListView{
         new UserDB().queryList("createdList",this,deviceID);
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList.setAdapter(eventAdapter);
+        dataChange();
 
 //onclick per event item
         eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
@@ -71,6 +73,16 @@ public class EventListCreatedFragment extends Fragment implements EventListView{
     public void dataChange(){
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
+        for (Event event:dataList
+             ) {
+            if(event.getStartTime()!=null){
+                if (event.getStartTime().getTime()<= new Date().getTime()){
+                    new WaitinglistDB().drawEvent(event);
+
+                }
+            }
+
+        }
 
         eventList.setAdapter(eventAdapter);
 

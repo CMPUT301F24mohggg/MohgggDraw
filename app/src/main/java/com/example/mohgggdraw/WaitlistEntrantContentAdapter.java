@@ -36,7 +36,7 @@ public class WaitlistEntrantContentAdapter extends ArrayAdapter<String> {
         ImageView image = view.findViewById(R.id.profile_placeholder);
 
 
-        Map user = new UserDB().getUserMapFromID(entrant, userName, image);
+        new UserDB().getUserMapFromID(entrant, userName, image);
         return view;
     }
 }

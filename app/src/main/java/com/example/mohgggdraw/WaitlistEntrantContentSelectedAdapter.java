@@ -41,7 +41,7 @@ public class WaitlistEntrantContentSelectedAdapter extends ArrayAdapter<String> 
             (fragment).updateSelectedList(entrant);
 
         });
-        Map user = new UserDB().getUserMapFromID(entrant, userName, image);
+        new UserDB().getUserMapFromID(entrant, userName, image);
         return view;
     }
 
@@ -51,42 +51,3 @@ public class WaitlistEntrantContentSelectedAdapter extends ArrayAdapter<String> 
 
 }
 
-
-/**?
- *   for (String entrant : myList) {
- *
- *
- *             View itemView = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, entrantListContainer, false);
- *             TextView userName = itemView.findViewById(R.id.userName);
- *             ImageView image = itemView.findViewById(R.id.profile_placeholder);
- *             CheckBox button = itemView.findViewById(R.id.selectCheckBox);
- *             button.setOnClickListener(v -> {
- *                 if(!selectedList.contains(entrant)) {
- *                     selectedList.add(entrant);
- *                     Log.d("dsaf", "i got here!!" + selectedList.toString());
- *                     updateButton();
- *                 }else {
- *                     selectedList.remove(entrant);
- *                     updateButton();
- *
- *                 }
- *
- *
- *
- *
- *             });
- *             Map user = new UserDB().getUserMapFromID(entrant,userName,image);
- *
- *
- *
- *             //expand image
- *
- *
- *             entrantListContainer.addView(itemView);
- *             //
- *
- *         }
- *
- *     }
- * /
- */

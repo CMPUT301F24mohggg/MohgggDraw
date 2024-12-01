@@ -3,6 +3,7 @@ package com.example.mohgggdraw;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Camera;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /***
  * Event adapter for listview
@@ -46,6 +55,8 @@ public class EventAdapter extends ArrayAdapter<Event> {
             return view;
         }
 
+
+
         // Find views from XML layout
         TextView eventTitle = view.findViewById(R.id.eventTitle);
         TextView eventDate = view.findViewById(R.id.eventDate);
@@ -57,10 +68,22 @@ public class EventAdapter extends ArrayAdapter<Event> {
         eventTitle.setText(event.getTitle() != null ? event.getTitle() : "Untitled Event");
 
         // Set event date (Month and Day)
-        eventDate.setText(event.getDate() != null ? event.getDate() : "Unknown Date");
+
+        if(event.getStartTime() != null){
+
+
+        }
+        eventDate.setText(event.getStartTime() != null ? new SimpleDateFormat("MMMM").format(event.getStartTime()).substring(0,3) +"\n"+ String.valueOf(event.getStartTime().getDate()): "Unknown Date");
 
         // Set event time details
-        String timeDetails = String.format("Time: %s", event.getTime() != null ? event.getTime() : "Unknown Time");
+        String time="";
+        if( event.getStartTime()!=null) {
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(event.getStartTime());
+            time = (cal.get(Calendar.DAY_OF_WEEK))+" "+String.valueOf(cal.get(Calendar.HOUR)==0?"12":cal.get(Calendar.HOUR))+":"+cal.get(Calendar.MINUTE)+(cal.get(Calendar.AM_PM)==0?"AM":"PM");
+
+        }
+        String timeDetails = String.format("Time: %s", event.getStartTime() != null ? time : "Unknown Time");
         eventDetails.setText(timeDetails);
 
         // Set event description

@@ -18,12 +18,18 @@ import java.util.List;
 public class WaitlistViewEntrantsFragment extends Fragment {
     private Event event;
     private final List<Fragment> fragments = new ArrayList<>();
+    private HomeFragment home;
+    ViewPager2 viewPager;
 
     public WaitlistViewEntrantsFragment() {
     }
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public void setHome(HomeFragment home) {
+        this.home = home;
     }
 
     @Nullable
@@ -37,7 +43,7 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Initialize ViewPager2
-        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        viewPager = view.findViewById(R.id.viewPager);
 
         // Initialize tabs
         TextView tab1 = view.findViewById(R.id.tab1);
@@ -50,6 +56,10 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         fragments.add(new WaitlistEntrantContentCancelledFragment()); // Second tab
         fragments.add(new WaitlistEntrantContentSelectedFragment()); // Third tab
         fragments.add(new WaitlistEntrantContentConfirmedFragment()); // Fourth tab
+        fragments.add(new MapFragment());
+
+        ((WaitlistEntrantContentFragment)fragments.get(0)).setFragment(this);
+
 
         // Set event to fragments
         if (event != null) {
@@ -81,6 +91,10 @@ public class WaitlistViewEntrantsFragment extends Fragment {
 
         // Set default tab style
         updateTabStyles(tab1, tab2, tab3, tab4, 0);
+    }
+    public void switchToMap(){
+        viewPager.setCurrentItem(4);
+
     }
 
     private void updateTabStyles(TextView tab1, TextView tab2, TextView tab3, TextView tab4, int position) {
