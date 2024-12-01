@@ -196,6 +196,10 @@ public class ReviewFragment extends Fragment {
                     qrHash = eventQr.getQrHash();
                     documentReference.update("QRhash", qrHash);
                     sharedViewModel.setEventQr(eventQr);
+
+                    // Add eventId to the user's document in Firestore
+                    updateUserWithEvent(deviceID, eventId);
+
                     Toast.makeText(getContext(), "Event successfully created and uploaded to Firestore!", Toast.LENGTH_SHORT).show();
 
                     // Swap to next fragment
@@ -205,6 +209,19 @@ public class ReviewFragment extends Fragment {
                     Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Error uploading event: ", e);
                 });
+    }
 
+    /**
+     * Adds the created eventId to the organizer's user document in Firestore.
+     */
+    private void updateUserWithEvent(String deviceID, String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("user");
+
+        // Locate the user document by device ID
+        usersRef.document(deviceID)
+                .update("createdList", com.google.firebase.firestore.FieldValue.arrayUnion(eventId))
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Event ID added to user document successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to add event ID to user document", e));
     }
 }
