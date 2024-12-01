@@ -5,22 +5,19 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class EventListTabViewFragment extends Fragment {
-    List<Fragment> fragments= new ArrayList<>();
+    List<Fragment> fragments = new ArrayList<>();
     String deviceID;
     HomeFragment home;
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,52 +28,63 @@ public class EventListTabViewFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize TabLayout and ViewPager2
-        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
-        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        // Get device ID
         deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // Create fragments for tabs
-        fragments.add(new EventListDisplayFragment()); // First tab waitlist
-        fragments.add(new EventListConfirmFragment()); //selected
-        fragments.add(new EventListCreatedFragment());//cancelled
+        // Initialize custom tab bar and ViewPager2
+        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        List<TextView> tabs = new ArrayList<>();
+        tabs.add(view.findViewById(R.id.tab1)); // My Events
+        tabs.add(view.findViewById(R.id.tab2)); // Waiting List
+        tabs.add(view.findViewById(R.id.tab3)); // Created
 
-        ((EventListView)fragments.get(0)).setDevice(deviceID);
-        ((EventListView)fragments.get(0)).setFragment(home);
-        ((EventListView)fragments.get(1)).setDevice(deviceID);
-        ((EventListView)fragments.get(2)).setDevice(deviceID);
-        ((EventListView)fragments.get(1)).setFragment(home);
-        ((EventListView)fragments.get(2)).setFragment(home);
+        // Create fragments for each tab
+        fragments.add(new EventListDisplayFragment()); // My Events
+        fragments.add(new EventListConfirmFragment()); // Waiting List
+        fragments.add(new EventListCreatedFragment()); // Created
 
+        // Set device ID and home fragment in each custom fragment
+        for (int i = 0; i < fragments.size(); i++) {
+            ((EventListView) fragments.get(i)).setDevice(deviceID);
+            ((EventListView) fragments.get(i)).setFragment(home);
+        }
 
-
-
-        // Tab titles
-        List<String> tabTitles = new ArrayList<>();
-        tabTitles.add("My Events");
-        tabTitles.add("Waiting List");
-        tabTitles.add("Created");
-
-
-        // Set up adapter
+        // Set up ViewPager2 adapter
         TabFragmentAdapter adapter = new TabFragmentAdapter(this, fragments);
         viewPager.setAdapter(adapter);
 
-        // Link TabLayout with ViewPager2
-        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabTitles.get(position))).attach();
+        // Handle tab clicks
+        for (int i = 0; i < tabs.size(); i++) {
+            int finalI = i;
+            tabs.get(i).setOnClickListener(v -> {
+                viewPager.setCurrentItem(finalI); // Switch ViewPager page
+                updateTabStyles(tabs, finalI);   // Update tab styles
+            });
+        }
+
+        // Sync tab styles with ViewPager page changes
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                updateTabStyles(tabs, position); // Update styles based on page
+            }
+        });
     }
 
-    public void setHomeFragment(HomeFragment home){
+    private void updateTabStyles(List<TextView> tabs, int selectedIndex) {
+        for (int i = 0; i < tabs.size(); i++) {
+            TextView tab = tabs.get(i);
+            if (i == selectedIndex) {
+                tab.setTextColor(getResources().getColor(R.color.white));
+                tab.setBackgroundResource(R.drawable.tab_selected_background);
+            } else {
+                tab.setTextColor(getResources().getColor(R.color.purple_500));
+                tab.setBackgroundResource(R.drawable.tab_unselected_background);
+            }
+        }
+    }
+
+    public void setHomeFragment(HomeFragment home) {
         this.home = home;
-
     }
-
-
-
-
-
-
-
-
-
 }

@@ -4,14 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
-
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,29 +26,55 @@ public class ManageListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize TabLayout and ViewPager2
-        TabLayout tabLayout = view.findViewById(R.id.tabLayout);
+        // Initialize ViewPager2
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 
-        // Create a list of fragments for the slider
+        // Custom Tab Bar (LinearLayout)
+        List<TextView> tabs = new ArrayList<>();
+        tabs.add(view.findViewById(R.id.tab1)); // Waiting List
+        tabs.add(view.findViewById(R.id.tab2)); // Cancelled List
+        tabs.add(view.findViewById(R.id.tab3)); // Selected List
+        tabs.add(view.findViewById(R.id.tab4)); // Entrant List
+
+        // Create fragments for each tab
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new WaitlistFragment());
-        //fragments.add(new CancelledListFragment());
-        //fragments.add(new SelectedListFragment());
-        //fragments.add(new EntrantListFragment());
+        fragments.add(new WaitlistEntrantContentFragment());
+        fragments.add(new WaitlistEntrantContentCancelledFragment());
+        fragments.add(new WaitlistEntrantContentSelectedFragment());
+        fragments.add(new WaitlistEntrantContentConfirmedFragment());
 
-        // Set up titles for tabs
-        List<String> fragmentTitles = new ArrayList<>();
-        fragmentTitles.add("Waiting List");
-        fragmentTitles.add("Cancelled List");
-        fragmentTitles.add("Selected List");
-        fragmentTitles.add("Entrant List");
-
-        // Set up adapter
+        // Set up ViewPager2 adapter
         TabFragmentAdapter adapter = new TabFragmentAdapter(this, fragments);
         viewPager.setAdapter(adapter);
 
-        // Link TabLayout and ViewPager2
-        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(fragmentTitles.get(position))).attach();
+        // Handle tab clicks
+        for (int i = 0; i < tabs.size(); i++) {
+            int finalI = i;
+            tabs.get(i).setOnClickListener(v -> {
+                viewPager.setCurrentItem(finalI);
+                updateTabStyles(tabs, finalI);
+            });
+        }
+
+        // Sync tab styles with ViewPager page changes
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                updateTabStyles(tabs, position);
+            }
+        });
+    }
+
+    private void updateTabStyles(List<TextView> tabs, int selectedIndex) {
+        for (int i = 0; i < tabs.size(); i++) {
+            TextView tab = tabs.get(i);
+            if (i == selectedIndex) {
+                tab.setTextColor(getResources().getColor(R.color.purple_500));
+                tab.setBackgroundResource(R.drawable.tab_selected_background);
+            } else {
+                tab.setTextColor(getResources().getColor(R.color.white));
+                tab.setBackgroundResource(R.drawable.tab_unselected_background);
+            }
+        }
     }
 }
