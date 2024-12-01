@@ -324,7 +324,7 @@ public class WaitinglistDB {
                     Event event = docSnapshotToEvent(documentSnapshot);
                     if (event != null) {
                         events.add(event);
-                        fragment.setEventList(new ArrayList<>(events)); // Update UI safely
+                        fragment.setEventList((events)); // Update UI safely
                     }
                 } else {
                     Log.e(TAG, "Document with ID " + eventId + " does not exist.");
