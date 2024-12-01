@@ -56,7 +56,7 @@
             app:tint="@color/black" />
 
         <TextView
-            android:id="@+id/text_event_location"
+            android:id="@+id/eventInfoLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -143,7 +143,7 @@
                 app:tint="@color/black" />
 
             <TextView
-                android:id="@+id/text_event_start_date"
+                android:id="@+id/eventInfoDay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -168,7 +168,7 @@
                 app:tint="@color/black" />
 
             <TextView
-                android:id="@+id/text_event_end_date"
+                android:id="@+id/eventInfoTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -218,7 +218,7 @@
                 app:tint="@color/black" />
 
             <TextView
-                android:id="@+id/text_max_entrants"
+                android:id="@+id/eventInfoPeople"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
