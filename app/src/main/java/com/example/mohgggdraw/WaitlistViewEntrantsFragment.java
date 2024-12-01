@@ -29,7 +29,7 @@ public class WaitlistViewEntrantsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_manage_list, container, false);
+        return inflater.inflate(R.layout.fragment_manage_list2, container, false);
     }
 
     @Override
@@ -90,28 +90,28 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         tab3.setBackgroundResource(R.drawable.tab_unselected_background);
         tab4.setBackgroundResource(R.drawable.tab_unselected_background);
 
-        tab1.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        tab2.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        tab3.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        tab4.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        tab1.setTextColor(ContextCompat.getColor(requireContext(), R.color.unselected_text_color));
+        tab2.setTextColor(ContextCompat.getColor(requireContext(), R.color.unselected_text_color));
+        tab3.setTextColor(ContextCompat.getColor(requireContext(), R.color.unselected_text_color));
+        tab4.setTextColor(ContextCompat.getColor(requireContext(), R.color.unselected_text_color));
 
         // Highlight the selected tab
         switch (position) {
             case 0:
                 tab1.setBackgroundResource(R.drawable.tab_selected_background);
-                tab1.setTextColor(ContextCompat.getColor(requireContext(), R.color.purple_500));
+                tab1.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color));
                 break;
             case 1:
                 tab2.setBackgroundResource(R.drawable.tab_selected_background);
-                tab2.setTextColor(ContextCompat.getColor(requireContext(), R.color.purple_500));
+                tab2.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color));
                 break;
             case 2:
                 tab3.setBackgroundResource(R.drawable.tab_selected_background);
-                tab3.setTextColor(ContextCompat.getColor(requireContext(), R.color.purple_500));
+                tab3.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color));
                 break;
             case 3:
                 tab4.setBackgroundResource(R.drawable.tab_selected_background);
-                tab4.setTextColor(ContextCompat.getColor(requireContext(), R.color.purple_500));
+                tab4.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color));
                 break;
         }
     }

@@ -9,7 +9,6 @@
         <color name="black" tools:ignore="MissingPrefix">#000000</color>
         <color name="white" tools:ignore="MissingPrefix">#FFFFFF</color>
         <color android:name="red">#D32F2F</color>
-
     </resources>
 
 </selector>

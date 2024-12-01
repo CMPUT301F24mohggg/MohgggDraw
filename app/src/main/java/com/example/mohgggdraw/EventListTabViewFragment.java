@@ -75,11 +75,11 @@ public class EventListTabViewFragment extends Fragment {
         for (int i = 0; i < tabs.size(); i++) {
             TextView tab = tabs.get(i);
             if (i == selectedIndex) {
-                tab.setTextColor(getResources().getColor(R.color.white));
-                tab.setBackgroundResource(R.drawable.tab_selected_background);
+                tab.setTextColor(getResources().getColor(R.color.selected_text_color)); // Use selected text color
+                tab.setBackgroundResource(R.drawable.tab_selected_background);         // Use selected background
             } else {
-                tab.setTextColor(getResources().getColor(R.color.purple_500));
-                tab.setBackgroundResource(R.drawable.tab_unselected_background);
+                tab.setTextColor(getResources().getColor(R.color.unselected_text_color)); // Use unselected text color
+                tab.setBackgroundResource(R.drawable.tab_unselected_background);         // Use unselected background
             }
         }
     }
