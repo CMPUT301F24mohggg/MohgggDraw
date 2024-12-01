@@ -88,6 +88,7 @@ public class RandomWaitlistSelector {
         controller.updateLists(selected,event.getWaitingList());
         Log.d("tag",selected.toString());
         frag.updateFragments();
+
         return selected;
     }
 }
