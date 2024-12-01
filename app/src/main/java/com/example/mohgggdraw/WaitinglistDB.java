@@ -305,23 +305,26 @@ public class WaitinglistDB {
         return myArray;
     }
 
-    ArrayList<Event> events = new ArrayList<>();
-    public void createEventListFromStringList(ArrayList<String> list, EventListView fragment){
-
-        for (String eventId:list
-             ) {
-            waitlistRef.document(eventId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                    Event event = docSnapshotToEvent(documentSnapshot);
-                    events.add(event);
-                    fragment.setEventList(events);
-                }
-            });
-
+    public void createEventListFromStringList(ArrayList<String> list, EventListView fragment) {
+        if (list == null || list.isEmpty()) {
+            Log.e(TAG, "createEventListFromStringList: Provided list is null or empty!");
+            fragment.setEventList(new ArrayList<>()); // Set empty list to avoid null pointers
+            return;
         }
 
+        ArrayList<Event> events = new ArrayList<>(); // Use method-local list
+        for (String eventId : list) {
+            waitlistRef.document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Event event = docSnapshotToEvent(documentSnapshot);
+                    if (event != null) {
+                        events.add(event);
+                        fragment.setEventList(new ArrayList<>(events)); // Update UI safely
+                    }
+                } else {
+                    Log.e(TAG, "Document with ID " + eventId + " does not exist.");
+                }
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
+        }
     }
-
 }
