@@ -16,4 +16,6 @@ public interface SetListView {
     public void updateList(ArrayAdapter adapter);
 
     public void updateSelectedList(String entrant);
+
+    public void setEvent(Event event);
 }

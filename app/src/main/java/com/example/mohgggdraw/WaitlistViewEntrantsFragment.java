@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class WaitlistViewEntrantsFragment extends Fragment {
     private Event event;
@@ -59,13 +60,14 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         fragments.add(new MapFragment());
 
         ((WaitlistEntrantContentFragment)fragments.get(0)).setFragment(this);
+        ((WaitlistEntrantContentCancelledFragment)fragments.get(1)).setFragment(this);
 
 
         // Set event to fragments
         if (event != null) {
             for (Fragment fragment : fragments) {
-                if (fragment instanceof WaitlistEntrantContentFragment) {
-                    ((WaitlistEntrantContentFragment) fragment).setEvent(event);
+                if (fragment instanceof SetListView) {
+                    ((SetListView) fragment).setEvent(event);
                 }
             }
         }

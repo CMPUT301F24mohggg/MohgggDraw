@@ -92,7 +92,7 @@ public class WaitinglistDB {
         myMap.put("Accepted", new ArrayList<>());
         myMap.put("Cancelled", new ArrayList<>());
         myMap.put("Selected", new ArrayList<>());
-        DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
+        //DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
 
         Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
