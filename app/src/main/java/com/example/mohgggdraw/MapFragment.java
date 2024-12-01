@@ -15,19 +15,24 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MapFragment extends Fragment {
 
     private ImageView mapImage;
+    private Event event; // Replace hardcoded ID with an Event object
+    private final float mapWidth = 1527f; // Actual map dimensions in pixels
+    private final float mapHeight = 768f;
 
-    // Actual map dimensions in pixels (match the drawable image dimensions)
-    private final float mapWidth = 1527f; // Width of the map image
-    private final float mapHeight = 768f; // Height of the map image
+    public void setEvent(Event event) {
+        this.event = event; // Set the event object
+        Log.d("MapFragment", "Event set: " + event.getEventId()); // Log for debugging
+    }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,92 +45,104 @@ public class MapFragment extends Fragment {
 
         mapImage = view.findViewById(R.id.map);
 
-        // Query Firestore and add pins to the map image
-        fetchUsersAndDrawPins();
+        if (event != null) {
+            fetchEventAndDrawPins(event.getEventId());
+        } else {
+            Log.e("MapFragment", "Event object is null. Cannot fetch event details.");
+        }
     }
 
-    /**
-     * Fetch user data from Firestore and add pins to the map.
-     */
-    private void fetchUsersAndDrawPins() {
+    private void fetchEventAndDrawPins(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("user")
+        db.collection("Events")
+                .document(eventId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        List<Map<String, Object>> userDataList = new ArrayList<>();
-                        task.getResult().forEach(document -> userDataList.add(document.getData()));
+                        List<String> waitingList = (List<String>) task.getResult().get("EventWaitinglist");
+                        Log.d("MapFragment", "Fetched waiting list: " + waitingList);
 
-                        mapImage.post(() -> {
-                            Bitmap updatedMap = addPinsToMap(userDataList);
-                            mapImage.setImageBitmap(updatedMap);
-                        });
+                        if (waitingList != null && !waitingList.isEmpty()) {
+                            fetchUserGeolocations(waitingList);
+                        } else {
+                            Log.e("MapFragment", "Waiting list is empty or null for event: " + eventId);
+                        }
                     } else {
-                        Log.e("FirestoreError", "Failed to fetch users", task.getException());
+                        Log.e("FirestoreError", "Failed to fetch event data", task.getException());
                     }
                 });
     }
 
-    /**
-     * Adds pins to the map image and returns a new bitmap.
-     */
-    private Bitmap addPinsToMap(List<Map<String, Object>> userDataList) {
-        // Load the map image as a Bitmap
+    private void fetchUserGeolocations(List<String> userIds) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<PointF> pinLocations = new ArrayList<>();
+
+        for (String userId : userIds) {
+            db.collection("user")
+                    .document(userId)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot userDoc = task.getResult();
+                            String location = userDoc.getString("location");
+                            Log.d("MapFragment", "User ID: " + userId + ", Location: " + location);
+
+                            if (location != null && !location.isEmpty()) {
+                                String[] latLng = location.split(",");
+                                try {
+                                    double latitude = Double.parseDouble(latLng[0].trim());
+                                    double longitude = Double.parseDouble(latLng[1].trim());
+                                    pinLocations.add(latLngToPoint(latitude, longitude));
+                                } catch (NumberFormatException e) {
+                                    Log.e("MapFragment", "Invalid location format for user ID: " + userId, e);
+                                }
+                            }
+
+                            // If all user locations are fetched, update the map
+                            if (pinLocations.size() == userIds.size()) {
+                                mapImage.post(() -> {
+                                    Bitmap updatedMap = drawPinsOnMap(pinLocations);
+                                    mapImage.setImageBitmap(updatedMap);
+                                });
+                            }
+                        } else {
+                            Log.e("FirestoreError", "Failed to fetch user data for ID: " + userId, task.getException());
+                        }
+                    });
+        }
+    }
+
+    private Bitmap drawPinsOnMap(List<PointF> pinLocations) {
         Bitmap originalBitmap = ((BitmapDrawable) mapImage.getDrawable()).getBitmap();
         Bitmap updatedBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-        // Create a Canvas to draw on the Bitmap
         Canvas canvas = new Canvas(updatedBitmap);
         Paint paint = new Paint();
-        paint.setTextSize(48); // Adjust size as needed
-        paint.setColor(0xFFFF0000); // Red color
+        paint.setTextSize(48);
+        paint.setColor(0xFFFF0000);
         paint.setAntiAlias(true);
 
-        // Iterate through user data and draw pins
-        for (Map<String, Object> userData : userDataList) {
-            String location = (String) userData.get("location");
+        for (PointF point : pinLocations) {
+            // Slight adjustment for better visual alignment
+            point.x += 10;
+            point.y -= 10;
 
-            if (location != null && !location.isEmpty()) {
-                String[] latLng = location.split(",");
-                try {
-                    double latitude = Double.parseDouble(latLng[0].trim());
-                    double longitude = Double.parseDouble(latLng[1].trim());
-
-                    // Convert latitude/longitude to map points
-                    PointF point = latLngToPoint(latitude, longitude);
-
-                    // Adjust the point to move it slightly to the right and up
-                    point.x += 10; // Move right by 10 pixels
-                    point.y -= 10; // Move up by 10 pixels
-
-                    // Draw the pin
-                    canvas.drawText("📍", point.x, point.y, paint);
-                } catch (NumberFormatException e) {
-                    Log.e("MapFragment", "Invalid location format", e);
-                }
-            }
+            canvas.drawText("📍", point.x, point.y, paint);
         }
 
         return updatedBitmap;
     }
 
-    /**
-     * Converts latitude and longitude to pixel coordinates on the map image.
-     */
     private PointF latLngToPoint(double latitude, double longitude) {
-        // Latitude/longitude range
         double lonRange = 360.0; // Longitude range [-180, 180]
         double latRange = 180.0; // Latitude range [-90, 90]
 
-        // Convert lat/lng to x/y coordinates
         float x = (float) ((longitude + 180.0) / lonRange * mapWidth);
         float y = (float) ((90.0 - latitude) / latRange * mapHeight);
 
-        // Apply manual offsets for Edmonton's location for more acciurate map
-
-        x += 40; // Move right by 40 pixels
-        y -= 30; // Move up by 30 pixels
+        x += 40; // Offset for better accuracy
+        y -= 30;
 
         return new PointF(x, y);
     }

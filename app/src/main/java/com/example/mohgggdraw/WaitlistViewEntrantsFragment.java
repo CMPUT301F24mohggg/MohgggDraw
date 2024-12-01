@@ -62,6 +62,11 @@ public class WaitlistViewEntrantsFragment extends Fragment {
         ((WaitlistEntrantContentFragment)fragments.get(0)).setFragment(this);
         ((WaitlistEntrantContentCancelledFragment)fragments.get(1)).setFragment(this);
 
+    // Set the event object to the MapFragment
+            if (fragments.get(4) instanceof MapFragment) {
+                ((MapFragment) fragments.get(4)).setEvent(event);
+            }
+
 
         // Set event to fragments
         if (event != null) {
