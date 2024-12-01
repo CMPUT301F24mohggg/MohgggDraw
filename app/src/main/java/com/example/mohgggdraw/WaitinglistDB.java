@@ -130,22 +130,28 @@ public class WaitinglistDB {
     }
     //query to pull all events into arraylist with the field eventwaitinglist mainly for test purpose
 
-    public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment){
-        ArrayList<Event> myArray= new ArrayList<>();
-        Task query= waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment) {
+        ArrayList<Event> myArray = new ArrayList<>();
 
+        waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot doc: queryDocumentSnapshots) {
-
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
                     myArray.add(docSnapshotToEvent(doc));
                 }
-                fragment.dataChange();
+
+                // Safely update the fragment
+                if (fragment.isAdded() && fragment.getContext() != null) {
+                    fragment.dataChange();
+                } else {
+                    Log.e("WaitinglistDB", "Fragment is not ready to update the data.");
+                }
             }
-        });;
+        });
 
         return myArray;
     }
+
 
     //takes doc snapshot of event and turns into event object
     public Event docSnapshotToEvent(DocumentSnapshot doc){

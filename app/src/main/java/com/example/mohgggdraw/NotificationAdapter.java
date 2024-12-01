@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
+import java.util.Objects;
+
 /**
  * Adapter for displaying notifications in a RecyclerView.
  * Each notification item can include a title, message, event details, and action buttons
@@ -253,13 +255,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.declineButton.setVisibility(View.GONE);
 
             // Show the status based on the conditions
-            if(notification.getStatus() != null) {
+            if(notification.getStatus() != null && (Objects.equals(notification.getStatus(), "selected"))) {
                 if (isAccepted) {
                     holder.eventStatus.setText("You have joined!");
                     holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_success)); // Green color
                     holder.eventStatus.setVisibility(View.VISIBLE);
                 } else if (isDeclined) {
-                    holder.eventStatus.setText("You have declined/canceled!");
+                    holder.eventStatus.setText("You have declined!");
                     holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_error)); // Red color
                     holder.eventStatus.setVisibility(View.VISIBLE);
                 }

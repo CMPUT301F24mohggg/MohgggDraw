@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -54,43 +55,48 @@ public class EventListDisplayFragment extends Fragment {
         //return inflater.inflate(R.layout.fragment_home, container, false);
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-    dataList = new ArrayList<Event>();
-//        for(int i=0;i<10;i++){
-//            Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
-//            dataList.add(event);
-//            new WaitinglistDB().updateWaitlist(event);
-//
-//        }
-        //pulling all data for test purpose
+        // Initialize ListView
+        eventList = view.findViewById(R.id.eventList);
+        dataList = new ArrayList<>();
+
+        // Call WaitinglistDB query and handle the callback
         dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
-        eventAdapter = new EventAdapter(this.getContext(), dataList);
-        eventList = view.findViewById(R.id.eventList);
+        // Initialize adapter
+        if (getContext() != null) {
+            eventAdapter = new EventAdapter(requireContext(), dataList);
+            eventList.setAdapter(eventAdapter);
+        } else {
+            Log.e("EventListDisplayFragment", "Context is null during onViewCreated");
+        }
 
-        eventList.setAdapter(eventAdapter);
-
-//onclick per event item
-        eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
+        // Set up item click listener
+        eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> list, View view,
-                                    final int i, long id) {
-
+            public void onItemClick(AdapterView<?> list, View view, final int i, long id) {
                 Event event = (Event) list.getItemAtPosition(i);
                 fragment.goToNextPage(event);
-
-
             }
         });
     }
+
     //updates list when data is changed
-    public void dataChange(){
+    public void dataChange() {
+        if (getContext() == null || eventList == null) {
+            Log.e("EventListDisplayFragment", "Context or eventList is null, skipping dataChange()");
+            return;
+        }
 
-        eventAdapter = new EventAdapter(this.getContext(), dataList);
-
-        eventList.setAdapter(eventAdapter);
-
+        if (eventAdapter == null) {
+            eventAdapter = new EventAdapter(requireContext(), dataList);
+            eventList.setAdapter(eventAdapter);
+        } else {
+            eventAdapter.notifyDataSetChanged();
+        }
     }
+
 
 }

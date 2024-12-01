@@ -1,27 +1,32 @@
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.util.List;
 /***
  This fragment represents the home screen of the application. It:
  - Inflates the home screen layout
  - Sets up any necessary UI components or listeners
  ***/
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ListSelectionFragment.ListSelectionListener{
     private OrganizerViewModel organizerViewModel;
     private ViewPager2 viewPager2;
     private ImageView backButton;
     private User user = new User();
     private WaitlistPagerAdapter waitlistAdapter;
+    private Boolean orgFlag = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,8 +59,14 @@ public class HomeFragment extends Fragment {
         });
         //goest to main home
         backButton.setOnClickListener(v -> {
+//            Log.e("onViewCreated for Back Button: ", "" + viewPager2.getCurrentItem() + " " + orgFlag);
             if (viewPager2.getCurrentItem() > 0) {
-                viewPager2.setCurrentItem(0);
+                if (orgFlag && viewPager2.getCurrentItem() == 3){
+                    orgFlag = false;
+                    viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 2,false);
+                } else {
+                    viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 1, false);
+                }
             }
         });
     }
@@ -63,7 +74,7 @@ public class HomeFragment extends Fragment {
     public void goToNextPage(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
-        viewPager2.setCurrentItem(1);
+        viewPager2.setCurrentItem(1,false);
         backButton.setVisibility(View.VISIBLE);
 
     }
@@ -71,8 +82,34 @@ public class HomeFragment extends Fragment {
     public void goToWaitlistView(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
-        viewPager2.setCurrentItem(2);
+        viewPager2.setCurrentItem(2,false);
         backButton.setVisibility(View.VISIBLE);
 
+    }
+
+    // send notification
+// Implement the send notification view method
+    public void goToSendNotificationView(Event event) {
+        orgFlag = true;
+        waitlistAdapter.setEvent(event);
+        viewPager2.setAdapter(waitlistAdapter);
+        viewPager2.setCurrentItem(3,false);
+        backButton.setVisibility(View.VISIBLE);
+    }
+
+    public void goToNotificationDetailsView(Event event, List<String> selectedLists) {
+        orgFlag = true;
+        NotificationDetailsFragment notificationFragment = new NotificationDetailsFragment(event, selectedLists, this);
+
+        waitlistAdapter.setNotificationDetailsFragment(notificationFragment);
+        viewPager2.setAdapter(waitlistAdapter);
+        viewPager2.setCurrentItem(4,false);
+        backButton.setVisibility(View.VISIBLE);
+    }
+
+
+    @Override
+    public void onListsSelected(Event event, List<String> selectedLists) {
+        goToNotificationDetailsView(event, selectedLists);
     }
 }

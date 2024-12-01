@@ -191,12 +191,10 @@ public class NotificationFragment extends Fragment {
 
                             if (!isDuplicate) {
                                 fetchEventDetails(newNotification, updatedNotification -> {
-                                    // Only add to in-app notifications if status is not null
-                                    if (updatedNotification.getStatus() != null) {
-                                        notificationList.add(updatedNotification);
-                                        sortNotificationList();
-                                        adapter.notifyItemInserted(0);
-                                    }
+                                    notificationList.add(updatedNotification);
+                                    sortNotificationList();
+                                    adapter.notifyItemInserted(0);
+
 
                                     // Always show system notification for new notifications
                                     showNotification(

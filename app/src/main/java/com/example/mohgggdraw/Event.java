@@ -9,10 +9,10 @@ package com.example.mohgggdraw;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 
-public class Event implements Serializable {
+public class Event {
     private String eventId;
     private String title;
     private String location;
@@ -25,6 +25,13 @@ public class Event implements Serializable {
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
+
+    private ArrayList<String> selectedList = new ArrayList<>();
+
+    private ArrayList<String> ConfirmedList = new ArrayList<>();
+
+    private ArrayList<String> CancelledList = new ArrayList<>();
+
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails) {
@@ -150,5 +157,29 @@ public class Event implements Serializable {
 
     public void removeFromWaitingList(User user) {
         waitingList.remove(user.getUid());
+    }
+
+    public ArrayList<String> getSelectedList() {
+        return selectedList;
+    }
+
+    public void setSelectedList(ArrayList<String> selectedList) {
+        this.selectedList = selectedList;
+    }
+
+    public ArrayList<String> getConfirmedList() {
+        return ConfirmedList;
+    }
+
+    public void setConfirmedList(ArrayList<String> confirmedList) {
+        ConfirmedList = confirmedList;
+    }
+
+    public ArrayList<String> getCancelledList() {
+        return CancelledList;
+    }
+
+    public void setCancelledList(ArrayList<String> cancelledList) {
+        CancelledList = cancelledList;
     }
 }
