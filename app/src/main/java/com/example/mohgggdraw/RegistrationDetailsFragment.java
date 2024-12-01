@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -39,18 +40,34 @@ public class RegistrationDetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registration_details, container, false);
 
+        // Initialize EditTexts
         registrationOpenEditText = view.findViewById(R.id.registration_open);
         registrationDeadlineEditText = view.findViewById(R.id.registration_deadline);
         eventStartTimeEditText = view.findViewById(R.id.event_start_time);
         eventEndTimeEditText = view.findViewById(R.id.event_end_time);
 
+        // Initialize ImageViews
+        ImageView calendarIconRegistrationOpen = view.findViewById(R.id.calendar_icon_registration_open);
+        ImageView calendarIconRegistrationDeadline = view.findViewById(R.id.calendar_icon_registration_deadline);
+        ImageView calendarIconEventStartTime = view.findViewById(R.id.calendar_icon_event_start_time);
+        ImageView calendarIconEventEndTime = view.findViewById(R.id.calendar_icon_event_end_time);
+
+        // Set onClickListeners for EditTexts and ImageViews
         registrationOpenEditText.setOnClickListener(v -> showDatePickerDialog(registrationOpenEditText, "registrationOpen"));
+        calendarIconRegistrationOpen.setOnClickListener(v -> showDatePickerDialog(registrationOpenEditText, "registrationOpen"));
+
         registrationDeadlineEditText.setOnClickListener(v -> showDatePickerDialog(registrationDeadlineEditText, "registrationDeadline"));
+        calendarIconRegistrationDeadline.setOnClickListener(v -> showDatePickerDialog(registrationDeadlineEditText, "registrationDeadline"));
+
         eventStartTimeEditText.setOnClickListener(v -> showDateTimePickerDialog(eventStartTimeEditText, "eventStartTime"));
+        calendarIconEventStartTime.setOnClickListener(v -> showDateTimePickerDialog(eventStartTimeEditText, "eventStartTime"));
+
         eventEndTimeEditText.setOnClickListener(v -> showDateTimePickerDialog(eventEndTimeEditText, "eventEndTime"));
+        calendarIconEventEndTime.setOnClickListener(v -> showDateTimePickerDialog(eventEndTimeEditText, "eventEndTime"));
 
         return view;
     }
+
 
     private void showDatePickerDialog(EditText editText, String field) {
         final Calendar calendar = Calendar.getInstance();
