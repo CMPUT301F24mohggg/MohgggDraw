@@ -33,6 +33,7 @@ public class CreatePagerAdapter extends FragmentStateAdapter {
                 return new QrWaitlistFragment(1);
             default:
                 return new EventCreatedSuccessFragment();
+
         }
     }
 

@@ -28,13 +28,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 /***
@@ -244,6 +248,7 @@ public class ProfileFragment extends Fragment {
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
+        addLists(deviceID);
         if (imageUrl != null) {
             userDetails.put("profileImageUrl", imageUrl);
         }
@@ -274,5 +279,20 @@ public class ProfileFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         requireActivity().finish();
+    }
+    public void addLists(String deviceID){
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                if (!data.containsKey("waitList")) {
+                    DocumentReference mydoc = db.collection("user").document(deviceID);
+                    mydoc.update("waitList", new ArrayList<String>());
+                    mydoc.update("entrantList", new ArrayList<String>());
+                    mydoc.update("createdList", new ArrayList<String>());
+
+                }
+            }
+        });
     }
 }

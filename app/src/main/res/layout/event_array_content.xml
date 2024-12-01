@@ -1,100 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    >
-
+    <!-- Registered Section Title -->
     <TextView
-        android:id="@+id/Description"
-        android:layout_width="247dp"
-        android:layout_height="71dp"
-        android:text="bio"
-        android:textColor="#a3a3a3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/datelistview"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/monthlistview"
+        android:id="@+id/registeredTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="Oct"
-        android:textColor="#7257FF"
-        android:textSize="14sp"
+        android:text="Registered"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.044"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventadapterimage"
-        app:layout_constraintVertical_bias="0.02" />
-
-    <TextView
-        android:id="@+id/datelistview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10"
-        android:textColor="#7257FF"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/eventadapterimage"
-        app:layout_constraintEnd_toStartOf="@+id/date"
-        app:layout_constraintHorizontal_bias="0.363"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monthlistview"
-        app:layout_constraintVertical_bias="0.02" />
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="27dp"
-        android:text="timeiguess"
-        android:textSize="14sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/monthlistview"
-        app:layout_constraintTop_toBottomOf="@+id/eventname" />
-
-    <TextView
-        android:id="@+id/eventname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="name"
-        android:textColor="#7257FF"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.088"
-        app:layout_constraintStart_toEndOf="@+id/monthlistview"
-        app:layout_constraintTop_toBottomOf="@+id/eventadapterimage"
-        app:layout_constraintVertical_bias="0.07" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/eventadapterimage"
-        android:layout_width="382dp"
-        android:layout_height="201dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.027"
-        app:layout_goneMarginLeft="24dp"
-        app:layout_goneMarginRight="24dp"
-        app:shapeAppearanceOverlay="@style/SpecificCornerRounded"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:layout_marginBottom="16dp" />
 
+    <!-- Registered Event Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/registeredCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:layout_constraintTop_toBottomOf="@id/registeredTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Event Image -->
+
+            <!-- Event Details Row (Date and Title) -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/eventImage"
+                android:layout_width="374dp"
+                android:layout_height="175dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/SpecificCornerRounded" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/eventDetailsContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/eventImage">
+
+                <!-- Date Background -->
+                <TextView
+                    android:id="@+id/eventDate"
+                    android:layout_width="66dp"
+                    android:layout_height="53dp"
+                    android:background="@drawable/rounded_date_background"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="MM DD"
+                    android:textColor="@color/purple_500"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- Event Title -->
+                <TextView
+                    android:id="@+id/eventTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Event Title"
+                    android:textColor="@color/purple_500"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/eventDate"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Event Time and Description -->
+
+            <TextView
+                android:id="@+id/eventDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Date and Time - Time"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/eventDetailsContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/eventDetailsContainer" />
+
+            <TextView
+                android:id="@+id/eventDescription"
+                android:layout_width="381dp"
+                android:layout_height="27dp"
+                android:layout_marginTop="4dp"
+                android:text="Event Details......."
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/eventDetails" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Waiting List Section Title -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

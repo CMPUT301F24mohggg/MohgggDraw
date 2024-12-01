@@ -4,14 +4,17 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-08T03:32:19.734651Z">
+        <DropdownSelection timestamp="2024-12-01T05:45:05.733253200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/mannat/.android/avd/Pixel_2_API_VanillaIceCream.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\emasc\.android\avd\Pixel_8a_API_35.avd" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="DrawFromWaitlistTest">
+        <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
   </component>
