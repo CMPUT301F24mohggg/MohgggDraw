@@ -33,6 +33,7 @@ public class WaitlistFragment extends Fragment {
     private ImageView iv;
     private TextView joinButton;
     private HomeFragment home;
+    private String deviceId;
 
     TextView name;
     TextView time;
@@ -48,8 +49,9 @@ public class WaitlistFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Get the device ID and set it as the user's UID
         String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        user.setUid(deviceId);  // Setting the device ID as UID
-
+        user.setUid(deviceId);
+        // Setting the device ID as UID
+        this.deviceId = deviceId;
         // Mainly for testing purposes as I can build objects from the arguments
         if (getArguments() != null) {
             Bundle args = getArguments();
@@ -71,6 +73,10 @@ public class WaitlistFragment extends Fragment {
         }
 
         return inflater.inflate(R.layout.view_event, container, false);
+    }
+
+    public void setDeviceId(String deviceId){
+        this.deviceId = deviceId;
     }
 
     @Override
@@ -109,7 +115,7 @@ public class WaitlistFragment extends Fragment {
 
             // Logic to decide if button is join, leave, or view waitlist
             joinButton = view.findViewById(R.id.eventInfoButton);
-            if (Objects.equals(event.getOrgID(), "Uaf")) {
+            if (Objects.equals(event.getOrgID(), deviceId)) {
                 // If organizer, view waitlist
                 joinButton.setText("View waitlist");
                 joinButton.setOnClickListener(v -> home.goToWaitlistView(event));

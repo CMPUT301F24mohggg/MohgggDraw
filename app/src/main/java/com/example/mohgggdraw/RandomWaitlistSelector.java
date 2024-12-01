@@ -74,6 +74,7 @@ public class RandomWaitlistSelector {
 
         // Call updateFragments on the provided fragment
         frag.updateFragments();
+
         return selected;
     }
 }
