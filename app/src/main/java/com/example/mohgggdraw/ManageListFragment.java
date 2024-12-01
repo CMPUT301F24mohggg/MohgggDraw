@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -34,14 +35,12 @@ public class ManageListFragment extends Fragment {
         tabs.add(view.findViewById(R.id.tab1)); // Waiting List
         tabs.add(view.findViewById(R.id.tab2)); // Cancelled List
         tabs.add(view.findViewById(R.id.tab3)); // Selected List
-        tabs.add(view.findViewById(R.id.tab4)); // Entrant List
 
         // Create fragments for each tab
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new WaitlistEntrantContentFragment());
         fragments.add(new WaitlistEntrantContentCancelledFragment());
         fragments.add(new WaitlistEntrantContentSelectedFragment());
-        fragments.add(new WaitlistEntrantContentConfirmedFragment());
 
         // Set up ViewPager2 adapter
         TabFragmentAdapter adapter = new TabFragmentAdapter(this, fragments);
@@ -63,16 +62,19 @@ public class ManageListFragment extends Fragment {
                 updateTabStyles(tabs, position);
             }
         });
+
+        // Set initial tab styles
+        updateTabStyles(tabs, 0);
     }
 
     private void updateTabStyles(List<TextView> tabs, int selectedIndex) {
         for (int i = 0; i < tabs.size(); i++) {
             TextView tab = tabs.get(i);
             if (i == selectedIndex) {
-                tab.setTextColor(getResources().getColor(R.color.purple_500));
+                tab.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color));
                 tab.setBackgroundResource(R.drawable.tab_selected_background);
             } else {
-                tab.setTextColor(getResources().getColor(R.color.white));
+                tab.setTextColor(ContextCompat.getColor(requireContext(), R.color.unselected_text_color));
                 tab.setBackgroundResource(R.drawable.tab_unselected_background);
             }
         }

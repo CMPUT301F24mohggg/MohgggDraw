@@ -8,68 +8,49 @@
     <!-- Tab Bar Container -->
     <LinearLayout
         android:id="@+id/tab_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="4dp"
+        android:padding="8dp"
         android:gravity="center"
         android:background="@drawable/tab_bar_background">
 
         <!-- Tab 1 -->
         <TextView
             android:id="@+id/tab1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_margin="4dp"
-            android:paddingHorizontal="16dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="Waiting List"
             android:tag="selected"
-            android:textColor="#7257FF"
+            android:textColor="@color/selected_text_color"
             android:textStyle="bold"
             android:background="@drawable/tab_selected_background" />
 
         <!-- Tab 2 -->
         <TextView
             android:id="@+id/tab2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_margin="4dp"
-            android:paddingHorizontal="16dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="Cancelled List"
             android:tag="unselected"
-            android:textColor="#A8A8A8"
+            android:textColor="@color/unselected_text_color"
             android:textStyle="bold"
             android:background="@drawable/tab_unselected_background" />
 
         <!-- Tab 3 -->
         <TextView
             android:id="@+id/tab3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_margin="4dp"
-            android:paddingHorizontal="16dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="Selected List"
             android:tag="unselected"
-            android:textColor="#A8A8A8"
-            android:textStyle="bold"
-            android:background="@drawable/tab_unselected_background" />
-
-        <!-- Tab 4 -->
-        <TextView
-            android:id="@+id/tab4"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_margin="4dp"
-            android:paddingHorizontal="16dp"
-            android:gravity="center"
-            android:text="Confirmed List"
-            android:tag="unselected"
-            android:textColor="#A8A8A8"
+            android:textColor="@color/unselected_text_color"
             android:textStyle="bold"
             android:background="@drawable/tab_unselected_background" />
     </LinearLayout>
