@@ -1,69 +1,70 @@
 package com.example.mohgggdraw;
 
-import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-
-import com.example.mohgggdraw.databinding.ActivityMainBinding;
-import com.google.firebase.firestore.Query;
-
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /***
  * Fragment to display Array of lists
  * used to display list of user events
  * ***/
-public class EventListDisplayFragment extends Fragment {
+public class EventListDisplayFragment extends Fragment implements EventListView {
 
     private ArrayList<Event> dataList;
     private ListView eventList;
     private EventAdapter eventAdapter;
-    private User user = new User();
-    private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
-    private ViewPager2 viewPager2;
     private HomeFragment fragment;
+    private String deviceID;
+    private User user;
 
-    public EventListDisplayFragment(User user, HomeFragment page){
-        this.user =user;
+    // Constructor for the first implementation
+    public EventListDisplayFragment(User user, HomeFragment page) {
+        this.user = user;
         this.fragment = page;
     }
 
+    // No-arg constructor for the second implementation
+    public EventListDisplayFragment() {
+        // Default constructor
+    }
+
+    // Setter method for fragment (from second implementation)
+    public void setFragment(HomeFragment fragment) {
+        this.fragment = fragment;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
         return inflater.inflate(R.layout.event_adapter_layout, container, false);
     }
-        //return inflater.inflate(R.layout.fragment_home, container, false);
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ListView
-        eventList = view.findViewById(R.id.eventList);
+        // Initialize dataList
         dataList = new ArrayList<>();
 
-        // Call WaitinglistDB query and handle the callback
-        dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        // Initialize ListView
+        eventList = view.findViewById(R.id.eventList);
+
+        // Determine data fetching method
+        if (deviceID != null) {
+            // If deviceID is set, use UserDB to query list
+            new UserDB().queryList("waitList", this, deviceID);
+        } else {
+            // Otherwise, use WaitinglistDB to query all events
+            dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        }
 
         // Initialize adapter
         if (getContext() != null) {
@@ -77,13 +78,15 @@ public class EventListDisplayFragment extends Fragment {
         eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> list, View view, final int i, long id) {
-                Event event = (Event) list.getItemAtPosition(i);
-                fragment.goToNextPage(event);
+                if (fragment != null) {
+                    Event event = (Event) list.getItemAtPosition(i);
+                    fragment.goToNextPage(event);
+                }
             }
         });
     }
 
-    //updates list when data is changed
+    // Updates list when data is changed
     public void dataChange() {
         if (getContext() == null || eventList == null) {
             Log.e("EventListDisplayFragment", "Context or eventList is null, skipping dataChange()");
@@ -98,5 +101,21 @@ public class EventListDisplayFragment extends Fragment {
         }
     }
 
+    // Implement interface method to set event list
+    @Override
+    public void setEventList(ArrayList<Event> events) {
+        dataList = events;
+        dataChange();
+    }
 
+    // Additional interface method implementation
+    @Override
+    public void setList(ArrayList list) {
+        // Optional: Implement if needed
+    }
+
+    // Setter for device ID
+    public void setDevice(String id) {
+        this.deviceID = id;
+    }
 }

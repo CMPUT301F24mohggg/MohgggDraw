@@ -8,6 +8,13 @@
     tools:context=".EventListDisplayFragment">
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Events"
+        android:id="@+id/event_view_title"
+        />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

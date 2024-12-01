@@ -27,6 +27,7 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
     private User user = new User();
     private WaitlistPagerAdapter waitlistAdapter;
     private Boolean orgFlag = false;
+    private boolean adminView = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +41,9 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         super.onViewCreated(view, savedInstanceState);
         //sets pager adapter to transition between homepages and event view pages
         waitlistAdapter = new WaitlistPagerAdapter(this, user);
+        if(adminView){
+            waitlistAdapter.setAdminView();
+        }
         organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
         viewPager2 = view.findViewById(R.id.waitlist_viewpage);
         backButton = view.findViewById(R.id.waitlist_back_button);
@@ -59,7 +63,6 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         });
         //goest to main home
         backButton.setOnClickListener(v -> {
-//            Log.e("onViewCreated for Back Button: ", "" + viewPager2.getCurrentItem() + " " + orgFlag);
             if (viewPager2.getCurrentItem() > 0) {
                 if (orgFlag && viewPager2.getCurrentItem() == 3){
                     orgFlag = false;
@@ -112,4 +115,11 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
     public void onListsSelected(Event event, List<String> selectedLists) {
         goToNotificationDetailsView(event, selectedLists);
     }
+
+    public void setAdminView(){
+        adminView = true;
+
+    }
+
+
 }

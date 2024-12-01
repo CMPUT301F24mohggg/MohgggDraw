@@ -7,12 +7,10 @@ package com.example.mohgggdraw;
  - Includes a no-arg constructor for Firebase compatibility
  ***/
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
-
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Event {
+public class Event{
     private String eventId;
     private String title;
     private String location;
@@ -21,7 +19,8 @@ public class Event {
     private String participationSettings;
     private String date = "nov 1";
     private String time = "3:00";
-    private int maxCapacity = 100;
+    private Date startTime = new Date();
+    private int maxCapacity = -1;
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
@@ -34,7 +33,7 @@ public class Event {
 
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
-    public Event(String eventId, String title, String location, String posterUrl, String registrationDetails) {
+    public Event() {
         this.eventId = eventId;
         this.title = title;
         this.location = location;
@@ -157,6 +156,15 @@ public class Event {
 
     public void removeFromWaitingList(User user) {
         waitingList.remove(user.getUid());
+    }
+    public void setStartTime(Date time){
+        this.startTime = time;
+
+
+    }
+    public Date getStartTime(){
+        return this.startTime;
+
     }
 
     public ArrayList<String> getSelectedList() {

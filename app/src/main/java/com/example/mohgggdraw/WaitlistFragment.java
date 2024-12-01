@@ -1,6 +1,5 @@
 package com.example.mohgggdraw;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,15 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
@@ -31,160 +25,190 @@ import java.util.Objects;
 
 /***
  * Fragment to view event and join waitlist
- * ***/
+ ***/
 public class WaitlistFragment extends Fragment {
-    Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
-    User user = new User();
-    String path;
-    Bitmap bmp;
-    ImageView iv;
-    StorageReference storageReference;
-    private ViewPager2 viewPager2;
-    TextView joinButton;
-    Button sendNotificationButton;
-    HomeFragment home;
+    private Event event;
+    private User user;
+    private Bitmap bmp;
+    private ImageView iv;
+    private TextView joinButton;
+    private Button sendNotificationButton;
+    private HomeFragment home;
     private String deviceId;
 
+    // TextViews for event details
+    private TextView name;
+    private TextView time;
+    private TextView day;
+    private TextView capacity;
+    private TextView location;
 
-    public WaitlistFragment(){
+    // Default constructor
+    public WaitlistFragment() {
         super();
+        this.event = new Event();
+        this.user = new User();
     }
 
-
-
-    public WaitlistFragment(Event event, User user,HomeFragment home) {
+    // Constructor with event, user, and home fragment
+    public WaitlistFragment(Event event, User user, HomeFragment home) {
         super();
-        this.event=event;
+        this.event = event;
         this.user = user;
         this.home = home;
-
-
     }
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        return inflater.inflate((R.layout.view_event), container, false);
+
+        // Get the device ID and set it as the user's UID
+        deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        user.setUid(deviceId);
+
+        // Handle test arguments if needed
+        if (getArguments() != null) {
+            Bundle args = getArguments();
+            if (args.getBoolean("Geo")) {
+                event.setGeolocation(true);
+                user.setUid("geotest");
+            } else {
+                user.setUid("device_user");
+                event.setGeolocation(false);
+            }
+
+            if (args.getBoolean("Org")) {
+                event.setOrgID(deviceId);
+                ArrayList<String> list = new ArrayList<>();
+                list.add("test_user1");
+                list.add("test_user2");
+                list.add("test_user3");
+                event.setWaitingList(list);
+            }
+        }
+
+        return inflater.inflate(R.layout.view_event, container, false);
     }
 
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        user.setUid(deviceId);  // Setting the device ID as Uid
+        // Initialize view components
+        initializeViews(view);
 
-        viewPager2 = view.findViewById(R.id.view_pager);
+        // Set event details
+        setEventDetails();
 
-        TextView name = (TextView) view.findViewById(R.id.eventtitle);
-        TextView time = (TextView) view.findViewById(R.id.eventInfoTime);
-        TextView day = (TextView) view.findViewById(R.id.eventInfoDay);
-        TextView capacity = (TextView) view.findViewById(R.id.eventInfoPeople);
-        TextView location = (TextView) view.findViewById(R.id.eventInfoLocation);
+        // Load event image
+        loadEventImage();
 
+        // Set up join/leave button logic
+        setupJoinButton();
+    }
 
+    private void initializeViews(View view) {
+        name = view.findViewById(R.id.eventtitle);
+        time = view.findViewById(R.id.eventInfoTime);
+        day = view.findViewById(R.id.eventInfoDay);
+        capacity = view.findViewById(R.id.eventInfoPeople);
+        location = view.findViewById(R.id.eventInfoLocation);
+        iv = view.findViewById(R.id.eventimage);
+        joinButton = view.findViewById(R.id.eventInfoButton);
+        sendNotificationButton = view.findViewById(R.id.send_notification_button);
+    }
+
+    private void setEventDetails() {
         name.setText(event.getTitle());
         time.setText(event.getTime());
         day.setText(event.getDate());
         capacity.setText(String.valueOf(event.getMaxCapacity()));
         location.setText(event.getLocation());
+    }
 
-        // pulling and creating image
-        path = event.getPosterUrl();
-        iv = (ImageView) view.findViewById(R.id.eventimage);
-        StorageReference myimage = new WaitinglistDB().getImage(path);
-        try{
-            File eventImage = File.createTempFile(event.getTitle(),".png");
-            myimage.getFile(eventImage)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+    private void loadEventImage() {
+        if (event.getPosterUrl() != null) {
+            StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+            try {
+                File eventImage = File.createTempFile(event.getTitle(), ".png");
+                myImage.getFile(eventImage)
+                        .addOnSuccessListener(taskSnapshot -> {
                             Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
                             iv.setImageBitmap(bitmap);
-
-                        }
-                    });{
-
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-// logic to decide if button is join leave or view waitlist
-        joinButton = view.findViewById(R.id.eventInfoButton);
-        sendNotificationButton = view.findViewById(R.id.send_notification_button);
-        if(Objects.equals(event.getOrgID(), deviceId)){
-            //if organizer view waitlist
-            joinButton.setText("View waitlist");
-            joinButton.setOnClickListener(v -> {
-                home.goToWaitlistView(event);
-
-            });
-            sendNotificationButton.setVisibility(View.VISIBLE);
-            sendNotificationButton.setOnClickListener(v -> {
-                home.goToSendNotificationView(event);
-            });
-
-
-        }else {
-
-            if (event.getWaitingList().contains(user.getUid())) {
-                //if in event leave waitlist
-                joinButton.setText("Leave event");
-                joinButton.setOnClickListener(v -> {
-                            new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
-                        }
-                );
-
-
-            } else {
-                //if not in waitlist join
-                joinButton.setText("Join event");
-                joinButton.setOnClickListener(v -> {
-
-                    //logic for geolocation
-                    if (event.isGeolocation()) {
-                        new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
-                    } else {
-                        new WaitinglistController(event).addUser(user);
-                        onDialogueFinished();
-
-                    }
-                });
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
+    private void setupJoinButton() {
+        if (Objects.equals(event.getOrgID(), deviceId)) {
+            // If organizer, view waitlist
+            setupOrganizerButton();
+        } else {
+            updateJoinButton();
+        }
+    }
 
-    public void onDialogueFinished(){
-        //refresh page after dialogue to update teh buttons
-        if (event.getWaitingList().contains(user.getUid())){
+    private void setupOrganizerButton() {
+        joinButton.setText("View waitlist");
+        joinButton.setOnClickListener(v -> {
+            if (home != null) home.goToWaitlistView(event);
+        });
+
+        if (sendNotificationButton != null) {
+            sendNotificationButton.setVisibility(View.VISIBLE);
+            sendNotificationButton.setOnClickListener(v -> {
+                if (home != null) home.goToSendNotificationView(event);
+            });
+        }
+    }
+
+    private void updateJoinButton() {
+        if (event.getWaitingList().contains(user.getUid())) {
+            // If in event, leave waitlist
             joinButton.setText("Leave event");
-            joinButton.setOnClickListener(v->{
-                        new leaveEventButton(event, user,this).show(getActivity().getSupportFragmentManager(),"join");
-                    }
+            joinButton.setOnClickListener(v ->
+                    new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join")
             );
-
-
-        }else {
+        } else {
+            // If not in waitlist, join
             joinButton.setText("Join event");
             joinButton.setOnClickListener(v -> {
-
+                // Logic for geolocation
                 if (event.isGeolocation()) {
                     new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
                 } else {
                     new WaitinglistController(event).addUser(user);
+                    new UserDB().addEventToUserList(event.getEventId(), deviceId);
                     onDialogueFinished();
-
                 }
             });
         }
-
-
-
     }
-    public Event getEvent(){
+
+    public void onDialogueFinished() {
+        // Refresh page after dialogue to update the buttons
+        updateJoinButton();
+    }
+
+    // Setter methods for flexibility
+    public void setImportant(Event event, HomeFragment home) {
+        this.event = event;
+        this.home = home;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    // Getter methods
+    public Event getEvent() {
         return event;
     }
-    public User getUser(){
+
+    public User getUser() {
         return user;
     }
 }
