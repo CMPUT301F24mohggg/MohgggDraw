@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,102 +19,86 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
 public class BrowseUsersFragment extends Fragment {
-    private FirebaseFirestore db;
+
     private ListView userListView;
-    private ArrayList<String> userNames;
     private ArrayAdapter<String> adapter;
+    private ArrayList<String> userNames;
+    private ArrayList<String> userIds;
+    private FirebaseFirestore db;
+    private View fabDelete;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_user_tab, container, false);
-    }
+        View view = inflater.inflate(R.layout.fragment_user_tab, container, false);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // Initialize views
         userListView = view.findViewById(R.id.user_list_view);
+        fabDelete = view.findViewById(R.id.fab_delete);
 
-        // Initialize Firestore and ListView
         db = FirebaseFirestore.getInstance();
         userNames = new ArrayList<>();
+        userIds = new ArrayList<>();
 
-        // Create ArrayAdapter to populate the ListView
-        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userNames);
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, userNames);
         userListView.setAdapter(adapter);
+        userListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        // Fetch all user names from Firestore
-        fetchUserNames();
+        fetchUsers();
 
-        // Commented-out search functionality
-        /*
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+        fabDelete.setOnClickListener(v -> showDeleteConfirmationDialog());
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                filterUsers(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {}
-        });
-        */
+        return view;
     }
 
-    private void fetchUserNames() {
-        // Get a reference to the "user" collection in Firestore
-        db.collection("user")
-                .get()  // Fetch all documents
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Loop through all documents in the "user" collection
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Get the name and userType
-                            String userName = document.getString("name");
-                            Long userType = document.getLong("userType");
+    private void fetchUsers() {
+        db.collection("user").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                userNames.clear();
+                userIds.clear();
 
-                            // Only add users with userType 0 or 2
-                            if (userName != null && userType != null && (userType == 0 || userType == 2)) {
-                                userNames.add(userName);
-                            }
-                        }
-                        // Notify the adapter to update the ListView
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getActivity(), "Error getting documents: " + task.getException(), Toast.LENGTH_SHORT).show();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String name = document.getString("name");
+                    String id = document.getId();
+                    Long userType = document.getLong("userType");
+
+                    if (name != null && userType != null && userType == 0) {
+                        userNames.add(name);
+                        userIds.add(id);
                     }
-                });
+                }
+                adapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(getActivity(), "Failed to fetch users.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // Commented-out filtering functionality
-    /*
-    private void filterUsers(String query) {
-        // Filters the user list with string query
-        filteredUserNames.clear();
-
-        // If the query is empty, show all users
-        if (query.isEmpty()) {
-            filteredUserNames.addAll(userNames);
-        } else {
-            // Filter the user names based on the query
-            for (String userName : userNames) {
-                if (userName.toLowerCase().contains(query.toLowerCase())) {
-                    filteredUserNames.add(userName);
-                }
+    private void showDeleteConfirmationDialog() {
+        ArrayList<String> selectedIds = new ArrayList<>();
+        for (int i = 0; i < userListView.getCount(); i++) {
+            if (userListView.isItemChecked(i)) {
+                selectedIds.add(userIds.get(i));
             }
         }
 
-        // Notify the adapter to update the ListView with the filtered data
-        adapter.notifyDataSetChanged();
+        if (selectedIds.isEmpty()) {
+            Toast.makeText(getActivity(), "No users selected for deletion.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Delete Users?");
+        builder.setMessage("Are you sure you want to delete the selected users?");
+        builder.setPositiveButton("Yes", (dialog, which) -> deleteSelectedUsers(selectedIds));
+        builder.setNegativeButton("Nevermind", null);
+        builder.show();
     }
-    */
+
+    private void deleteSelectedUsers(ArrayList<String> selectedIds) {
+        for (String id : selectedIds) {
+            db.collection("user").document(id).delete().addOnSuccessListener(aVoid -> {
+                Toast.makeText(getActivity(), "Deleted successfully.", Toast.LENGTH_SHORT).show();
+                fetchUsers();
+            }).addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to delete.", Toast.LENGTH_SHORT).show());
+        }
+    }
 }
