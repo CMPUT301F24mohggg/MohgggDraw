@@ -63,7 +63,6 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         viewPager2 = view.findViewById(R.id.waitlist_viewpage);
         backButton = view.findViewById(R.id.waitlist_back_button);
 
-
         viewPager2.setAdapter(waitlistAdapter);
         //main eventview page
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -76,12 +75,12 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
                 }
             }
         });
-        //goest to main home
+        //goes to main home
         backButton.setOnClickListener(v -> {
             if (viewPager2.getCurrentItem() > 0) {
                 if (orgFlag && viewPager2.getCurrentItem() == 3){
                     orgFlag = false;
-                    viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 2,false);
+                    viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 2, false);
                 } else {
                     viewPager2.setCurrentItem(viewPager2.getCurrentItem() - 1, false);
                 }

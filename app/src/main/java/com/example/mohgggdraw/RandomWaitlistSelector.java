@@ -36,6 +36,8 @@ public class RandomWaitlistSelector {
         }
 
         controller.updateLists(selected, event.getWaitingList());
+        //todo notifications
+
         return selected;
     }
 
@@ -73,6 +75,7 @@ public class RandomWaitlistSelector {
         Log.d("tag", selected.toString());
 
         // Call updateFragments on the provided fragment
+        //todo notification
         frag.updateFragments();
 
         return selected;

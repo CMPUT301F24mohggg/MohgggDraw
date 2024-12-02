@@ -7,7 +7,6 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,11 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +51,9 @@ public class WaitlistFragment extends Fragment {
         this.user = new User();
     }
 
-    // Constructor with event, user, and home fragment
+    /**
+     * Constructor with event, user, and home fragment
+     */
     public WaitlistFragment(Event event, User user, HomeFragment home) {
         super();
         this.event = event;
@@ -103,14 +100,17 @@ public class WaitlistFragment extends Fragment {
         // Initialize view components
         initializeViews(view);
 
-        // Set event details
-        setEventDetails();
+        // If home is not null, proceed with setting up the view
+        if (home != null) {
+            // Set event details
+            setEventDetails();
 
-        // Load event image
-        loadEventImage();
+            // Load event image
+            loadEventImage();
 
-        // Set up join/leave button logic
-        setupJoinButton();
+            // Set up join/leave button logic
+            setupJoinButton();
+        }
     }
 
     /**
@@ -134,12 +134,12 @@ public class WaitlistFragment extends Fragment {
      */
     private void setEventDetails() {
         name.setText(event.getTitle());
-        time.setText(event.getTime());
+        // Different time method from the second implementation
+        time.setText(event.getStartTime() != null ? event.getStartTime().toString() : event.getTime());
         day.setText(event.getDate());
         capacity.setText(String.valueOf(event.getMaxCapacity()));
         location.setText(event.getLocation());
     }
-
 
     /**
      * Downloads and displays the event's poster image if available.
@@ -223,8 +223,6 @@ public class WaitlistFragment extends Fragment {
         updateJoinButton();
     }
 
-    // Utility methods for testing and configuration
-
     /**
      * Sets the event and home fragment for navigation and data.
      *
@@ -236,6 +234,11 @@ public class WaitlistFragment extends Fragment {
         this.home = home;
     }
 
+    /**
+     * Sets the device ID for testing purposes.
+     *
+     * @param deviceId The device ID to set.
+     */
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
@@ -248,6 +251,7 @@ public class WaitlistFragment extends Fragment {
     public Event getEvent() {
         return event;
     }
+
     /**
      * Retrieves the user object.
      *

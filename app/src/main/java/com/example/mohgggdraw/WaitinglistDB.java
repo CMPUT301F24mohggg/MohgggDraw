@@ -173,10 +173,18 @@ public class WaitinglistDB {
         if (path == null) {
             path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
         }
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference ref = storage.getReferenceFromUrl(path);
+        try {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference ref = storage.getReferenceFromUrl(path);
+            return ref;
+        }catch (Exception e){
+            path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference ref = storage.getReferenceFromUrl(path);
+            return ref;
+        }
 
-        return ref;
+
     }
 
     //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
@@ -329,7 +337,7 @@ public class WaitinglistDB {
                     Event event = docSnapshotToEvent(documentSnapshot);
                     if (event != null) {
                         events.add(event);
-                        fragment.setEventList(new ArrayList<>(events)); // Update UI safely
+                        fragment.setEventList((events)); // Update UI safely
                     }
                 } else {
                     Log.e(TAG, "Document with ID " + eventId + " does not exist.");
