@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Fragments for admins
         adminFragmentMap.put(R.id.nav_home, new HomeFragment());
-        adminFragmentMap.put(R.id.nav_create, new BrowseProfilesFragment());
+        adminFragmentMap.put(R.id.nav_tool, new BrowseProfilesFragment());
         adminFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         adminFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         adminFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());

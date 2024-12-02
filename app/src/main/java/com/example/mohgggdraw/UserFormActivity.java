@@ -63,7 +63,6 @@ public class UserFormActivity extends AppCompatActivity {
 
         // Link UI components
         editTextName = findViewById(R.id.editTextName);
-        editTextFacilityName = findViewById(R.id.editTextFacilityName);
         editTextPhone = findViewById(R.id.editTextPhone);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextLocation = findViewById(R.id.editTextLocation);
@@ -88,11 +87,9 @@ public class UserFormActivity extends AppCompatActivity {
      */
     private void configureFormFields() {
         if ("organizer".equals(userType)) {
-            editTextFacilityName.setVisibility(EditText.VISIBLE);
             editTextName.setHint("Name");
         } else {
-            editTextFacilityName.setVisibility(EditText.GONE);
-            editTextName.setHint(userType.equals("admin") ? "Admin Name" : "Entrant Name");
+            editTextName.setHint(userType.equals("admin") ? "Name" : "Name");
         }
     }
 
@@ -197,11 +194,6 @@ public class UserFormActivity extends AppCompatActivity {
             return;
         }
 
-        if ("organizer".equals(userType) && facilityName.isEmpty()) {
-            Toast.makeText(this, "Facility Name is required for organizers", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         Map<String, Object> userDetails = new HashMap<>();
@@ -211,9 +203,7 @@ public class UserFormActivity extends AppCompatActivity {
         userDetails.put("email", email);
         userDetails.put("location", location);
         userDetails.put("userType", getUserTypeCode(userType));
-        if ("organizer".equals(userType)) {
-            userDetails.put("facilityName", facilityName);
-        }
+
 
         db.collection("user").document(deviceID)
                 .set(userDetails)
