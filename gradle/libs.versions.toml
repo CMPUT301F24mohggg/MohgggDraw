@@ -26,6 +26,7 @@ monitor = "1.7.1"
 playServicesMaps = "19.0.0"
 junitJupiter = "5.8.1"
 playServicesLocation = "21.3.0"
+coreTesting = "2.1.0"
 
 [libraries]
 cardview-v7 = { module = "com.android.support:cardview-v7", version.ref = "cardviewV7" }
@@ -55,6 +56,7 @@ androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-test
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
 
 [plugins]
 androidx-monitor = { id = "androidx.test.monitor", version.ref = "monitor" }

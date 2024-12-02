@@ -200,4 +200,24 @@ public class BrowseProfilesFragment extends Fragment {
         imagesTab.setBackgroundResource(R.drawable.tab_unselected_background);
         imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
+
+
+    /**
+     * Determines the tab name based on its position.
+     *
+     * @param position Tab position (0 = Facilities, 1 = Users, 2 = Images).
+     * @return The name of the tab.
+     */
+    public String getTabName(int position) {
+        switch (position) {
+            case 0:
+                return "Facilities";
+            case 1:
+                return "Users";
+            case 2:
+                return "Images";
+            default:
+                return "Unknown";
+        }
+    }
 }

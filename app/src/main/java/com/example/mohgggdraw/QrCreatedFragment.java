@@ -61,7 +61,7 @@ public class QrCreatedFragment extends Fragment {
     private ImageView newQrImageView;
     private EventQr eventQr;
     private SharedViewModel sharedViewModel;
-    private String eventId;
+    public String eventId;
 
     public QrCreatedFragment() {
         this.eventQr = null;
@@ -118,7 +118,7 @@ public class QrCreatedFragment extends Fragment {
         this.eventId = eventQr.getEventId();
     }
 
-    private void qrShare(Bitmap qrBitmap) {
+    public void qrShare(Bitmap qrBitmap) {
 
         String stringPath = MediaStore.Images.Media.insertImage(this.getActivity().getContentResolver(),
                 qrBitmap, "Event QR Code", null);

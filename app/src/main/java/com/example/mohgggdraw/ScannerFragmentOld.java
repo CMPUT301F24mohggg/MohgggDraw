@@ -27,9 +27,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 /***
- This fragment starts an Intent for QR scanner. It:
- - Uses the camera to scan a QR code
- - Displays the event details if the QR code is valid
+ OLD FRAGMENT FOR SCANNER NOT USED
  ***/
 public class ScannerFragmentOld extends Fragment {
 

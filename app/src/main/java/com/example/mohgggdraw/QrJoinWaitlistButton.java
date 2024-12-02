@@ -20,11 +20,11 @@ public class QrJoinWaitlistButton extends DialogFragment {
 
     User user= new User();
     QrWaitlistFragment qrWaitlistFragment;
-    public QrJoinWaitlistButton(Event event, User user, QrWaitlistFragment qrWaitlistFragment){
+    public QrJoinWaitlistButton(Event event, User user,QrWaitlistFragment qrWaitlistFragment){
         super();
         this.event = event;
         this.user = user;
-        this.qrWaitlistFragment = qrWaitlistFragment;
+        this.qrWaitlistFragment=qrWaitlistFragment;
 
     }
 
@@ -42,6 +42,7 @@ public class QrJoinWaitlistButton extends DialogFragment {
         Button button = view.findViewById(R.id.accept_terms_button);
         button.setOnClickListener(v ->{
             new WaitinglistController(event).addUser(user);
+            new UserDB().addEventToUserList(event.getEventId(),user.getUid());
             qrWaitlistFragment.onDialogueFinished();
             dismiss();
         });
