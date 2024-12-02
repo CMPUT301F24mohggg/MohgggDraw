@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
         organizerViewModel = new ViewModelProvider(requireActivity()).get(OrganizerViewModel.class);
         viewPager2 = view.findViewById(R.id.waitlist_viewpage);
         backButton = view.findViewById(R.id.waitlist_back_button);
+        //viewPager2.setOffscreenPageLimit(4);
 
 
         viewPager2.setAdapter(waitlistAdapter);
@@ -59,6 +60,12 @@ public class HomeFragment extends Fragment {
         //goest to main home
         backButton.setOnClickListener(v -> {
             if (viewPager2.getCurrentItem() > 0) {
+                waitlistAdapter = new WaitlistPagerAdapter(this, user);
+                if(adminView){
+                    waitlistAdapter.setAdminView();
+                }
+                viewPager2.setAdapter(waitlistAdapter);
+
                 viewPager2.setCurrentItem(0);
             }
         });
