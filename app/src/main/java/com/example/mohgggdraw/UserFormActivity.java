@@ -24,8 +24,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -241,7 +244,29 @@ public class UserFormActivity extends AppCompatActivity {
     private void navigateToHomeScreen() {
         Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("navigateToHomeFragment", true);
         startActivity(intent);
         finish();
+    }
+    public void addLists(String deviceID){
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data =  documentSnapshot.getData();
+                if(!data.containsKey("waitList")){
+                    DocumentReference mydoc = db.collection("user").document(deviceID);
+                    mydoc.update("waitList",new ArrayList<String>());
+                    mydoc.update("entrantList",new ArrayList<String>());
+                    mydoc.update("createdList",new ArrayList<String>());
+
+                }
+
+
+
+
+            }
+
+        });
+
     }
 }
