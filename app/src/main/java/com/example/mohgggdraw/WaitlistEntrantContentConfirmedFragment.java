@@ -17,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 /***
- * Content fragment to display
+ * Content fragment to display displays comfirmed list from event
  */
 public class WaitlistEntrantContentConfirmedFragment extends Fragment implements SetListView{
     private ArrayList<String> dataList;

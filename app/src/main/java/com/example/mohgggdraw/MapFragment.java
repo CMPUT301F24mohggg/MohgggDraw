@@ -21,6 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ *Map fragment to view general area where joined
+ * */
 public class MapFragment extends Fragment {
 
     private ImageView mapImage;

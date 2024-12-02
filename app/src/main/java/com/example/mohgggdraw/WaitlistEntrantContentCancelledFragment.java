@@ -17,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 /***
- * Content fragment to display entrants for the first tab.
+ * Content fragment to display entrants for the first tab. which is waitinglist
  */
 public class WaitlistEntrantContentCancelledFragment extends Fragment implements SetListView {
     private ArrayList<String> dataList;
@@ -48,11 +48,7 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment implements
         redraw.setOnClickListener(v->{
                     new RandomWaitlistSelector(event).fillSelected(frag);
                     frag.updateFragments();
-
-                }
-
-                );
-
+                });
         if(event!=null) {
             new WaitinglistDB().setListFromDB("EventCancelledlist", this, event);
         }
@@ -69,6 +65,7 @@ public class WaitlistEntrantContentCancelledFragment extends Fragment implements
     public Context retContext() {
         return getContext();
     }
+
 
     @Override
     public void updateButton() {

@@ -66,6 +66,7 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
         });
 
     }
+    //updates selected list for user who have been button clicked for deletion
     public void updateSelectedList(String entrant){
         if (!selectedList.contains(entrant)) {
             selectedList.add(entrant);

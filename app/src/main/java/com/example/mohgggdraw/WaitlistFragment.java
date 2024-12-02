@@ -56,6 +56,10 @@ public class WaitlistFragment extends Fragment {
         this.user = new User();
     }
 
+    /**
+     * Constructor with event, user, and home fragment
+     */
+
     // Constructor with event, user, and home fragment
     public WaitlistFragment(Event event, User user, HomeFragment home) {
         super();

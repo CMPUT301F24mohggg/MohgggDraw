@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
+/**
+ * tab layout for entrant waitlist fragment holds all waitlist fragments
+ * */
 public class WaitlistViewEntrantsFragment extends Fragment {
     private Event event;
     private final List<Fragment> fragments = new ArrayList<>();

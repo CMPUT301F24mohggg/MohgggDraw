@@ -32,6 +32,9 @@ public class AdminEventView extends Fragment {
         return inflater.inflate(R.layout.admin_event_view_layout, container, false);
     }
 
+    /**
+     * Create event view for admins, query data of all events
+     * */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

@@ -14,6 +14,9 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *Fragment to hold tabs to all the event view tabs
+ * */
 public class EventListTabViewFragment extends Fragment {
     List<Fragment> fragments = new ArrayList<>();
     String deviceID;
@@ -37,6 +40,10 @@ public class EventListTabViewFragment extends Fragment {
         tabs.add(view.findViewById(R.id.tab1)); // My Events
         tabs.add(view.findViewById(R.id.tab2)); // Waiting List
         tabs.add(view.findViewById(R.id.tab3)); // Created
+
+        ((TextView)tabs.get(0)).setText("WaitingList");
+        ((TextView)tabs.get(0)).setText("Confirmed");
+        ((TextView)tabs.get(0)).setText("Created");
 
         // Create fragments for each tab
         fragments.add(new EventListDisplayFragment()); // My Events
@@ -70,7 +77,7 @@ public class EventListTabViewFragment extends Fragment {
             }
         });
     }
-
+    //change tab styles
     private void updateTabStyles(List<TextView> tabs, int selectedIndex) {
         for (int i = 0; i < tabs.size(); i++) {
             TextView tab = tabs.get(i);
