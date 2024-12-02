@@ -87,6 +87,14 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
             }
         });
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        waitlistAdapter = new WaitlistPagerAdapter(this,user);
+        viewPager2.setAdapter(waitlistAdapter);
+    }
+
     /**
      * Navigates to the event view page.
      *

@@ -87,4 +87,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     public void setNotificationDetailsFragment(NotificationDetailsFragment fragment) {
         this.notificationDetailsFragment = fragment;
     }
+
+    public void refresh() {
+    }
 }

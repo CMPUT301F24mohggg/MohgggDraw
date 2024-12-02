@@ -130,6 +130,8 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
     @Override
     public void setEventList(ArrayList<Event> events) {
         dataList = events;
+        eventAdapter = new EventAdapter(requireContext(), dataList);
+        eventList.setAdapter(eventAdapter);
         dataChange();
     }
 
