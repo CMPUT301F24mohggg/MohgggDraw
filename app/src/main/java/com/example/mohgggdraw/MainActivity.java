@@ -108,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
         organizerFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
 
         adminFragmentMap.put(R.id.nav_home, new HomeFragment());
-        adminFragmentMap.put(R.id.nav_create, new AdminFragment());
-        adminFragmentMap.put(R.id.nav_scanQr, new BrowseProfilesFragment());
+        adminFragmentMap.put(R.id.nav_tool, new BrowseProfilesFragment());
+        adminFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         adminFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         adminFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
         ((HomeFragment)adminFragmentMap.get(R.id.nav_home)).setAdminView();
