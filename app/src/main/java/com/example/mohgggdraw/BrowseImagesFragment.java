@@ -47,7 +47,7 @@ public class BrowseImagesFragment extends Fragment {
         imageItems = new ArrayList<>();
         selectedImages = new HashSet<>();
 
-        // Set up the adapter and attach to the GridView
+        // Set up the adapter and attach it to the GridView
         adapter = new ImageAdapter();
         gridView.setAdapter(adapter);
 
@@ -70,7 +70,7 @@ public class BrowseImagesFragment extends Fragment {
                 item.getDownloadUrl().addOnSuccessListener(uri -> {
                     // Add image to the list and notify the adapter
                     imageItems.add(new ImageItem(uri.toString(), item));
-                    adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged(); // Notify the adapter after adding each image
                 }).addOnFailureListener(e -> Log.e("BrowseImagesFragment", "Failed to fetch image URL", e));
             }
         }).addOnFailureListener(e -> {
@@ -95,6 +95,10 @@ public class BrowseImagesFragment extends Fragment {
         TextView btnYes = dialogView.findViewById(R.id.btn_yes);
         TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
 
+        // Customize the dialog
+        title.setText("Delete Selected?");
+        message.setText("Are you sure you want to delete the selected images?");
+
         // Create the AlertDialog
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(dialogView)
@@ -115,9 +119,12 @@ public class BrowseImagesFragment extends Fragment {
     }
 
     private void deleteSelectedImages() {
-        for (ImageItem image : selectedImages) {
+        ArrayList<ImageItem> imagesToDelete = new ArrayList<>(selectedImages); // Copy to avoid modification issues
+
+        for (ImageItem image : imagesToDelete) {
             image.getStorageReference().delete().addOnSuccessListener(aVoid -> {
                 imageItems.remove(image); // Remove the image from the list
+                selectedImages.remove(image);
                 adapter.notifyDataSetChanged(); // Refresh the GridView
                 Toast.makeText(getContext(), "Image deleted successfully.", Toast.LENGTH_SHORT).show();
             }).addOnFailureListener(e -> {
@@ -125,7 +132,6 @@ public class BrowseImagesFragment extends Fragment {
                 Toast.makeText(getContext(), "Failed to delete some images.", Toast.LENGTH_SHORT).show();
             });
         }
-        selectedImages.clear(); // Clear the selection after deletion
     }
 
     // Inner class to represent each image item
@@ -144,6 +150,19 @@ public class BrowseImagesFragment extends Fragment {
 
         public StorageReference getStorageReference() {
             return storageReference;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ImageItem)) return false;
+            ImageItem imageItem = (ImageItem) o;
+            return url.equals(imageItem.url);
+        }
+
+        @Override
+        public int hashCode() {
+            return url.hashCode();
         }
     }
 
@@ -177,9 +196,12 @@ public class BrowseImagesFragment extends Fragment {
             ImageItem imageItem = imageItems.get(position);
 
             // Load the image into the ImageView using Glide
-            Glide.with(getContext()).load(imageItem.getUrl()).into(imageView);
+            Glide.with(getContext())
+                    .load(imageItem.getUrl())
+                    .into(imageView);
 
             // Set up the checkbox
+            checkBox.setOnCheckedChangeListener(null); // Remove existing listener to avoid interference
             checkBox.setChecked(selectedImages.contains(imageItem));
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
