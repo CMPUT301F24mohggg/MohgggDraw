@@ -16,24 +16,47 @@
         android:layout_alignParentTop="true"
         app:title="" />
 
-    <ImageView
-        android:id="@+id/profileImageView"
+    <!-- Profile Picture with Pen Icon -->
+    <FrameLayout
+        android:id="@+id/profileContainer"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
-        android:src="@drawable/user"
-        android:contentDescription="Profile picture"
-        android:scaleType="centerCrop"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true" />
+        android:layout_marginTop="80dp">
 
+        <!-- Profile Picture -->
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/user"
+            android:scaleType="centerCrop"
+            android:contentDescription="Profile picture"
+            android:background="@drawable/circle_background"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Pen Icon for Editing -->
+        <ImageView
+            android:id="@+id/editProfileIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="4dp"
+            android:background="@drawable/circle_background_pen"
+            android:clickable="true"
+            android:contentDescription="Edit profile picture"
+            android:focusable="true"
+            android:padding="4dp"
+            android:src="@drawable/ic_edit" />
+    </FrameLayout>
+
+    <!-- User Name -->
     <TextView
         android:id="@+id/nameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profileImageView"
+        android:layout_below="@id/profileContainer"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="User"
@@ -42,6 +65,7 @@
         android:clickable="true"
         android:focusable="true" />
 
+    <!-- Other UI elements for profile info -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -95,7 +119,6 @@
             android:layout_height="wrap_content"
             android:text="Delete Profile"
             android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"/>
-
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>
