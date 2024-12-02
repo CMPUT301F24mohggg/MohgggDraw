@@ -37,16 +37,34 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         // Default constructor
     }
 
-    // Setter method for fragment (from second implementation)
+    /**
+     * Sets the HomeFragment instance to navigate back.
+     *
+     * @param fragment The HomeFragment instance.
+     */
     public void setFragment(HomeFragment fragment) {
         this.fragment = fragment;
     }
 
+    /**
+     * Inflates the layout for the fragment.
+     *
+     * @param inflater  LayoutInflater to inflate views in the fragment.
+     * @param container The parent view that the fragment's UI is attached to.
+     * @param savedInstanceState Bundle with the saved state of the fragment.
+     * @return The root view of the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.event_adapter_layout, container, false);
     }
 
+    /**
+     * Called after the view is created. Initializes the list, adapter, and event listeners.
+     *
+     * @param view The view returned by {@link #onCreateView}.
+     * @param savedInstanceState Bundle with the saved state of the fragment.
+     */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -86,7 +104,10 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         });
     }
 
-    // Updates list when data is changed
+
+    /**
+     * Updates the list data and refreshes the adapter.
+     */
     public void dataChange() {
         if (getContext() == null || eventList == null) {
             Log.e("EventListDisplayFragment", "Context or eventList is null, skipping dataChange()");
@@ -101,20 +122,33 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         }
     }
 
-    // Implement interface method to set event list
+    /**
+     * Sets the event list data and triggers a UI update.
+     *
+     * @param events The list of events to display.
+     */
     @Override
     public void setEventList(ArrayList<Event> events) {
         dataList = events;
         dataChange();
     }
 
-    // Additional interface method implementation
+    /**
+     * Sets a generic list (optional implementation).
+     *
+     * @param list The list of data to set.
+     */
     @Override
     public void setList(ArrayList list) {
         // Optional: Implement if needed
     }
 
-    // Setter for device ID
+
+    /**
+     * Sets the device ID for querying data.
+     *
+     * @param id The device ID string.
+     */
     public void setDevice(String id) {
         this.deviceID = id;
     }

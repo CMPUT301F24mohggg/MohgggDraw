@@ -20,18 +20,37 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * This fragment provides a user interface for composing and sending notifications
+ * to selected entrants of an event. It allows users to specify a notification title,
+ * message, and confirm the action before dispatching notifications.
+ */
 public class NotificationDetailsFragment extends Fragment {
     private  List<String> selectedLists;
     private Event event;
     private HomeFragment home;
 
+    /**
+     * Constructs a new NotificationDetailsFragment.
+     *
+     * @param event         The event associated with the notification.
+     * @param selectedLists The lists of selected entrants to notify.
+     * @param home          The parent fragment to navigate back to after sending notifications.
+     */
     public NotificationDetailsFragment(Event event, List<String> selectedLists, HomeFragment home) {
         this.event = event;
         this.selectedLists = selectedLists;
         this.home = home;
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater  LayoutInflater to inflate the views in this fragment.
+     * @param container The parent view to attach this fragment to.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     * @return The root view of the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notification_details, container, false);
@@ -55,7 +74,12 @@ public class NotificationDetailsFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Displays a confirmation dialog before sending notifications.
+     *
+     * @param title   The title of the notification.
+     * @param details The details of the notification.
+     */
     private void showConfirmationDialog(String title, String details) {
         // Inflate the custom layout
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.join_event, null);
@@ -93,7 +117,12 @@ public class NotificationDetailsFragment extends Fragment {
         dialog.show();
     }
 
-
+    /**
+     * Sends notifications to the selected lists using Firebase Firestore and NotificationUtils.
+     *
+     * @param title   The title of the notification.
+     * @param details The details of the notification.
+     */
     private void sendNotifications(String title, String details) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String eventId = event.getEventId();
@@ -135,6 +164,9 @@ public class NotificationDetailsFragment extends Fragment {
             });
         }
     }
+    /**
+     * Clears the input fields for the notification title and details.
+     */
     private void clearFields() {
         requireActivity().runOnUiThread(() -> {
             if (getView() != null) {

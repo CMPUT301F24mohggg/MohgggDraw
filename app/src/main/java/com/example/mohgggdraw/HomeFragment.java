@@ -29,6 +29,14 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
     private Boolean orgFlag = false;
     private boolean adminView = false;
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater LayoutInflater to inflate the views in this fragment.
+     * @param container The parent view to attach this fragment to.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     * @return The root view of the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -36,6 +44,13 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    /**
+     * Called after the fragment's view is created.
+     * Sets up the pager adapter, back button, and page navigation logic.
+     *
+     * @param view The view returned by {@link #onCreateView}.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -73,7 +88,11 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
             }
         });
     }
-    //goes to eventview
+    /**
+     * Navigates to the event view page.
+     *
+     * @param event The selected event.
+     */
     public void goToNextPage(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
@@ -81,7 +100,11 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         backButton.setVisibility(View.VISIBLE);
 
     }
-    //waitlist view
+    /**
+     * Navigates to the waitlist view page for a specific event.
+     *
+     * @param event The selected event.
+     */
     public void goToWaitlistView(Event event){
         waitlistAdapter.setEvent(event);
         viewPager2.setAdapter(waitlistAdapter);
@@ -90,8 +113,11 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
 
     }
 
-    // send notification
-// Implement the send notification view method
+    /**
+     * Navigates to the send notification view.
+     *
+     * @param event The selected event.
+     */
     public void goToSendNotificationView(Event event) {
         orgFlag = true;
         waitlistAdapter.setEvent(event);
@@ -100,6 +126,12 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         backButton.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Navigates to the notification details view.
+     *
+     * @param event The selected event.
+     * @param selectedLists The list of selected items related to the event.
+     */
     public void goToNotificationDetailsView(Event event, List<String> selectedLists) {
         orgFlag = true;
         NotificationDetailsFragment notificationFragment = new NotificationDetailsFragment(event, selectedLists, this);
@@ -110,16 +142,28 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         backButton.setVisibility(View.VISIBLE);
     }
 
-
+    /**
+     * Handles the selection of lists from the ListSelectionFragment.
+     *
+     * @param event The selected event.
+     * @param selectedLists The list of selected items related to the event.
+     */
     @Override
     public void onListsSelected(Event event, List<String> selectedLists) {
         goToNotificationDetailsView(event, selectedLists);
     }
-
+    /**
+     * Sets the admin view flag for the fragment.
+     */
     public void setAdminView(){
         adminView = true;
 
     }
+    /**
+     * Returns the ViewPager2 instance used in the fragment.
+     *
+     * @return The ViewPager2 instance.
+     */
     public ViewPager2 getViewPager2() {
         return viewPager2;
     }

@@ -15,23 +15,46 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * This fragment provides a user interface for selecting lists associated with an event.
+ * Users can select one or more lists and proceed to the next step in the process.
+ */
 public class ListSelectionFragment extends Fragment {
     private Event event;
     private List<String> selectedLists = new ArrayList<>();
     private ListSelectionListener listener;
-
+    /**
+     * Constructs a new ListSelectionFragment.
+     *
+     * @param event    The event associated with the selection process.
+     * @param listener The listener to notify when lists are selected.
+     */
     public ListSelectionFragment(Event event, ListSelectionListener listener) {
         this.event = event;
         this.listener = listener;
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater  LayoutInflater to inflate the views in this fragment.
+     * @param container The parent view to attach this fragment to.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_list_selection, container, false);
     }
 
+    /**
+     * Called after the fragment's view is created.
+     * Sets up the checkboxes, click listeners, and Next button behavior.
+     *
+     * @param view The view returned by {@link #onCreateView}.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,7 +100,13 @@ public class ListSelectionFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Configures a checkbox and its associated container.
+     *
+     * @param container   The view container for the checkbox.
+     * @param checkBox    The checkbox to configure.
+     * @param chosenList  The identifier for the list associated with this checkbox.
+     */
     private void setupCheckbox(View container, CheckBox checkBox, String chosenList) {
         if (container == null || checkBox == null) return;
 
@@ -97,13 +126,25 @@ public class ListSelectionFragment extends Fragment {
             checkBox.setChecked(newCheckedState); // This will trigger the OnCheckedChangeListener
         });
     }
-
+    /**
+     * Retrieves the event associated with the fragment.
+     *
+     * @return The event instance.
+     */
     public Event getEvent() {
         return event; // Provide access to the event
     }
 
-    // Interface for communication with parent fragments
+    /**
+     * Interface for communicating list selection events to a parent fragment or activity.
+     */
     public interface ListSelectionListener {
+        /**
+         * Called when one or more lists are selected.
+         *
+         * @param event         The event associated with the selected lists.
+         * @param selectedLists The list of selected list identifiers.
+         */
         void onListsSelected(Event event, List<String> selectedLists);
     }
 

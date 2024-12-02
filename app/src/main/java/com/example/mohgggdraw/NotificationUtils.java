@@ -9,8 +9,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Utility class for handling the creation and sending of notifications to devices.
+ * This class interacts with Firestore to filter devices that have opted out of notifications
+ * and sends notifications to eligible devices.
+ */
 public class NotificationUtils {
+    /**
+     * Sends a notification to a list of devices, excluding those that have opted out.
+     * Notifications are saved in the Firestore "notification" collection.
+     *
+     * @param title     The title of the notification.
+     * @param details   The content of the notification.
+     * @param deviceIds A list of device IDs to send the notification to.
+     * @param eventId   The event ID associated with the notification.
+     * @param status    The status of the notification (e.g., "sent", "read").
+     */
     public static void sendNotification(String title, String details, ArrayList<String> deviceIds, String eventId, String status) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -72,7 +86,16 @@ public class NotificationUtils {
                 });
     }
 
-    // Fallback method to send notifications to all devices if document retrieval fails
+    /**
+     * Sends notifications to all devices in case the opt-out document retrieval fails.
+     * This is a fallback mechanism.
+     *
+     * @param title     The title of the notification.
+     * @param details   The content of the notification.
+     * @param deviceIds A list of device IDs to send the notification to.
+     * @param eventId   The event ID associated with the notification.
+     * @param status    The status of the notification (e.g., "sent", "read").
+     */
     private static void sendNotificationsToAllDevices(String title, String details, ArrayList<String> deviceIds, String eventId, String status) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Timestamp fireStoreTimestamp = Timestamp.now();

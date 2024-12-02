@@ -26,9 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-/***
- * Fragment to view event and join waitlist
- ***/
+/**
+ * Fragment to display event details and allow users to join or leave the event waitlist.
+ * Organizers can view the waitlist and send notifications to participants.
+ */
 public class WaitlistFragment extends Fragment {
     private Event event;
     private User user;
@@ -46,7 +47,9 @@ public class WaitlistFragment extends Fragment {
     private TextView capacity;
     private TextView location;
 
-    // Default constructor
+    /**
+     * Default constructor. Initializes with default `Event` and `User` objects.
+     */
     public WaitlistFragment() {
         super();
         this.event = new Event();
@@ -110,6 +113,11 @@ public class WaitlistFragment extends Fragment {
         setupJoinButton();
     }
 
+    /**
+     * Initializes the views in the layout.
+     *
+     * @param view The root view of the fragment.
+     */
     private void initializeViews(View view) {
         name = view.findViewById(R.id.eventtitle);
         time = view.findViewById(R.id.eventInfoTime);
@@ -121,6 +129,9 @@ public class WaitlistFragment extends Fragment {
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
     }
 
+    /**
+     * Populates the event details in the UI.
+     */
     private void setEventDetails() {
         name.setText(event.getTitle());
         time.setText(event.getTime());
@@ -129,6 +140,10 @@ public class WaitlistFragment extends Fragment {
         location.setText(event.getLocation());
     }
 
+
+    /**
+     * Downloads and displays the event's poster image if available.
+     */
     private void loadEventImage() {
         if (event.getPosterUrl() != null) {
             StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
@@ -145,6 +160,9 @@ public class WaitlistFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets up the join/leave button logic based on the user's role and event status.
+     */
     private void setupJoinButton() {
         if (Objects.equals(event.getOrgID(), deviceId)) {
             // If organizer, view waitlist
@@ -154,6 +172,9 @@ public class WaitlistFragment extends Fragment {
         }
     }
 
+    /**
+     * Configures the button for organizers to view the waitlist and send notifications.
+     */
     private void setupOrganizerButton() {
         joinButton.setText("View waitlist");
         joinButton.setOnClickListener(v -> {
@@ -168,6 +189,9 @@ public class WaitlistFragment extends Fragment {
         }
     }
 
+    /**
+     * Updates the join button text and functionality for regular users.
+     */
     private void updateJoinButton() {
         if (event.getWaitingList().contains(user.getUid())) {
             // If in event, leave waitlist
@@ -191,12 +215,22 @@ public class WaitlistFragment extends Fragment {
         }
     }
 
+    /**
+     * Refreshes the page after an action to update the join button state.
+     */
     public void onDialogueFinished() {
         // Refresh page after dialogue to update the buttons
         updateJoinButton();
     }
 
-    // Setter methods for flexibility
+    // Utility methods for testing and configuration
+
+    /**
+     * Sets the event and home fragment for navigation and data.
+     *
+     * @param event The event object.
+     * @param home  The home fragment.
+     */
     public void setImportant(Event event, HomeFragment home) {
         this.event = event;
         this.home = home;
@@ -206,11 +240,19 @@ public class WaitlistFragment extends Fragment {
         this.deviceId = deviceId;
     }
 
-    // Getter methods
+    /**
+     * Retrieves the associated event.
+     *
+     * @return The event object.
+     */
     public Event getEvent() {
         return event;
     }
-
+    /**
+     * Retrieves the user object.
+     *
+     * @return The user object.
+     */
     public User getUser() {
         return user;
     }
