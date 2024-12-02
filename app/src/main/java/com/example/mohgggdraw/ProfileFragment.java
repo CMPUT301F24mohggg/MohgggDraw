@@ -1,11 +1,13 @@
 package com.example.mohgggdraw;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -55,6 +57,7 @@ public class ProfileFragment extends Fragment {
     private static final int PICK_IMAGE_REQUEST = 1;
 
     private ImageView profileImageView;
+    private ImageView editProfileIcon;
     private TextView nameTextView;
     private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
     private Button buttonSubmit, buttonDelete;
@@ -102,6 +105,7 @@ public class ProfileFragment extends Fragment {
      */
     private void initViews(View view) {
         profileImageView = view.findViewById(R.id.profileImageView);
+        editProfileIcon = view.findViewById(R.id.editProfileIcon);
         nameTextView = view.findViewById(R.id.nameTextView);
         editTextName = view.findViewById(R.id.editTextName);
         editTextPhone = view.findViewById(R.id.editTextPhone);
@@ -127,7 +131,7 @@ public class ProfileFragment extends Fragment {
      * Sets up listeners for buttons and profile image actions.
      */
     private void setupListeners() {
-        profileImageView.setOnClickListener(v -> handleProfileImageClick());
+        editProfileIcon.setOnClickListener(v -> showProfileOptionsDialog());
 
         buttonSubmit.setOnClickListener(v -> updateUserData(null)); // Initially no image URL to update
         buttonDelete.setOnClickListener(v -> deleteUserData());
@@ -136,37 +140,32 @@ public class ProfileFragment extends Fragment {
     /**
      * Handles the profile image click. Allows the user to either upload a new picture or delete the current one.
      */
-    private void handleProfileImageClick() {
-        if (isGalleryImage) {
-            confirmDeleteProfileImage();
-        } else {
-            showImageOptions();
-        }
+    private void showProfileOptionsDialog() {
+        Dialog dialog = new Dialog(requireContext());
+        dialog.setContentView(R.layout.dialog_box_profile);
+
+        // views
+        Button btnUpload = dialog.findViewById(R.id.btnUpload);
+        Button btnDelete = dialog.findViewById(R.id.btnDelete);
+        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        // Handling click listeners
+        btnUpload.setOnClickListener(v -> {
+            openGallery();
+            dialog.dismiss();
+        });
+
+        btnDelete.setOnClickListener(v -> { // in case of delete
+            setDefaultProfilePicture();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 
-    /**
-     * Shows an AlertDialog with options to upload a new profile picture or reset to the default.
-     */
-    private void showImageOptions() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Profile Picture")
-                .setMessage("Would you like to upload a profile picture from the gallery?")
-                .setPositiveButton("Yes", (dialog, which) -> openGallery())
-                .setNegativeButton("No", (dialog, which) -> resetToDefaultProfilePicture())
-                .show();
-    }
 
-    /**
-     * Confirms whether the user wants to delete the current profile picture.
-     */
-    private void confirmDeleteProfileImage() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Delete Profile Picture")
-                .setMessage("Do you want to delete the current profile picture?")
-                .setPositiveButton("Yes", (dialog, which) -> resetToDefaultProfilePicture())
-                .setNegativeButton("No", null)
-                .show();
-    }
 
     /**
      * Resets the profile picture to the default initials-based placeholder.
@@ -191,6 +190,7 @@ public class ProfileFragment extends Fragment {
     private void setDefaultProfilePicture() {
         if (userName != null && !userName.isEmpty()) {
             profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
+
         }
     }
 
@@ -235,6 +235,31 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
+     * Creates a circular version of the bitmap
+     * @param bitmap
+     * @return circular cropped bitmap object
+     */
+    private Bitmap circularBitmap(Bitmap bitmap) {
+        int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+
+        // Draws the circular shape
+        float radius = size / 2f;
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        // Crops the image (to fit the circular frame)
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, -((bitmap.getWidth() - size) / 2f), -((bitmap.getHeight() - size) / 2f), paint);
+
+        return output;
+    }
+
+    /**
      * Processes the result from the gallery and uploads the image to Firebase.
      *
      * @param imageUri The URI of the selected image.
@@ -242,14 +267,19 @@ public class ProfileFragment extends Fragment {
     private void handleGalleryResult(Uri imageUri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
-            profileImageView.setImageBitmap(bitmap);
+
+            Bitmap circularBitmap = circularBitmap(bitmap);
+            profileImageView.setImageBitmap(circularBitmap);
+
             isGalleryImage = true;
-            uploadProfilePictureToFirebase(bitmap);
+            uploadProfilePictureToFirebase(circularBitmap);
         } catch (IOException e) {
             Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
             Log.e("ProfileFragment", "Error loading image", e);
         }
     }
+
+
 
     /**
      * Uploads the selected profile picture to Firebase Storage.
