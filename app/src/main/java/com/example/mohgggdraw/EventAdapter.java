@@ -99,6 +99,10 @@ public class EventAdapter extends ArrayAdapter<Event> {
         return view;
     }
 
+    /**
+     *loads image from event
+     * */
+
     private void loadEventImage(Event event, ImageView imageView) {
         if (event.getPosterUrl() != null) {
             try {

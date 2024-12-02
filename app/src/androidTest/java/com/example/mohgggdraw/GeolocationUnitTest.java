@@ -47,7 +47,7 @@ public class GeolocationUnitTest {
     public void testJoinGeolocationWaitlist() {
         onView(withId(R.id.eventInfoButton)).perform(click());
 
-        onView(withText("warning")).check(matches(isDisplayed()));
+        onView(withText("Warning")).check(matches(isDisplayed()));
 
         onView(withId(R.id.accept_terms_button)).perform(click());
         onView(withText("Leave event")).check(matches(isDisplayed()));

@@ -54,12 +54,7 @@ public class WaitlistFragment extends Fragment {
     /**
      * Constructor with event, user, and home fragment
      */
-    public WaitlistFragment(Event event, User user, HomeFragment home) {
-        super();
-        this.event = event;
-        this.user = user;
-        this.home = home;
-    }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Branch to view all lists in admin
+ * */
 public class AdminEventView extends EventListDisplayFragment {
     private ArrayList<Event> dataList;
     private ListView eventList;
@@ -40,6 +44,9 @@ public class AdminEventView extends EventListDisplayFragment {
         return inflater.inflate(R.layout.event_adapter_layout, container, false);
     }
 
+    /**
+     * Create event view for admins, query data of all events
+     * */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         dataList = new ArrayList<>();

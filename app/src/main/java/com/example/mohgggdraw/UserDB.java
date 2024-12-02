@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+
+/**
+ *Access point to the user collection in the firebase
+ * */
 public class UserDB {
     private FirebaseFirestore db;
     private CollectionReference waitlistRef;
@@ -32,8 +36,16 @@ public class UserDB {
         waitlistRef= db.collection("user");
     }
 
-    public void getUserMapFromID(String id, TextView userName, ImageView image){
 
+    /**
+     *Gets a user map from the user id string and sets it in the list
+     *
+     * @param id
+     * @param userName
+     * @param image
+     * */
+    public void getUserMapFromID(String id, TextView userName, ImageView image){
+        //query id in userdoc
         myDoc = waitlistRef.document((String.valueOf(id)));
         Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -41,6 +53,7 @@ public class UserDB {
                 data = documentSnapshot.getData();
                 if(data!=  null) {
                     userName.setText((String) data.get("name"));
+                    //creating and setting image
                     if (data.get("profileImageUrl") != null) {
                         try {
                             File imageFile = File.createTempFile(
@@ -73,6 +86,11 @@ public class UserDB {
         });
     }
 
+    /**
+     * creates a list of eventIDs from the userID and what eventlist name is
+     * then creates the event list to be pushed to event listview frags
+     *
+     * */
     public void queryList(String listName, EventListView frag,String id){
         myDoc = waitlistRef.document((String.valueOf(id)));
         Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -92,13 +110,18 @@ public class UserDB {
 
 
     }
+    /**
+     * adds event to user waitlist
+     * */
     public void addEventToUserList(String eventID,String userID){
         DocumentReference mydoc = waitlistRef.document(userID);
         mydoc.update("waitList", FieldValue.arrayUnion(eventID));
 
 
     }
-
+    /**
+     *removes event from user waitlist
+     * */
     public void removeEventToUserList(String eventID,String userID){
         DocumentReference mydoc = waitlistRef.document(userID);
         mydoc.update("waitList", FieldValue.arrayRemove(eventID));

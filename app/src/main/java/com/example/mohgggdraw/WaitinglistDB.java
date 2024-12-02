@@ -86,6 +86,10 @@ public class WaitinglistDB {
 
     }
 
+
+    /**
+     *gets non waiting list lists from the database and shuffles them using the pick remaining function
+     * */
     public ArrayList<String> getOtherLists(Event event, RandomWaitlistSelector randomWaitlistSelector, WaitlistViewEntrantsFragment frag) {
         //reason not pulled with event is because only needed for some admin stuff
         Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>(3);
@@ -121,7 +125,7 @@ public class WaitinglistDB {
         return list;
     }
 
-
+    //removes from list
     public void removeFromList(String listName, ArrayList<String> removeList, Event event){
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
         for (String id:removeList
@@ -134,6 +138,9 @@ public class WaitinglistDB {
 
     }
 
+    /**
+     * creates and sets list of events into setlistview fragment using selected adapter
+     * */
     public void setListFromDBSelected(String name, SetListView fragment, Event event){
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
 
@@ -148,6 +155,10 @@ public class WaitinglistDB {
         });
     }
 
+
+    /**
+     * sets  event list from name in db using regular event content adapter
+     * */
     public void setListFromDB(String name, SetListView fragment, Event event){
         DocumentReference mydoc = waitlistRef.document((String.valueOf(event.getEventId())));
 
@@ -297,7 +308,7 @@ public class WaitinglistDB {
         return myevent;
     }
 
-
+    //updates lists of event in db
     public void updateLists(Event event, ArrayList selected, ArrayList waitlist) {
         myDoc = waitlistRef.document((String.valueOf(event.getEventId())));
         myDoc.update("EventWaitinglist", waitlist);
@@ -305,7 +316,8 @@ public class WaitinglistDB {
 
 
     }
-
+    //mostly for tests
+    //query event with given name
     public ArrayList<Event> queryWithName(AdminEventView adminEventView, String name) {
         ArrayList<Event> myArray = new ArrayList<>();
         Query query = waitlistRef.whereEqualTo("eventTitle", "Organizer");
@@ -323,6 +335,7 @@ public class WaitinglistDB {
         return myArray;
     }
 
+    //creates list event list from list of strings
     public void createEventListFromStringList(ArrayList<String> list, EventListView fragment) {
         if (list == null || list.isEmpty()) {
             Log.e(TAG, "createEventListFromStringList: Provided list is null or empty!");
@@ -345,7 +358,7 @@ public class WaitinglistDB {
             }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
         }
     }
-
+    //function to draw event winners from event during the start
     public void drawEvent(Event event){
         waitlistRef.document(event.getEventId()).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
