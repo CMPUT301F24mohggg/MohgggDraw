@@ -64,4 +64,12 @@ public class ScannerViewModel extends ViewModel {
     public void setNewPosition(int fragmentIndex) {
         newPosition.setValue(fragmentIndex);
     }
+
+    /**
+     * Sets the new fragment position to navigate to.
+     *
+     */
+    public LiveData<Integer> getNewPosition() {
+        return newPosition;
+    }
 }
