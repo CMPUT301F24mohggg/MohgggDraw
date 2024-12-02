@@ -25,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -192,16 +191,20 @@ public class NotificationFragment extends Fragment {
 
                             if (!isDuplicate) {
                                 fetchEventDetails(newNotification, updatedNotification -> {
-                                    notificationList.add(updatedNotification);
-                                    sortNotificationList();
-                                    adapter.notifyItemInserted(0);
-
+                                    // Only add to in-app notifications if status is not null
+                                    if (updatedNotification.getStatus() != null) {
+                                        notificationList.add(updatedNotification);
+                                        sortNotificationList();
+                                        adapter.notifyItemInserted(0);
+                                    }
 
                                     // Always show system notification for new notifications
                                     showNotification(
                                             actualContext,
                                             updatedNotification.getTitle(),
-                                            updatedNotification.getMessage()
+                                            updatedNotification.getMessage(),
+                                            updatedNotification.getTitle(),
+                                            updatedNotification.getStartTime()
                                     );
                                 });
                             }
@@ -250,8 +253,7 @@ public class NotificationFragment extends Fragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String eventName = documentSnapshot.getString("eventTitle");
-                        Timestamp startTime = documentSnapshot.getTimestamp("startTime");
-                        Log.e("fetchEventDetails: start time", " " + startTime);
+                        String startTime = documentSnapshot.getString("startTime");
                         notification.setTitle(notification.getTitle());
                         notification.setEventDetail("Event: " + eventName + " starts at: " + startTime);
                         notification.setMessage(notification.getMessage());
@@ -327,28 +329,17 @@ public class NotificationFragment extends Fragment {
         String eventId = notification.getEventId();
         String userId = deviceId;
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Create references to both Events and Users collections
         DocumentReference eventRef = db.collection("Events").document(eventId);
-        DocumentReference userRef = db.collection("user").document(userId);
-
         db.runTransaction(transaction -> {
-            // Fetch event snapshot
-            DocumentSnapshot eventSnapshot = transaction.get(eventRef);
+            DocumentSnapshot snapshot = transaction.get(eventRef);
 
-            // Fetch user snapshot
-            DocumentSnapshot userSnapshot = transaction.get(userRef);
-
-            // Get lists from event
-            List<String> selectedList = (List<String>) eventSnapshot.get("EventSelectedlist");
-            List<String> confirmedList = (List<String>) eventSnapshot.get("EventConfirmedlist");
+            List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
+            List<String> confirmedList = (List<String>) snapshot.get("EventConfirmedlist");
 
             // Ensure the lists are not null
             if (selectedList == null) selectedList = new ArrayList<>();
             if (confirmedList == null) confirmedList = new ArrayList<>();
 
-            // Check if user is already confirmed
             if (confirmedList.contains(userId)) {
                 return "already_confirmed";
             }
@@ -357,31 +348,8 @@ public class NotificationFragment extends Fragment {
             selectedList.remove(userId);
             confirmedList.add(userId);
 
-            // Update event lists
             transaction.update(eventRef, "EventSelectedlist", selectedList);
             transaction.update(eventRef, "EventConfirmedlist", confirmedList);
-
-            // Handle user's entrantList
-            List<String> userEntrantList = (List<String>) userSnapshot.get("entrantList");
-            List<String> userWaitList = (List<String>) userSnapshot.get("waitList");
-
-            // Ensure lists are not null
-            if (userEntrantList == null) {
-                userEntrantList = new ArrayList<>();
-            }
-            if (userWaitList == null) {
-                userWaitList = new ArrayList<>();
-            }
-
-            // Remove event from waitList and add to entrantList
-            userWaitList.remove(eventId);
-            if (!userEntrantList.contains(eventId)) {
-                userEntrantList.add(eventId);
-            }
-
-            // Update user document
-            transaction.update(userRef, "waitList", userWaitList);
-            transaction.update(userRef, "entrantList", userEntrantList);
 
             return "accept_recorded";
         }).addOnSuccessListener(result -> {
@@ -392,7 +360,6 @@ public class NotificationFragment extends Fragment {
             }
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error recording accept action", e);
-            Toast.makeText(getContext(), "Failed to accept event.", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -404,8 +371,10 @@ public class NotificationFragment extends Fragment {
      * @param context The context used to display the notification.
      * @param title The title of the notification.
      * @param message The message of the notification.
+     * @param eventTitle The title of the event.
+     * @param startTime The start time of the event.
      */
-    public void showNotification(Context context, String title, String message) {
+    public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
         if (context == null) {
             Log.e(TAG, "Context is null, cannot show notification.");
             return;

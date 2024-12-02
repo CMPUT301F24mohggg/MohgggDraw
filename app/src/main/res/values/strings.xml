@@ -14,4 +14,5 @@
     <string name="create">Create</string>
     <string name="home">Home</string>
     <string name="button_next">Next</string>
+    <string name="event_poster_placeholder">Event Poster Placeholder</string>
 </resources>

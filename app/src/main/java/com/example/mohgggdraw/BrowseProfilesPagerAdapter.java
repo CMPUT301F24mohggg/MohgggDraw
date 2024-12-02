@@ -13,6 +13,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
  * <li>BrowseFacilitiesFragment</li>
  * <li>BrowseUsersFragment</li>
  * <li>BrowseImagesFragment</li>
+ * <li>AdminEventView</li>
  * </ul>
  */
 public class BrowseProfilesPagerAdapter extends FragmentStateAdapter {
@@ -34,6 +35,7 @@ public class BrowseProfilesPagerAdapter extends FragmentStateAdapter {
      * <li>0: BrowseFacilitiesFragment</li>
      * <li>1: BrowseUsersFragment</li>
      * <li>2: BrowseImagesFragment</li>
+     * <li>3: AdminEventView</li>
      * </ul>
      *
      * @param position The position of the fragment in the ViewPager2.
@@ -49,19 +51,21 @@ public class BrowseProfilesPagerAdapter extends FragmentStateAdapter {
                 return new BrowseUsersFragment();
             case 2:
                 return new BrowseImagesFragment();
+            case 3:
+                return new AdminEventView(); // New Events fragment
             default:
-                return new BrowseFacilitiesFragment();
+                return new BrowseFacilitiesFragment(); // Default fallback
         }
     }
 
     /**
      * Returns the total number of fragments managed by the adapter.
      *
-     * @return The total number of fragments (3: Facilities, Users, Images).
+     * @return The total number of fragments (4: Facilities, Users, Images, Events).
      */
     @Override
     public int getItemCount() {
-        return 3; // Total number of pages
+        return 4; // Updated to include the new "Events" tab
     }
 
     /**

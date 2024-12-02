@@ -20,26 +20,42 @@ public class RandomWaitlistSelector {
     }
 
     public ArrayList<String> pickFromWaitlist() {
-        ArrayList<String> selected;
+        ArrayList<String> selected = new ArrayList<>();
+        ArrayList<String> waitingList = event.getWaitingList(); // Copy of the waiting list
+        ArrayList<String> losers = new ArrayList<>(); // To hold the IDs of losers
 
-        selected = new ArrayList<>();
-
-        if (event.getMaxCapacity() != -1 && (event.getWaitingList().size() > event.getMaxCapacity())) {
+        if (event.getMaxCapacity() != -1 && waitingList.size() > event.getMaxCapacity()) {
             for (int i = 0; i < event.getMaxCapacity(); i++) {
-                int pos = rand.nextInt(event.getWaitingList().size());
-                String id = event.getWaitingList().remove(pos);
+                int pos = rand.nextInt(waitingList.size());
+                String id = waitingList.remove(pos);
                 selected.add(id);
             }
+            losers.addAll(waitingList); // Remaining users in the waiting list are losers
         } else {
-            selected = event.getWaitingList();
-            event.setWaitingList(new ArrayList<>());
+            selected = waitingList;
+            event.setWaitingList(new ArrayList<>()); // Clear the waiting list
         }
 
         controller.updateLists(selected, event.getWaitingList());
-        //todo notifications
+
+        // Sending notifications
+        String eventId = event.getEventId(); // Assuming your Event class has a getId() method
+        String winnerTitle = "Congratulations!";
+        String winnerMessage = "You have been selected for the event: " + event.getTitle();
+        String loserTitle = "Better luck next time!";
+        String loserMessage = "You were not selected for the event: " + event.getTitle();
+
+        // Notify winners
+        NotificationUtils.sendNotification(winnerTitle, winnerMessage, selected, eventId, "selected");
+
+        // Notify losers
+        if (!losers.isEmpty()) {
+            NotificationUtils.sendNotification(loserTitle, loserMessage, losers, eventId, "not_selected");
+        }
 
         return selected;
     }
+
 
     public void setSeed(long i) {
         rand.setSeed(i);
@@ -60,22 +76,34 @@ public class RandomWaitlistSelector {
         int totalCap = event.getMaxCapacity();
         int rerollAmnt = totalCap - selected.size() - accepted.size();
 
-        if (event.getWaitingList().size() > rerollAmnt) {
+        ArrayList<String> waitingList = event.getWaitingList(); // Copy of the waiting list
+        ArrayList<String> newSelected = new ArrayList<>(); // Newly selected users
+
+        if (waitingList.size() > rerollAmnt) {
             for (int i = 0; i < rerollAmnt; i++) {
-                int pos = rand.nextInt(event.getWaitingList().size());
-                String id = event.getWaitingList().remove(pos);
-                selected.add(id);
+                int pos = rand.nextInt(waitingList.size());
+                String id = waitingList.remove(pos);
+                newSelected.add(id);
             }
         } else {
-            selected.addAll(event.getWaitingList());
-            event.setWaitingList(new ArrayList<>());
+            newSelected.addAll(waitingList);
+            event.setWaitingList(new ArrayList<>()); // Clear the waiting list
         }
 
+        selected.addAll(newSelected);
         controller.updateLists(selected, event.getWaitingList());
+
+        // Send notifications to winners and losers
+        String eventId = event.getEventId(); // Assuming Event class has a getId() method
+        String winnerTitle = "Congratulations on the re-roll!";
+        String winnerMessage = "You have been selected for the event " + event.getTitle();
+
+        // Notify winners
+        NotificationUtils.sendNotification(winnerTitle, winnerMessage, newSelected, eventId, "selected");
+
         Log.d("tag", selected.toString());
 
         // Call updateFragments on the provided fragment
-        //todo notification
         frag.updateFragments();
 
         return selected;

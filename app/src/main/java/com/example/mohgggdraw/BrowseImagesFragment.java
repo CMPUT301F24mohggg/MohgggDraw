@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -114,33 +115,43 @@ public class BrowseImagesFragment extends Fragment {
         }
 
         // Inflate the custom layout
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        View dialogView = inflater.inflate(R.layout.dialog_confirmation, null);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_confirmation_dialog, null);
 
-        // Find views in the custom layout
-        TextView title = dialogView.findViewById(R.id.dialog_title);
-        TextView message = dialogView.findViewById(R.id.dialog_message);
-        TextView btnYes = dialogView.findViewById(R.id.btn_yes);
-        TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
-
-        // Customize the dialog
-        title.setText("Delete Selected?");
-        message.setText("Are you sure you want to delete the selected images?");
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
+        // Build the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setCancelable(true)
+                .setCancelable(false)
                 .create();
 
-        btnYes.setOnClickListener(v -> {
-            deleteSelectedImages();
+        // Ensure rounded background and proper dimensions
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Get references to dialog components
+        TextView titleTextView = dialogView.findViewById(R.id.title_text_view);
+        TextView messageTextView = dialogView.findViewById(R.id.message_text_view);
+        Button confirmButton = dialogView.findViewById(R.id.confirm_button);
+        TextView cancelTextView = dialogView.findViewById(R.id.cancel_text_view);
+
+        // Set the title and message for the dialog
+        titleTextView.setText("Delete Selected?");
+        messageTextView.setText("Are you sure you want to delete the selected images?");
+
+        // Handle the confirm button click
+        confirmButton.setOnClickListener(v -> {
             dialog.dismiss();
+            deleteSelectedImages(); // Perform the deletion
         });
 
-        btnNevermind.setOnClickListener(v -> dialog.dismiss());
+        // Handle the cancel button click
+        cancelTextView.setOnClickListener(v -> dialog.dismiss());
 
+        // Show the dialog
         dialog.show();
     }
+
+
 
     /**
      * Deletes the selected images from Firebase Storage and updates the GridView.
@@ -235,14 +246,17 @@ public class BrowseImagesFragment extends Fragment {
             // Load the image into the ImageView using Glide
             Glide.with(getContext()).load(imageItem.getUrl()).into(imageView);
 
-            // Set up the checkbox
-            checkBox.setOnCheckedChangeListener(null); // Remove existing listener to avoid interference
+            // Set the initial state of the checkbox
             checkBox.setChecked(selectedImages.contains(imageItem));
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    selectedImages.add(imageItem);
-                } else {
+
+            // Set an OnClickListener on the entire item view
+            convertView.setOnClickListener(v -> {
+                if (selectedImages.contains(imageItem)) {
                     selectedImages.remove(imageItem);
+                    checkBox.setChecked(false); // Uncheck the box
+                } else {
+                    selectedImages.add(imageItem);
+                    checkBox.setChecked(true); // Check the box
                 }
             });
 

@@ -1,6 +1,5 @@
 package com.example.mohgggdraw;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -93,14 +93,6 @@ public class BrowseFacilitiesFragment extends Fragment {
 
     /**
      * Displays a custom confirmation dialog for deleting the selected facilities.
-     * <p>
-     * The dialog includes:
-     * <ul>
-     * <li>A title indicating the action ("Delete Selected?")</li>
-     * <li>A message asking for confirmation</li>
-     * <li>A "Yes" button to proceed with deletion</li>
-     * <li>A "Nevermind" button to cancel the action</li>
-     * </ul>
      */
     private void showDeleteConfirmationDialog() {
         ArrayList<String> selectedIds = new ArrayList<>();
@@ -116,29 +108,34 @@ public class BrowseFacilitiesFragment extends Fragment {
         }
 
         // Inflate the custom layout for the dialog
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        View dialogView = inflater.inflate(R.layout.dialog_confirmation, null);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_confirmation_dialog, null);
 
-        // Set up the dialog views
-        TextView title = dialogView.findViewById(R.id.dialog_title);
-        TextView message = dialogView.findViewById(R.id.dialog_message);
-        TextView btnYes = dialogView.findViewById(R.id.btn_yes);
-        TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
-
-        title.setText("Delete Selected?");
-        message.setText("Are you sure you want to delete the selected facilities?");
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
+        // Build the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setCancelable(true)
+                .setCancelable(false)
                 .create();
 
-        btnYes.setOnClickListener(v -> {
+        // Ensure rounded background and proper dimensions
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Set up the dialog views
+        TextView titleTextView = dialogView.findViewById(R.id.title_text_view);
+        TextView messageTextView = dialogView.findViewById(R.id.message_text_view);
+        TextView cancelTextView = dialogView.findViewById(R.id.cancel_text_view);
+        View confirmButton = dialogView.findViewById(R.id.confirm_button);
+
+        titleTextView.setText("Delete Selected?");
+        messageTextView.setText("Are you sure you want to delete the selected facilities?");
+
+        confirmButton.setOnClickListener(v -> {
             deleteSelectedFacilities(selectedIds);
             dialog.dismiss();
         });
 
-        btnNevermind.setOnClickListener(v -> dialog.dismiss());
+        cancelTextView.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
     }
