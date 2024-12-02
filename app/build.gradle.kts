@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.play.services.maps)
     androidTestImplementation(libs.junit.jupiter)
     implementation(libs.play.services.location)
+    androidTestImplementation(libs.androidx.core.testing)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
     // RecyclerView and Messaging
@@ -124,6 +125,7 @@ dependencies {
     debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
 
     // QR Code Scanning dependencies

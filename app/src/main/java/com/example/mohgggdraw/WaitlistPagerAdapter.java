@@ -45,20 +45,9 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
 
 
             default:
-                if (adminView) {
-                    AdminEventView adminEventView = new AdminEventView();
-                    adminEventView.setFragment((HomeFragment) fragment);
-                    return adminEventView;
-
-                }
-                else{
-
-                    EventListDisplayFragment fragment1 = new EventListDisplayFragment();
-                    fragment1.setFragment((HomeFragment) fragment);
-                    fragment1.setDevice(user.getUid());
+                    EventListTabViewFragment fragment1 = new EventListTabViewFragment();
+                    fragment1.setHomeFragment((HomeFragment) fragment);
                     return fragment1;
-
-                }
         }
 //
     }
@@ -74,4 +63,10 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     public void setAdminView() {
         adminView = true;
     }
+
+    public void refresh() {
+
+    }
 }
+}
+

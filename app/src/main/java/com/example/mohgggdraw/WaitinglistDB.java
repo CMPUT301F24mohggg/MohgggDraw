@@ -173,10 +173,33 @@ public class WaitinglistDB {
         if (path == null) {
             path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
         }
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference ref = storage.getReferenceFromUrl(path);
+        try {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference ref = storage.getReferenceFromUrl(path);
+            return ref;
+        }catch (Exception e){
+            path = "https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd";
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference ref = storage.getReferenceFromUrl(path);
+            return ref;
+        }
 
-        return ref;
+
+    }
+
+    public void setAllEventsView(AdminEventView frag){
+
+        Task query = waitlistRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                ArrayList<Event> array= new ArrayList();
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                    array.add(docSnapshotToEvent(doc));
+                }
+                frag.setDataList(array);
+            }
+        });
+
     }
 
     //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
@@ -292,23 +315,23 @@ public class WaitinglistDB {
 
 
     }
-
+    /*
     public ArrayList<Event> queryWithName(AdminEventView adminEventView, String name) {
         ArrayList<Event> myArray = new ArrayList<>();
-        Query query = waitlistRef.whereEqualTo("eventTitle", "Organizer");
+        Query query = waitlistRef.whereEqualTo("eventTitle", name); // Use the name parameter dynamically
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
-
-                    myArray.add(docSnapshotToEvent(doc));
+                    myArray.add(docSnapshotToEvent(doc)); // Convert Firestore document to Event
                 }
-                adminEventView.dataChange();
+                adminEventView.updateEventList(myArray); // Update the event list in AdminEventView
             }
-        });
+        }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch events: " + e.getMessage()));
 
-        return myArray;
-    }
+        return myArray; // Return the list (though it might still be empty since Firestore fetch is async)
+    }*/
+
 
     public void createEventListFromStringList(ArrayList<String> list, EventListView fragment) {
         if (list == null || list.isEmpty()) {
@@ -324,7 +347,7 @@ public class WaitinglistDB {
                     Event event = docSnapshotToEvent(documentSnapshot);
                     if (event != null) {
                         events.add(event);
-                        fragment.setEventList(new ArrayList<>(events)); // Update UI safely
+                        fragment.setEventList((events)); // Update UI safely
                     }
                 } else {
                     Log.e(TAG, "Document with ID " + eventId + " does not exist.");

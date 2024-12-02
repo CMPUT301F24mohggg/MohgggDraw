@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-
-    <!-- ListView for Users -->
+    <!-- ListView for Users/Facilities -->
     <ListView
         android:id="@+id/user_list_view"
         android:layout_width="match_parent"
@@ -14,16 +13,18 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
         android:padding="10dp" />
+
+    <!-- Floating Action Button for Deletion -->
+    <ImageView
+        android:id="@+id/fab_delete"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:contentDescription="Delete"
+        android:src="@drawable/ic_trash"
+        app:tint="#FFFFFF"
+        android:background="@drawable/delete_button_background"
+        android:scaleType="center" />
 </RelativeLayout>
-
-
-    <!-- Search Bar -->
-<!--<EditText-->
-<!--android:id="@+id/search_bar"-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="wrap_content"-->
-<!--android:layout_margin="10dp"-->
-<!--android:hint="Search"-->
-<!--android:padding="10dp"-->
-<!--android:inputType="text"-->
-<!--android:background="@drawable/search_bar_background"/>-->

@@ -1,17 +1,21 @@
 package com.example.mohgggdraw;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +30,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -41,26 +50,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-/***
- This fragment represents the user's profile screen. It:
- - Inflates the layout for the profile screen
- - Sets up any necessary UI components or listeners
- ***/
 
 public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private ImageView profileImageView;
+    private ImageView profileImageView, editProfileIcon;
     private TextView nameTextView;
     private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
-    private Button buttonSubmit, buttonDelete;
+    private Button buttonSubmit;
     private Toolbar toolbar;
 
     private StorageReference storageReference;
     private FirebaseFirestore db;
     private String deviceID;
     private String userName;
+    private String originalName, originalPhone, originalEmail;
     private boolean isGalleryImage = false;
 
     @Override
@@ -86,14 +91,21 @@ public class ProfileFragment extends Fragment {
 
     private void initViews(View view) {
         profileImageView = view.findViewById(R.id.profileImageView);
+        editProfileIcon = view.findViewById(R.id.editProfileIcon);
         nameTextView = view.findViewById(R.id.nameTextView);
         editTextName = view.findViewById(R.id.editTextName);
         editTextPhone = view.findViewById(R.id.editTextPhone);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextLocation = view.findViewById(R.id.editTextLocation);
         buttonSubmit = view.findViewById(R.id.buttonSubmit);
-        buttonDelete = view.findViewById(R.id.buttonDelete);
         toolbar = view.findViewById(R.id.toolbar);
+
+        // Hide location field
+        editTextLocation.setVisibility(View.GONE);
+
+        // Disable the Update Profile button initially
+        buttonSubmit.setEnabled(false);
+        buttonSubmit.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray));
 
         // Set up the toolbar with back button functionality
         if (getActivity() instanceof AppCompatActivity) {
@@ -108,60 +120,108 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupListeners() {
-        profileImageView.setOnClickListener(v -> handleProfileImageClick());
+        editProfileIcon.setOnClickListener(v -> showProfileOptionsDialog());
 
-        buttonSubmit.setOnClickListener(v -> updateUserData(null)); // Initially no image URL to update
-        buttonDelete.setOnClickListener(v -> deleteUserData());
+        buttonSubmit.setOnClickListener(v -> updateUserData(null)); // Update user data
+
+        // Enable Update Profile button when fields change
+        TextWatcher inputWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boolean isModified = isDataModified();
+                buttonSubmit.setEnabled(isModified);
+                buttonSubmit.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(),
+                        isModified ? R.color.purple_500 : R.color.gray));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        // Attach TextWatcher to input fields
+        editTextName.addTextChangedListener(inputWatcher);
+        editTextPhone.addTextChangedListener(inputWatcher);
+        editTextEmail.addTextChangedListener(inputWatcher);
     }
 
-    private void handleProfileImageClick() {
-        if (isGalleryImage) {
-            confirmDeleteProfileImage();
-        } else {
-            showImageOptions();
-        }
+    /**
+     * Handles the profile image click. Allows the user to either upload a new picture or delete the current one.
+     */
+    private void showProfileOptionsDialog() {
+        Dialog dialog = new Dialog(requireContext());
+        dialog.setContentView(R.layout.dialog_box_profile);
+
+        // views
+        Button btnUpload = dialog.findViewById(R.id.btnUpload);
+        Button btnDelete = dialog.findViewById(R.id.btnDelete);
+        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        // Handling click listeners
+        btnUpload.setOnClickListener(v -> {
+            openGallery();
+            dialog.dismiss();
+        });
+
+        btnDelete.setOnClickListener(v -> { // in case of delete
+            resetToDefaultProfilePicture();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 
-    private void showImageOptions() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Profile Picture")
-                .setMessage("Would you like to upload a profile picture from the gallery?")
-                .setPositiveButton("Yes", (dialog, which) -> openGallery())
-                .setNegativeButton("No", (dialog, which) -> resetToDefaultProfilePicture())
-                .show();
-    }
 
-    private void confirmDeleteProfileImage() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Delete Profile Picture")
-                .setMessage("Do you want to delete the current profile picture?")
-                .setPositiveButton("Yes", (dialog, which) -> resetToDefaultProfilePicture())
-                .setNegativeButton("No", null)
-                .show();
-    }
 
+    /**
+     * Resets the profile picture to the default initials-based placeholder.
+     */
     private void resetToDefaultProfilePicture() {
         setDefaultProfilePicture();
         isGalleryImage = false;
         updateUserData(null); // Clear image URL in Firestore
     }
 
+    /**
+     * Opens the device gallery to allow the user to pick an image.
+     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Sets a default profile picture using the user's initials.
+     */
     private void setDefaultProfilePicture() {
-        if (userName != null && !userName.isEmpty()) {
-            profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
+        if (originalName != null && !originalName.isEmpty()) {
+            profileImageView.setImageDrawable(createInitialsDrawable(getInitials(originalName)));
+
         }
     }
 
+    /**
+     * Extracts the initials from the user's name for use in a default profile image.
+     *
+     * @param name The full name of the user.
+     * @return A string containing the initials.
+     */
     private String getInitials(String name) {
-        String[] parts = name.split(" ");
+        if (name == null || name.trim().isEmpty()) return "U"; // Default to "U" for User if name is empty
+        String[] parts = name.trim().split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
+    /**
+     * Creates a drawable containing the user's initials for the default profile image.
+     *
+     * @param initials The initials to display in the drawable.
+     * @return A Drawable object containing the initials.
+     */
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -169,10 +229,14 @@ public class ProfileFragment extends Fragment {
         paint.setColor(Color.GRAY);
         paint.setTextSize(50);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAntiAlias(true); // Smooth text rendering
         canvas.drawText(initials, 50, 65, paint);
         return new BitmapDrawable(getResources(), bitmap);
     }
 
+    /**
+     * Handles the result of the gallery activity for picking an image.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -182,18 +246,56 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Creates a circular version of the bitmap
+     * @param bitmap
+     * @return circular cropped bitmap object
+     */
+    private Bitmap circularBitmap(Bitmap bitmap) {
+        int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+
+        float radius = size / 2f;
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, -((bitmap.getWidth() - size) / 2f), -((bitmap.getHeight() - size) / 2f), paint);
+
+        return output;
+    }
+
+    /**
+     * Processes the result from the gallery and uploads the image to Firebase.
+     *
+     * @param imageUri The URI of the selected image.
+     */
     private void handleGalleryResult(Uri imageUri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
-            profileImageView.setImageBitmap(bitmap);
+
+            Bitmap circularBitmap = circularBitmap(bitmap);
+            profileImageView.setImageBitmap(circularBitmap);
+
             isGalleryImage = true;
-            uploadProfilePictureToFirebase(bitmap);
+            uploadProfilePictureToFirebase(circularBitmap);
         } catch (IOException e) {
             Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
             Log.e("ProfileFragment", "Error loading image", e);
         }
     }
 
+
+
+    /**
+     * Uploads the selected profile picture to Firebase Storage.
+     *
+     * @param bitmap The bitmap of the selected image.
+     */
     private void uploadProfilePictureToFirebase(Bitmap bitmap) {
         byte[] data = getImageData(bitmap);
         StorageReference profileRef = storageReference.child("profile_pictures/" + deviceID + ".jpg");
@@ -203,41 +305,67 @@ public class ProfileFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
     }
 
+    /**
+     * Converts a bitmap into a byte array for uploading.
+     *
+     * @param bitmap The bitmap to convert.
+     * @return A byte array representation of the bitmap.
+     */
     private byte[] getImageData(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();
     }
 
+
     private void loadUserData() {
         DocumentReference docRef = db.collection("user").document(deviceID);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                Log.d("ProfileFragment", "Document exists. Populating fields...");
-                editTextName.setText(documentSnapshot.getString("name"));
-                editTextPhone.setText(documentSnapshot.getString("phoneNumber"));
-                editTextEmail.setText(documentSnapshot.getString("email"));
-                editTextLocation.setText(documentSnapshot.getString("location"));
-                nameTextView.setText(documentSnapshot.getString("name") != null ? documentSnapshot.getString("name") : "User");
-                userName = documentSnapshot.getString("name");
-                setDefaultProfilePicture(); // Set profile picture using user's name initials
+                originalName = documentSnapshot.getString("name");
+                originalPhone = documentSnapshot.getString("phoneNumber");
+                originalEmail = documentSnapshot.getString("email");
+
+                editTextName.setText(originalName);
+                editTextPhone.setText(originalPhone);
+                editTextEmail.setText(originalEmail);
+                nameTextView.setText(originalName != null ? originalName : "User");
+
+                String profileImageUrl = documentSnapshot.getString("profileImageUrl");
+                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                    Glide.with(this)
+                            .asBitmap()
+                            .load(profileImageUrl)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(createInitialsDrawable(getInitials(originalName)))
+                            .error(createInitialsDrawable(getInitials(userName)))
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    profileImageView.setImageBitmap(circularBitmap(resource));
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    profileImageView.setImageDrawable(placeholder);
+                                }
+                            });
+                } else {
+                    setDefaultProfilePicture();
+                }
             } else {
-                Log.d("ProfileFragment", "No user data found for this device ID.");
                 Toast.makeText(getContext(), "No user data found", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(e -> {
-            Log.e("ProfileFragment", "Failed to load user data: " + e.getMessage(), e);
-            Toast.makeText(getContext(), "Failed to load user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+        }).addOnFailureListener(e -> Log.e("ProfileFragment", "Failed to load user data: " + e.getMessage(), e));
     }
 
     private void updateUserData(@Nullable String imageUrl) {
         String name = editTextName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
-        String location = editTextLocation.getText().toString().trim();
 
-        if (name.isEmpty() || phone.isEmpty() || email.isEmpty() || location.isEmpty()) {
+
+        if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
             Toast.makeText(getContext(), "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -247,7 +375,6 @@ public class ProfileFragment extends Fragment {
         userDetails.put("name", name);
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
-        userDetails.put("location", location);
         addLists(deviceID);
         if (imageUrl != null) {
             userDetails.put("profileImageUrl", imageUrl);
@@ -262,25 +389,19 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
-    private void deleteUserData() {
-        db.collection("user").document(deviceID).delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Profile deleted successfully", Toast.LENGTH_SHORT).show();
-                    navigateToSignupScreen();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to delete profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("ProfileFragment", "Failed to delete profile: " + e.getMessage());
-                });
-    }
+    private boolean isDataModified() {
+        String name = editTextName.getText().toString().trim();
+        String phone = editTextPhone.getText().toString().trim();
+        String email = editTextEmail.getText().toString().trim();
 
-    private void navigateToSignupScreen() {
-        Intent intent = new Intent(getContext(), SignupActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        requireActivity().finish();
+        return !name.equals(originalName) || !phone.equals(originalPhone) || !email.equals(originalEmail);
     }
-    public void addLists(String deviceID){
+    /**
+     * Adds default lists (waitList, entrantList, createdList) to the user's Firestore document if they don't exist.
+     *
+     * @param deviceID The unique ID of the user's device.
+     */
+    public void addLists(String deviceID) {
         DocumentReference mydoc = db.collection("user").document(deviceID);
         Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -290,9 +411,9 @@ public class ProfileFragment extends Fragment {
                     mydoc.update("waitList", new ArrayList<String>());
                     mydoc.update("entrantList", new ArrayList<String>());
                     mydoc.update("createdList", new ArrayList<String>());
-
                 }
             }
         });
     }
 }
+
