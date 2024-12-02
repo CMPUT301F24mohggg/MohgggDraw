@@ -24,6 +24,13 @@ public class Event{
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
+
+    private ArrayList<String> selectedList = new ArrayList<>();
+
+    private ArrayList<String> ConfirmedList = new ArrayList<>();
+
+    private ArrayList<String> CancelledList = new ArrayList<>();
+
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
     public Event() {
@@ -69,7 +76,6 @@ public class Event{
     public void setTime(String time) {
         this.time = time;
     }
-
 
     public int getMaxCapacity() {
         return maxCapacity;
@@ -159,5 +165,29 @@ public class Event{
     public Date getStartTime(){
         return this.startTime;
 
+    }
+
+    public ArrayList<String> getSelectedList() {
+        return selectedList;
+    }
+
+    public void setSelectedList(ArrayList<String> selectedList) {
+        this.selectedList = selectedList;
+    }
+
+    public ArrayList<String> getConfirmedList() {
+        return ConfirmedList;
+    }
+
+    public void setConfirmedList(ArrayList<String> confirmedList) {
+        ConfirmedList = confirmedList;
+    }
+
+    public ArrayList<String> getCancelledList() {
+        return CancelledList;
+    }
+
+    public void setCancelledList(ArrayList<String> cancelledList) {
+        CancelledList = cancelledList;
     }
 }

@@ -3,7 +3,7 @@ package com.example.mohgggdraw;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +15,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.Locale;
 
 /***
  * Event adapter for listview
@@ -36,7 +32,7 @@ import java.util.TimeZone;
  ***/
 public class EventAdapter extends ArrayAdapter<Event> {
 
-    public EventAdapter(Context context, ArrayList<Event> events) {
+    public EventAdapter(@NonNull Context context, @NonNull ArrayList<Event> events) {
         super(context, 0, events);
     }
 
@@ -55,8 +51,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
             return view;
         }
 
-
-
         // Find views from XML layout
         TextView eventTitle = view.findViewById(R.id.eventTitle);
         TextView eventDate = view.findViewById(R.id.eventDate);
@@ -68,32 +62,48 @@ public class EventAdapter extends ArrayAdapter<Event> {
         eventTitle.setText(event.getTitle() != null ? event.getTitle() : "Untitled Event");
 
         // Set event date (Month and Day)
-
-        if(event.getStartTime() != null){
-
-
-        }
-        eventDate.setText(event.getStartTime() != null ? new SimpleDateFormat("MMMM").format(event.getStartTime()).substring(0,3) +"\n"+ String.valueOf(event.getStartTime().getDate()): "Unknown Date");
+        eventDate.setText(event.getStartTime() != null ?
+                new SimpleDateFormat("MMM\nd", Locale.getDefault()).format(event.getStartTime()) :
+                "Unknown Date");
 
         // Set event time details
-        String time="";
-        if( event.getStartTime()!=null) {
+        String time = "";
+        if (event.getStartTime() != null) {
             Calendar cal = GregorianCalendar.getInstance();
             cal.setTime(event.getStartTime());
-            time = (cal.get(Calendar.DAY_OF_WEEK))+" "+String.valueOf(cal.get(Calendar.HOUR)==0?"12":cal.get(Calendar.HOUR))+":"+cal.get(Calendar.MINUTE)+(cal.get(Calendar.AM_PM)==0?"AM":"PM");
 
+            int hour = cal.get(Calendar.HOUR);
+            hour = hour == 0 ? 12 : hour;
+            String minuteStr = String.format("%02d", cal.get(Calendar.MINUTE));
+            String amPm = cal.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
+
+            time = String.format("%s %s:%s %s",
+                    getDayOfWeekString(cal.get(Calendar.DAY_OF_WEEK)),
+                    hour,
+                    minuteStr,
+                    amPm);
         }
-        String timeDetails = String.format("Time: %s", event.getStartTime() != null ? time : "Unknown Time");
+
+        String timeDetails = String.format("Time: %s",
+                event.getStartTime() != null ? time : "Unknown Time");
         eventDetails.setText(timeDetails);
 
         // Set event description
-        eventDescription.setText(event.getRegistrationDetails() != null ? event.getRegistrationDetails() : "No Details Available");
+        eventDescription.setText(event.getRegistrationDetails() != null ?
+                event.getRegistrationDetails() :
+                "No Details Available");
 
         // Set event image from Firebase Storage
+        loadEventImage(event, eventImage);
+
+        return view;
+    }
+
+    private void loadEventImage(Event event, ImageView imageView) {
         if (event.getPosterUrl() != null) {
             try {
                 File eventImageFile = File.createTempFile(
-                        event.getEventId(), // Handle null titles
+                        event.getEventId() != null ? event.getEventId() : "event",
                         ".png"
                 );
                 StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
@@ -102,19 +112,34 @@ public class EventAdapter extends ArrayAdapter<Event> {
                             @Override
                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                 Bitmap bitmap = BitmapFactory.decodeFile(eventImageFile.getAbsolutePath());
-                                eventImage.setImageBitmap(bitmap);
+                                imageView.setImageBitmap(bitmap);
                             }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("EventAdapter", "Error loading image", e);
+                            imageView.setImageResource(R.drawable.eventpage_banner_placeholder);
                         });
             } catch (IOException e) {
-                e.printStackTrace();
-                // Optionally set a placeholder image on error
-                eventImage.setImageResource(R.drawable.eventpage_banner_placeholder);
+                Log.e("EventAdapter", "Error creating temp file", e);
+                imageView.setImageResource(R.drawable.eventpage_banner_placeholder);
             }
         } else {
             // Set a placeholder image if no URL is provided
-            eventImage.setImageResource(R.drawable.eventpage_banner_placeholder);
+            imageView.setImageResource(R.drawable.eventpage_banner_placeholder);
         }
+    }
 
-        return view;
+    // Helper method to convert day of week to string
+    private String getDayOfWeekString(int dayOfWeek) {
+        switch (dayOfWeek) {
+            case Calendar.SUNDAY: return "Sun";
+            case Calendar.MONDAY: return "Mon";
+            case Calendar.TUESDAY: return "Tue";
+            case Calendar.WEDNESDAY: return "Wed";
+            case Calendar.THURSDAY: return "Thu";
+            case Calendar.FRIDAY: return "Fri";
+            case Calendar.SATURDAY: return "Sat";
+            default: return "";
+        }
     }
 }

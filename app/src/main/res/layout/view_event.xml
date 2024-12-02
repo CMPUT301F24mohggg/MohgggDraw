@@ -162,4 +162,21 @@
         app:layout_constraintTop_toBottomOf="@id/eventInfoPeople" />
 
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/send_notification_button"
+        android:layout_width="253dp"
+        android:layout_height="74dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/large_trail"
+        android:gravity="center"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="Send Notification To"
+        android:textColor="#5336E2"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventInfoButton"
+        android:visibility="gone"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
