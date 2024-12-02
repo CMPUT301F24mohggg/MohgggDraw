@@ -35,6 +35,8 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -203,21 +205,22 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Extracts initials from a user's name.
+     * Extracts the initials from the user's name for use in a default profile image.
      *
-     * @param name The user's name.
+     * @param name The full name of the user.
      * @return A string containing the initials.
      */
     private String getInitials(String name) {
-        String[] parts = name.split(" ");
+        if (name == null || name.trim().isEmpty()) return "U"; // Default to "U" for User if name is empty
+        String[] parts = name.trim().split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
     /**
-     * Creates a drawable containing the user's initials.
+     * Creates a drawable containing the user's initials for the default profile image.
      *
-     * @param initials The initials to display.
-     * @return A Drawable containing the initials.
+     * @param initials The initials to display in the drawable.
+     * @return A Drawable object containing the initials.
      */
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
@@ -226,6 +229,7 @@ public class ProfileFragment extends Fragment {
         paint.setColor(Color.GRAY);
         paint.setTextSize(50);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setAntiAlias(true); // Smooth text rendering
         canvas.drawText(initials, 50, 65, paint);
         return new BitmapDrawable(getResources(), bitmap);
     }
@@ -256,11 +260,9 @@ public class ProfileFragment extends Fragment {
         paint.setAntiAlias(true);
         paint.setColor(Color.WHITE);
 
-        // Draws the circular shape
         float radius = size / 2f;
         canvas.drawCircle(radius, radius, radius, paint);
 
-        // Crops the image (to fit the circular frame)
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, -((bitmap.getWidth() - size) / 2f), -((bitmap.getHeight() - size) / 2f), paint);
 
@@ -327,16 +329,27 @@ public class ProfileFragment extends Fragment {
                 editTextName.setText(originalName);
                 editTextPhone.setText(originalPhone);
                 editTextEmail.setText(originalEmail);
-
                 nameTextView.setText(originalName != null ? originalName : "User");
 
                 String profileImageUrl = documentSnapshot.getString("profileImageUrl");
                 if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                     Glide.with(this)
+                            .asBitmap()
                             .load(profileImageUrl)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(createInitialsDrawable(getInitials(originalName)))
-                            .into(profileImageView);
+                            .error(createInitialsDrawable(getInitials(userName)))
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    profileImageView.setImageBitmap(circularBitmap(resource));
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    profileImageView.setImageDrawable(placeholder);
+                                }
+                            });
                 } else {
                     setDefaultProfilePicture();
                 }
