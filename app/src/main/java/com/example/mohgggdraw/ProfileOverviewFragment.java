@@ -28,6 +28,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * ProfileOverviewFragment displays an overview of the user's profile, including:
+ * <ul>
+ * <li>User's name and email</li>
+ * <li>Profile picture</li>
+ * <li>Options to edit the profile or log out</li>
+ * </ul>
+ */
 public class ProfileOverviewFragment extends Fragment {
 
     private TextView userNameTextView;
@@ -36,11 +44,25 @@ public class ProfileOverviewFragment extends Fragment {
     private FirebaseFirestore db;
     private String deviceID;
 
+    /**
+     * Inflates the layout for the fragment.
+     *
+     * @param inflater           The LayoutInflater used to inflate the layout.
+     * @param container          The parent view that this fragment's UI is attached to.
+     * @param savedInstanceState The saved state of the fragment, if available.
+     * @return The created View for the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile_overview, container, false);
     }
 
+    /**
+     * Initializes the fragment's views and sets up click listeners for buttons.
+     *
+     * @param view               The root view of the fragment.
+     * @param savedInstanceState The saved state of the fragment, if available.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -55,6 +77,7 @@ public class ProfileOverviewFragment extends Fragment {
         // Load user data
         loadUserData();
 
+        // Initialize buttons and switches
         Button buttonEditProfile = view.findViewById(R.id.buttonEditProfile);
         Button buttonLogout = view.findViewById(R.id.buttonLogout);
         Switch switchNotifications = view.findViewById(R.id.switchNotifications);
@@ -75,6 +98,9 @@ public class ProfileOverviewFragment extends Fragment {
         });
     }
 
+    /**
+     * Loads user data from Firebase Firestore and updates the UI elements.
+     */
     private void loadUserData() {
         DocumentReference docRef = db.collection("user").document(deviceID);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -107,12 +133,24 @@ public class ProfileOverviewFragment extends Fragment {
         });
     }
 
+    /**
+     * Extracts the initials from the user's name for use in a default profile image.
+     *
+     * @param name The full name of the user.
+     * @return A string containing the initials.
+     */
     private String getInitials(String name) {
         if (name == null || name.trim().isEmpty()) return "U"; // Default to "U" for User if name is empty
         String[] parts = name.trim().split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
+    /**
+     * Creates a drawable containing the user's initials for the default profile image.
+     *
+     * @param initials The initials to display in the drawable.
+     * @return A Drawable object containing the initials.
+     */
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -120,7 +158,7 @@ public class ProfileOverviewFragment extends Fragment {
         paint.setColor(Color.GRAY);
         paint.setTextSize(50);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setAntiAlias(true); // Smooths text rendering
+        paint.setAntiAlias(true); // Smooth text rendering
         canvas.drawText(initials, 50, 65, paint);
         return new BitmapDrawable(getResources(), bitmap);
     }
