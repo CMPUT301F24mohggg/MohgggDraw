@@ -215,12 +215,12 @@ public class ProfileOverviewFragment extends Fragment {
     private void updateNotification(boolean isEnabled) {
         if (!isEnabled) {
             db.collection("notification").document("notificationOptOut")
-                    .update("deviceId", FieldValue.arrayUnion(deviceID))
+                    .update("deviceIds", FieldValue.arrayUnion(deviceID))
                     .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted out of notifications"))
                     .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting out", e));
         } else {
             db.collection("notification").document("notificationOptOut")
-                    .update("deviceId", FieldValue.arrayRemove(deviceID))
+                    .update("deviceIds", FieldValue.arrayRemove(deviceID))
                     .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted in to notifications"))
                     .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting in", e));
         }
