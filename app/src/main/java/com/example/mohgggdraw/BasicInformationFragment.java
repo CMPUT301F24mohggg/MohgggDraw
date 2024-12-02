@@ -98,11 +98,21 @@ public class BasicInformationFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Opens an image picker to allow the user to select an image for the event poster and is displayed
+     */
     private void selectImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Handles the result of the image selection activity.
+     *
+     * @param requestCode The request code passed to startActivityForResult.
+     * @param resultCode The result code returned by the image selection activity.
+     * @param data The data returned by the activity.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -113,6 +123,9 @@ public class BasicInformationFragment extends Fragment {
         }
     }
 
+    /**
+     * Uploads the selected image to Firebase Storage and saves the image URL to the ViewModel.
+     */
     private void uploadImageToFirebase() {
         if (imageUri != null) {
             StorageReference fileRef = storageReference.child(System.currentTimeMillis() + ".jpg");
@@ -128,12 +141,18 @@ public class BasicInformationFragment extends Fragment {
         }
     }
 
+    /**
+     * Saves the data in the SharedViewModel.
+     */
     public void saveData() {
         sharedViewModel.setEventTitle(titleInput.getText().toString());
         sharedViewModel.setEventLocation(locationInput.getText().toString());
         sharedViewModel.setEventDetail(detailInput.getText().toString());
     }
 
+    /**
+     * Resets the data in the SharedViewModel.
+     */
     public void resetData() {
         sharedViewModel.setEventTitle(null);
         sharedViewModel.setEventLocation(null);
