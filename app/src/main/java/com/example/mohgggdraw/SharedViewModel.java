@@ -1,6 +1,15 @@
 package com.example.mohgggdraw;
 
 import androidx.lifecycle.*;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import com.example.mohgggdraw.databinding.FragmentSecondBinding;
+
 /***
  This SharedViewModel serves as a shared data store for the event creation process. It:
  - Holds LiveData for all event details (title, location, dates, settings, etc.)
@@ -14,6 +23,7 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<String> registrationOpen = new MutableLiveData<>();
     private final MutableLiveData<String> registrationDeadline = new MutableLiveData<>();
     private final MutableLiveData<String> eventStartTime = new MutableLiveData<>();
+    private final MutableLiveData<String> eventEndTime = new MutableLiveData<>();
     private final MutableLiveData<String> maxPoolingSample = new MutableLiveData<>();
     private final MutableLiveData<String> maxEntrants = new MutableLiveData<>();
     private final MutableLiveData<Boolean> enableGeolocation = new MutableLiveData<>();
@@ -45,6 +55,9 @@ public class SharedViewModel extends ViewModel {
 
     public LiveData<String> getEventStartTime() { return eventStartTime; }
     public void setEventStartTime(String startTime) { eventStartTime.setValue(startTime); }
+
+    public LiveData<String> getEventEndTime() { return eventEndTime; }
+    public void setEventEndTime(String endTime) { eventEndTime.setValue(endTime); }
 
     public LiveData<String> getMaxPoolingSample() { return maxPoolingSample; }
     public void setMaxPoolingSample(String sample) { maxPoolingSample.setValue(sample); }

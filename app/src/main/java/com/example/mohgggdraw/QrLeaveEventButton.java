@@ -31,7 +31,7 @@ public class QrLeaveEventButton extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.leave_activity,null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.leave_event,null);
         //creating leave button taht removes from database
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Button button = view.findViewById(R.id.leaveButton);

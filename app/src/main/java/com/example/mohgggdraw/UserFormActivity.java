@@ -23,7 +23,11 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -205,6 +209,10 @@ public class UserFormActivity extends AppCompatActivity {
         userDetails.put("location", location);
         userDetails.put("name", name);
         userDetails.put("userType", getUserTypeCode(userType)); // Store the userType as a numeric code
+        addLists(deviceID);
+
+
+
 
         db.collection("user").document(deviceID)
                 .set(userDetails)
@@ -246,5 +254,26 @@ public class UserFormActivity extends AppCompatActivity {
         intent.putExtra("navigateToHomeFragment", true);
         startActivity(intent);
         finish();
+    }
+    public void addLists(String deviceID){
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data =  documentSnapshot.getData();
+                if(!data.containsKey("waitList")){
+                    DocumentReference mydoc = db.collection("user").document(deviceID);
+                    mydoc.update("waitList",new ArrayList<String>());
+                    mydoc.update("entrantList",new ArrayList<String>());
+                    mydoc.update("createdList",new ArrayList<String>());
+
+                }
+
+
+
+
+            }
+
+        });
+
     }
 }

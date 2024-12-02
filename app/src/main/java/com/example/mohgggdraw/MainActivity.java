@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         entrantFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         entrantFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         entrantFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
+        //((HomeFragment)entrantFragmentMap.get(R.id.nav_home)).setAdminView();
 
         organizerFragmentMap.put(R.id.nav_home, new HomeFragment());
         organizerFragmentMap.put(R.id.nav_create, new CreateFragment());
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         adminFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         adminFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         adminFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
+        ((HomeFragment)adminFragmentMap.get(R.id.nav_home)).setAdminView();
     }
 
     private void checkAndInitializeUser(String deviceID) {
