@@ -40,6 +40,7 @@ public class QrWaitlistFragment extends Fragment {
     TextView joinButton;
     private ScannerViewModel scannerViewModel;
     private SharedViewModel sharedViewModel;
+    private String deviceId;
 
 
     public QrWaitlistFragment(int version){
@@ -51,7 +52,7 @@ public class QrWaitlistFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get the device ID and set it as the user's UID
-        String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         user.setUid(deviceId);  // Setting the device ID as Uid
 
         if (version == 0) {
@@ -197,6 +198,7 @@ public class QrWaitlistFragment extends Fragment {
                         new QrJoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
                     } else {
                         new WaitinglistController(event).addUser(user);
+                        new UserDB().addEventToUserList(event.getEventId(), deviceId);
                         onDialogueFinished();
 
                     }
