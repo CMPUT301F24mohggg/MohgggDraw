@@ -220,7 +220,6 @@ public class WaitinglistDB {
     public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment) {
         ArrayList<Event> myArray = new ArrayList<>();
         Task query = waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
@@ -230,8 +229,6 @@ public class WaitinglistDB {
                 fragment.dataChange();
             }
         });
-        ;
-
         return myArray;
     }
 
@@ -260,6 +257,10 @@ public class WaitinglistDB {
             if(map.get("startTime") instanceof Timestamp) {
                 myevent.setStartTime(((Timestamp) map.get("startTime")).toDate());
             }
+        }
+
+        if (map.get("eventLocation") != null) {
+            myevent.setLocation((String) map.get("eventLocation"));
         }
 
         myevent.setOrgID((String) map.get("organizerId"));

@@ -19,8 +19,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 /***
@@ -89,13 +91,19 @@ public class WaitlistFragment extends Fragment {
          day = view.findViewById(R.id.eventInfoDay);
          capacity = view.findViewById(R.id.eventInfoPeople);
          location = view.findViewById(R.id.eventInfoLocation);
-        if(home !=null) {
+        if(home !=null && event!= null) {
             name.setText(event.getTitle());
-            time.setText(event.getStartTime().toString());
-            day.setText(event.getDate());
+            //time.setText(event.getStartTime().toString());
+            //day.setText(event.getDate());
             capacity.setText(String.valueOf(event.getMaxCapacity()));
-            location.setText(event.getLocation());
+            location.setText(event.getLocation()!= null ? event.getLocation(): "Unknown Location");
+            day.setText(event.getStartTime() != null ? new SimpleDateFormat("MMMM").format(event.getStartTime()).substring(0,3)+ String.valueOf(event.getStartTime().getDate()): "Unknown Date");
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(event.getStartTime());
+            String timeString = (cal.get(Calendar.DAY_OF_WEEK))+" "+String.valueOf(cal.get(Calendar.HOUR)==0?"12":cal.get(Calendar.HOUR))+":"+cal.get(Calendar.MINUTE)+(cal.get(Calendar.AM_PM)==0?"AM":"PM");
 
+            String timeDetails = String.format("Time: %s", event.getStartTime() != null ? timeString : "Unknown Time");
+            time.setText(timeDetails);
             // Pulling and creating image
             iv = view.findViewById(R.id.eventimage);
             if (iv != null) {
