@@ -292,23 +292,23 @@ public class WaitinglistDB {
 
 
     }
-
+    /*
     public ArrayList<Event> queryWithName(AdminEventView adminEventView, String name) {
         ArrayList<Event> myArray = new ArrayList<>();
-        Query query = waitlistRef.whereEqualTo("eventTitle", "Organizer");
+        Query query = waitlistRef.whereEqualTo("eventTitle", name); // Use the name parameter dynamically
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
-
-                    myArray.add(docSnapshotToEvent(doc));
+                    myArray.add(docSnapshotToEvent(doc)); // Convert Firestore document to Event
                 }
-                adminEventView.dataChange();
+                adminEventView.updateEventList(myArray); // Update the event list in AdminEventView
             }
-        });
+        }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch events: " + e.getMessage()));
 
-        return myArray;
-    }
+        return myArray; // Return the list (though it might still be empty since Firestore fetch is async)
+    }*/
+
 
     public void createEventListFromStringList(ArrayList<String> list, EventListView fragment) {
         if (list == null || list.isEmpty()) {

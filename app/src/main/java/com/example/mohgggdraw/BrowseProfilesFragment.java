@@ -30,65 +30,82 @@ public class BrowseProfilesFragment extends Fragment {
     private TextView facilitiesTab;
     private TextView usersTab;
     private TextView imagesTab;
+    private TextView eventsTab;
 
-    /**
-     * Inflates the fragment layout and sets up the UI components.
-     *
-     * @param inflater           The LayoutInflater object used to inflate views.
-     * @param container          The parent view that this fragment's UI will be attached to.
-     * @param savedInstanceState If non-null, contains the previous saved state of the fragment.
-     * @return The created view for this fragment.
-     */
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the correct layout for the fragment
         return inflater.inflate(R.layout.fragment_browse_profiles, container, false);
     }
 
     /**
-     * Called after the view is created. Sets up the ViewPager2, tab navigation, and click listeners.
+     * Inflates the fragment layout and sets up the UI components.
      *
-     * @param view               The root view of the fragment.
+     * @param view          The parent view that this fragment's UI will be attached to.
      * @param savedInstanceState If non-null, contains the previous saved state of the fragment.
+     * @return The created view for this fragment.
      */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Link tab buttons to the layout views
         facilitiesTab = view.findViewById(R.id.tab_facilities);
         usersTab = view.findViewById(R.id.tab_users);
         imagesTab = view.findViewById(R.id.tab_images);
+        eventsTab = view.findViewById(R.id.tab_events);
 
-        // Set up the adapter for ViewPager2
         viewPager2 = view.findViewById(R.id.browse_profiles_viewpager);
         BrowseProfilesPagerAdapter adapter = new BrowseProfilesPagerAdapter(this);
         viewPager2.setAdapter(adapter);
 
-        // Set up click listeners for each tab
-        facilitiesTab.setOnClickListener(v -> {
-            if (viewPager2.getCurrentItem() != 0) {
-                updateTabBarFacilities();
-                swapToFragment(0);
+        // Add a page change callback to sync tab highlights with ViewPager2
+        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                switch (position) {
+                    case 0:
+                        updateTabBarFacilities();
+                        break;
+                    case 1:
+                        updateTabBarUsers();
+                        break;
+                    case 2:
+                        updateTabBarImages();
+                        break;
+                    case 3:
+                        updateTabBarEvents();
+                        break;
+                }
             }
+        });
+
+        // Set tab click listeners
+        facilitiesTab.setOnClickListener(v -> {
+            updateTabBarFacilities();
+            viewPager2.setCurrentItem(0);
         });
 
         usersTab.setOnClickListener(v -> {
-            if (viewPager2.getCurrentItem() != 1) {
-                updateTabBarUsers();
-                swapToFragment(1);
-            }
+            updateTabBarUsers();
+            viewPager2.setCurrentItem(1);
         });
 
         imagesTab.setOnClickListener(v -> {
-            if (viewPager2.getCurrentItem() != 2) {
-                updateTabBarImages();
-                swapToFragment(2);
-            }
+            updateTabBarImages();
+            viewPager2.setCurrentItem(2);
+        });
+
+        eventsTab.setOnClickListener(v -> {
+            updateTabBarEvents();
+            viewPager2.setCurrentItem(3);
         });
 
         // Default to Facilities tab
-        swapToFragment(0);
+        viewPager2.setCurrentItem(0);
     }
+
 
     /**
      * Ensures that the Facilities tab is selected by default when the fragment is resumed.
@@ -122,6 +139,9 @@ public class BrowseProfilesFragment extends Fragment {
 
         imagesTab.setBackgroundResource(R.drawable.tab_unselected_background);
         imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        eventsTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        eventsTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
 
     /**
@@ -136,6 +156,9 @@ public class BrowseProfilesFragment extends Fragment {
 
         imagesTab.setBackgroundResource(R.drawable.tab_unselected_background);
         imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        eventsTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        eventsTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
 
     /**
@@ -150,5 +173,25 @@ public class BrowseProfilesFragment extends Fragment {
 
         usersTab.setBackgroundResource(R.drawable.tab_unselected_background);
         usersTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        eventsTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        eventsTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+    }
+
+    /**
+     * Updates the appearance of the tab bar to highlight the Events tab as selected.
+     */
+    private void updateTabBarEvents() {
+        eventsTab.setBackgroundResource(R.drawable.tab_selected_background);
+        eventsTab.setTextColor(getResources().getColor(R.color.tab_selector_text_color, null));
+
+        facilitiesTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        facilitiesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        usersTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        usersTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
+
+        imagesTab.setBackgroundResource(R.drawable.tab_unselected_background);
+        imagesTab.setTextColor(getResources().getColor(R.color.tab_unselected_text_color, null));
     }
 }
