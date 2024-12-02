@@ -209,8 +209,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void preLoadNotifications() {
         Fragment notificationFragment = activeFragmentMap.get(R.id.nav_notifications);
-        if (notificationFragment instanceof NotificationFragment) {
-            ((NotificationFragment) notificationFragment).preLoadNotifications(this);
+        if (notificationFragment == null) {
+            notificationFragment = new NotificationFragment();
+            activeFragmentMap.put(R.id.nav_notifications, notificationFragment);
         }
     }
 

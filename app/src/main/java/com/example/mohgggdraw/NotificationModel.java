@@ -5,7 +5,6 @@ import com.google.firebase.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -21,7 +20,7 @@ public class NotificationModel {
     private String eventId;
     private String notificationId;
     private String deviceId;
-    private Timestamp startTime;
+    private String startTime;
     private String eventTitle;
     private String startMonth;
     private String startDate;
@@ -100,7 +99,7 @@ public class NotificationModel {
 
 
 
-    public Timestamp getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
@@ -109,7 +108,7 @@ public class NotificationModel {
      *
      * @param startTime The start time to set.
      */
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
         splitStartTime(startTime); // Update startMonth and startDate when startTime changes
     }
@@ -136,33 +135,30 @@ public class NotificationModel {
      *
      * @param startTime The start time in the format "dd/MM/yyyy".
      */
-    private void splitStartTime(Timestamp startTime) {
-        if (startTime == null) return;
+    private void splitStartTime(String startTime) {
+        if (startTime == null || startTime.isEmpty()) return;
 
-        // Convert Timestamp to Date
-        Date date = startTime.toDate();
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+            Date date = inputFormat.parse(startTime);
 
-        // Extract short month and day
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
-        SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
+            // Extract short month and day
+            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
+            SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
 
-        this.startMonth = monthFormat.format(date); // Example: "Nov"
-        this.startDate = dayFormat.format(date); // Example: "21"
+            this.startMonth = monthFormat.format(date); // Example: "Nov"
+            this.startDate = dayFormat.format(date); // Example: "21"
+        } catch (ParseException e) {
+            e.printStackTrace();
+            this.startMonth = "";
+            this.startDate = "";
+        }
     }
-    /**
-     * Sets the status of the notification.
-     *
-     * @param status The status to set.
-     */
+
     public void setStatus(String status) {
         this.status = status;
     }
 
-    /**
-     * Returns the ID of the related event.
-     *
-     * @return The event ID.
-     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
@@ -182,27 +178,15 @@ public class NotificationModel {
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
-    /**
-     * Returns the title of the related event.
-     *
-     * @return The event title.
-     */
+
     public String getEventTitle() {
         return eventTitle;
     }
-    /**
-     * Sets the title of the related event.
-     *
-     * @param eventTitle The event title to set.
-     */
+
     public void setEventTitle(String eventTitle) {
         this.eventTitle = eventTitle;
     }
-    /**
-     * Returns the month of the event's start time.
-     *
-     * @return The start month (e.g., "Nov").
-     */
+
     public String getStartMonth() {
         return startMonth;
     }
@@ -210,11 +194,7 @@ public class NotificationModel {
     public void setStartMonth(String startMonth) {
         this.startMonth = startMonth;
     }
-    /**
-     * Returns the day of the event's start time.
-     *
-     * @return The start day (e.g., "21").
-     */
+
     public String getStartDate() {
         return startDate;
     }
@@ -226,11 +206,7 @@ public class NotificationModel {
     public boolean isAccepted() {
         return isAccepted;
     }
-    /**
-     * Sets the acceptance status of the notification.
-     *
-     * @param accepted True to mark as accepted, otherwise false.
-     */
+
     public void setAccepted(boolean accepted) {
         isAccepted = accepted;
     }
@@ -238,19 +214,11 @@ public class NotificationModel {
     public boolean isDeclined() {
         return isDeclined;
     }
-    /**
-     * Sets the declined status of the notification.
-     *
-     * @param declined True to mark as declined, otherwise false.
-     */
+
     public void setDeclined(boolean declined) {
         isDeclined = declined;
     }
-    /**
-     * Returns the timestamp when the notification was created.
-     *
-     * @return The creation timestamp.
-     */
+
     public Timestamp getCreated_at() {
         return created_at;
     }
