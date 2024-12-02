@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -84,13 +85,33 @@ public class BrowseImagesFragment extends Fragment {
             return;
         }
 
-        // Show a confirmation dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Delete Selected Images?");
-        builder.setMessage("Are you sure you want to delete the selected images?");
-        builder.setPositiveButton("Yes", (dialog, which) -> deleteSelectedImages());
-        builder.setNegativeButton("Nevermind", null);
-        builder.show();
+        // Inflate the custom layout
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_confirmation, null);
+
+        // Find views in the custom layout
+        TextView title = dialogView.findViewById(R.id.dialog_title);
+        TextView message = dialogView.findViewById(R.id.dialog_message);
+        TextView btnYes = dialogView.findViewById(R.id.btn_yes);
+        TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
+
+        // Create the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        // Set up Yes button
+        btnYes.setOnClickListener(v -> {
+            deleteSelectedImages();
+            dialog.dismiss();
+        });
+
+        // Set up Nevermind button
+        btnNevermind.setOnClickListener(v -> dialog.dismiss());
+
+        // Show the dialog
+        dialog.show();
     }
 
     private void deleteSelectedImages() {

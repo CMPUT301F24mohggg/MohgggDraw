@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -85,12 +86,32 @@ public class BrowseUsersFragment extends Fragment {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Delete Users?");
-        builder.setMessage("Are you sure you want to delete the selected users?");
-        builder.setPositiveButton("Yes", (dialog, which) -> deleteSelectedUsers(selectedIds));
-        builder.setNegativeButton("Nevermind", null);
-        builder.show();
+        // Inflate the custom layout for the dialog
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_confirmation, null);
+
+        // Set up the dialog views
+        TextView title = dialogView.findViewById(R.id.dialog_title);
+        TextView message = dialogView.findViewById(R.id.dialog_message);
+        TextView btnYes = dialogView.findViewById(R.id.btn_yes);
+        TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
+
+        title.setText("Delete Selected?");
+        message.setText("Are you sure you want to delete the selected users?");
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        btnYes.setOnClickListener(v -> {
+            deleteSelectedUsers(selectedIds);
+            dialog.dismiss();
+        });
+
+        btnNevermind.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     private void deleteSelectedUsers(ArrayList<String> selectedIds) {
