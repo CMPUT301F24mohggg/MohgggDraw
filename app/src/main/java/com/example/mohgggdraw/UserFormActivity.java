@@ -23,17 +23,22 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * UserFormActivity allows the user to input their details based on user type (entrant, organizer, or admin)
- * and saves this information to Firebase Firestore.
+ * UserFormActivity handles the user registration process based on user type (entrant, organizer, or admin).
+ * It provides fields for user details, handles location permission, fetches the current location,
+ * and saves the user data to Firebase Firestore.
  */
 public class UserFormActivity extends AppCompatActivity {
 
-    private EditText editTextName, editTextPhone, editTextEmail, editTextLocation;
+    private EditText editTextName, editTextFacilityName, editTextPhone, editTextEmail, editTextLocation;
     private Button buttonSubmit;
     private String userType; // The type of user: "entrant", "organizer", or "admin"
     private FirebaseFirestore db;
@@ -42,38 +47,33 @@ public class UserFormActivity extends AppCompatActivity {
     private static final int REQUEST_CHECK_SETTINGS = 2000;
 
     /**
-     * Initializes the activity, setting up Firestore, UI elements, and button listeners.
+     * Called when the activity is first created.
+     * Initializes Firestore, location services, and UI elements.
      *
-     * @param savedInstanceState The saved instance state from the previous instance, if any.
+     * @param savedInstanceState The saved state of the activity, if any.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
 
-        // Initialize Firestore
+        // Initialize Firestore and location services
         db = FirebaseFirestore.getInstance();
-
-        // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Link UI components
         editTextName = findViewById(R.id.editTextName);
+        editTextFacilityName = findViewById(R.id.editTextFacilityName);
         editTextPhone = findViewById(R.id.editTextPhone);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextLocation = findViewById(R.id.editTextLocation);
         buttonSubmit = findViewById(R.id.buttonSubmit);
 
-        // Get user type from intent
+        // Retrieve user type from intent
         userType = getIntent().getStringExtra("userType");
 
-        // Set hints based on user type
-        if ("organizer".equals(userType)) {
-            editTextName.setHint("Organizer Name");
-        } else if ("admin".equals(userType)) {
-            editTextName.setHint("Admin Name");
-        } else {
-            editTextName.setHint("Entrant Name");
-        }
+        // Configure form fields based on user type
+        configureFormFields();
 
         // Request location permission
         requestLocationPermission();
@@ -83,7 +83,21 @@ public class UserFormActivity extends AppCompatActivity {
     }
 
     /**
-     * Requests the user's location permission.
+     * Configures the form fields based on the user type.
+     * Shows the Facility Name field only for organizers.
+     */
+    private void configureFormFields() {
+        if ("organizer".equals(userType)) {
+            editTextFacilityName.setVisibility(EditText.VISIBLE);
+            editTextName.setHint("Name");
+        } else {
+            editTextFacilityName.setVisibility(EditText.GONE);
+            editTextName.setHint(userType.equals("admin") ? "Admin Name" : "Entrant Name");
+        }
+    }
+
+    /**
+     * Requests location permission from the user.
      */
     private void requestLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -125,20 +139,16 @@ public class UserFormActivity extends AppCompatActivity {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
-        task.addOnSuccessListener(locationSettingsResponse -> {
-            // All location settings are satisfied, continue to request location updates
-            getUserLocation();
-        }).addOnFailureListener(exception -> {
-            if (exception instanceof ResolvableApiException) {
-                // Location settings are not satisfied, prompt user to enable it
-                try {
-                    ResolvableApiException resolvable = (ResolvableApiException) exception;
-                    resolvable.startResolutionForResult(UserFormActivity.this, REQUEST_CHECK_SETTINGS);
-                } catch (IntentSender.SendIntentException sendEx) {
-                    // Ignore the error
-                }
-            }
-        });
+        task.addOnSuccessListener(locationSettingsResponse -> getUserLocation())
+                .addOnFailureListener(exception -> {
+                    if (exception instanceof ResolvableApiException) {
+                        try {
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            resolvable.startResolutionForResult(UserFormActivity.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException ignored) {
+                        }
+                    }
+                });
     }
 
     /**
@@ -151,81 +161,94 @@ public class UserFormActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CHECK_SETTINGS) {
-            if (resultCode == RESULT_OK) {
-                // User agreed to make required location settings changes
-                getUserLocation();
-            } else {
-                Toast.makeText(this, "Location settings must be enabled to proceed", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == REQUEST_CHECK_SETTINGS && resultCode == RESULT_OK) {
+            getUserLocation();
+        } else {
+            Toast.makeText(this, "Location settings must be enabled to proceed", Toast.LENGTH_SHORT).show();
         }
     }
 
     /**
-     * Gets the user's current location and updates the location EditText field.
+     * Fetches the user's current location and sets it in the location field.
      */
     private void getUserLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        String locationString = location.getLatitude() + ", " + location.getLongitude();
-                        editTextLocation.setText(locationString);
-                    }
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    String locationString = location.getLatitude() + ", " + location.getLongitude();
+                    editTextLocation.setText(locationString);
                 }
             });
         }
     }
 
     /**
-     * Validates user input and saves the user data to Firestore if validation passes.
+     * Validates the user input and saves the user data to Firebase Firestore.
      */
     private void submitUserData() {
-        Log.d("UserFormActivity", "submitUserData() called");
-
         String name = editTextName.getText().toString().trim();
+        String facilityName = editTextFacilityName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
 
         if (name.isEmpty() || phone.isEmpty() || email.isEmpty() || location.isEmpty()) {
-            Toast.makeText(UserFormActivity.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
-            Log.d("UserFormActivity", "Fields are empty, not proceeding with data submission");
+            Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if ("organizer".equals(userType) && facilityName.isEmpty()) {
+            Toast.makeText(this, "Facility Name is required for organizers", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.d("UserFormActivity", "Device ID: " + deviceID);
 
         Map<String, Object> userDetails = new HashMap<>();
         userDetails.put("deviceID", deviceID);
+        userDetails.put("name", name);
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
-        userDetails.put("name", name);
-        userDetails.put("userType", getUserTypeCode(userType)); // Store the userType as a numeric code
+        userDetails.put("userType", getUserTypeCode(userType));
+        if ("organizer".equals(userType)) {
+            userDetails.put("facilityName", facilityName);
+        }
 
         db.collection("user").document(deviceID)
                 .set(userDetails)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(UserFormActivity.this, "User data saved successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("UserFormActivity", "Data saved successfully");
+                    addLists(deviceID);
+                    Toast.makeText(this, "User data saved successfully", Toast.LENGTH_SHORT).show();
                     navigateToHomeScreen();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(UserFormActivity.this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("UserFormActivity", "Failed to save data: " + e.getMessage());
-                });
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     /**
-     * Returns a numeric code based on the user type for easier storage.
+     * Adds default lists (waitList, entrantList, createdList) to the user's Firestore document.
      *
-     * @param userType The type of user: "entrant", "organizer", or "admin".
-     * @return An integer code representing the user type.
+     * @param deviceID The unique device ID of the user.
      */
-    int getUserTypeCode(String userType) {
+    private void addLists(String deviceID) {
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        mydoc.get().addOnSuccessListener(documentSnapshot -> {
+            Map<String, Object> data = documentSnapshot.getData();
+            if (data != null && !data.containsKey("waitList")) {
+                mydoc.update("waitList", new ArrayList<String>());
+                mydoc.update("entrantList", new ArrayList<String>());
+                mydoc.update("createdList", new ArrayList<String>());
+            }
+        });
+    }
+
+    /**
+     * Converts the user type string into a numeric code.
+     *
+     * @param userType The type of user (entrant, organizer, or admin).
+     * @return A numeric code representing the user type.
+     */
+    private int getUserTypeCode(String userType) {
         switch (userType) {
             case "organizer":
                 return 1;
@@ -238,12 +261,11 @@ public class UserFormActivity extends AppCompatActivity {
     }
 
     /**
-     * Navigates to the MainActivity, clearing any existing activities in the task stack.
+     * Navigates the user to the home screen and clears the activity stack.
      */
     private void navigateToHomeScreen() {
         Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("navigateToHomeFragment", true);
         startActivity(intent);
         finish();
     }

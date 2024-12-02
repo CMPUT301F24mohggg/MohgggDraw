@@ -1,48 +1,43 @@
 package com.example.mohgggdraw;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
-
-import com.example.mohgggdraw.databinding.ActivityMainBinding;
-import com.google.firebase.firestore.Query;
 
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /***
  * Fragment to display Array of lists
  * used to display list of user events
  * ***/
-public class EventListDisplayFragment extends Fragment {
+public class EventListDisplayFragment extends Fragment implements EventListView{
 
     private ArrayList<Event> dataList;
     private ListView eventList;
     private EventAdapter eventAdapter;
-    private User user = new User();
-    private final Map<Integer, Fragment> fragmentMap = new HashMap<>();
-    private ViewPager2 viewPager2;
     private HomeFragment fragment;
+    private String deviceID;
 
-    public EventListDisplayFragment(User user, HomeFragment page){
-        this.user =user;
-        this.fragment = page;
+
+    public void setFragment(HomeFragment fragment) {
+        this.fragment = fragment;
     }
 
+    @Override
+    public void setEventList(ArrayList<Event> events) {
+        dataList = events;
+        dataChange();
+
+
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,18 +52,14 @@ public class EventListDisplayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
 
     dataList = new ArrayList<Event>();
-//        for(int i=0;i<10;i++){
-//            Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
-//            dataList.add(event);
-//            new WaitinglistDB().updateWaitlist(event);
-//
-//        }
+
         //pulling all data for test purpose
-        dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
 
-        eventAdapter = new EventAdapter(this.getContext(), dataList);
+
         eventList = view.findViewById(R.id.eventList);
-
+        new UserDB().queryList("waitList",this,deviceID);
+        eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList.setAdapter(eventAdapter);
 
 //onclick per event item
@@ -79,8 +70,6 @@ public class EventListDisplayFragment extends Fragment {
 
                 Event event = (Event) list.getItemAtPosition(i);
                 fragment.goToNextPage(event);
-
-
             }
         });
     }
@@ -90,6 +79,17 @@ public class EventListDisplayFragment extends Fragment {
         eventAdapter = new EventAdapter(this.getContext(), dataList);
 
         eventList.setAdapter(eventAdapter);
+
+
+    }
+
+    @Override
+    public void setList(ArrayList list) {
+
+    }
+
+    public void setDevice(String id){
+        this.deviceID = id;
 
     }
 

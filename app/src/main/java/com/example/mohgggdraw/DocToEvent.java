@@ -36,27 +36,32 @@ public class DocToEvent {
         return documentSnapshot.getString("eventTitle") + "please dont leave this stuff empty";
     }
 
-    public Event createEvent() {
-        if (documentSnapshot == null) {
-            return null;
-        }
-
-        Map map = documentSnapshot.getData();
-        Event event;
-        event = new Event(this.eventId,
-                documentSnapshot.getString("eventTitle")+"please dont leave this stuff empty",
-                documentSnapshot.getString("eventLocation")+"please dont leave this stuff empty",
-                documentSnapshot.getString("imageUrl"),
-                documentSnapshot.getString("eventDetail")+"please dont leave this stuff empty");
-        if(documentSnapshot.get("geoLocationEnabled") != null) {
-            event.setGeolocation((boolean) map.get("geoLocationEnabled"));
-        }
-        event.setOrgID((String)map.get("organizerId"));
-        if (map.get("EventWaitingList") != null) {
-            event.setWaitingList((ArrayList<String>) map.get("EventWaitingList"));
-        } else {
-            event.setWaitingList(new ArrayList<String>());
-        }
+    public  Event createEvent(){
+        Event event =new WaitinglistDB().docSnapshotToEvent(documentSnapshot);
         return event;
     }
+
+//    public Event createEvent() {
+//        if (documentSnapshot == null) {
+//            return null;
+//        }
+//
+//        Map map = documentSnapshot.getData();
+//        Event event;
+//        event = new Event(this.eventId,
+//                documentSnapshot.getString("eventTitle")+"please dont leave this stuff empty",
+//                documentSnapshot.getString("eventLocation")+"please dont leave this stuff empty",
+//                documentSnapshot.getString("imageUrl"),
+//                documentSnapshot.getString("eventDetail")+"please dont leave this stuff empty");
+//        if(documentSnapshot.get("geoLocationEnabled") != null) {
+//            event.setGeolocation((boolean) map.get("geoLocationEnabled"));
+//        }
+//        event.setOrgID((String)map.get("organizerId"));
+//        if (map.get("EventWaitingList") != null) {
+//            event.setWaitingList((ArrayList<String>) map.get("EventWaitingList"));
+//        } else {
+//            event.setWaitingList(new ArrayList<String>());
+//        }
+//        return event;
+//    }
 }

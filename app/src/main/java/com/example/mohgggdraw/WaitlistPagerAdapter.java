@@ -12,6 +12,7 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     Event event;
     User user;
     Fragment fragment;
+    boolean adminView = false;
 
     public WaitlistPagerAdapter(@NonNull Fragment fragment, User user) {
         super(fragment.getChildFragmentManager(), fragment.getLifecycle());
@@ -29,11 +30,34 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
         switch(position) {
 
             case 1:
-                return new WaitlistFragment(event,user,(HomeFragment) fragment);
+                WaitlistFragment waitlistFragment = new WaitlistFragment();
+                waitlistFragment.setImportant(event,(HomeFragment)fragment);
+                return waitlistFragment;
             case 2:
-                return new WaitlistViewEntrantsFragment(event);
+                WaitlistViewEntrantsFragment waitlistViewEntrantsFragment = new WaitlistViewEntrantsFragment();
+                waitlistViewEntrantsFragment.setEvent(event);
+                waitlistViewEntrantsFragment.setHome((HomeFragment) fragment);
+                return waitlistViewEntrantsFragment;
+
+            case 3:
+                MapFragment map = new MapFragment();
+                return map;
+
+
             default:
-                return new EventListDisplayFragment(user, (HomeFragment) fragment);
+                if (adminView) {
+                    AdminEventView adminEventView = new AdminEventView();
+                    adminEventView.setFragment((HomeFragment) fragment);
+                    return adminEventView;
+
+                }
+                else{
+
+                    EventListTabViewFragment fragment1 = new EventListTabViewFragment();
+                    fragment1.setHomeFragment((HomeFragment) fragment);
+                    return fragment1;
+
+                }
         }
 //
     }
@@ -44,5 +68,9 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     }
     public void setEvent(Event event){
         this.event = event;
+    }
+
+    public void setAdminView() {
+        adminView = true;
     }
 }

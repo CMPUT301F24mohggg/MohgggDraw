@@ -28,21 +28,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-/***
- This fragment represents the user's profile screen. It:
- - Inflates the layout for the profile screen
- - Sets up any necessary UI components or listeners
- ***/
 
+/**
+ * This fragment represents the user's profile screen.
+ * It allows users to:
+ * - View and update their profile details
+ * - Upload a profile picture
+ * - Delete their account
+ * - Navigate to other parts of the app
+ */
 public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -59,6 +66,14 @@ public class ProfileFragment extends Fragment {
     private String userName;
     private boolean isGalleryImage = false;
 
+    /**
+     * Inflates the layout for the profile screen.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate views in the fragment.
+     * @param container The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous state.
+     * @return The view for the fragment's UI.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -80,6 +95,11 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Initializes all the views and toolbar for the fragment.
+     *
+     * @param view The root view of the fragment.
+     */
     private void initViews(View view) {
         profileImageView = view.findViewById(R.id.profileImageView);
         nameTextView = view.findViewById(R.id.nameTextView);
@@ -103,6 +123,9 @@ public class ProfileFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
     }
 
+    /**
+     * Sets up listeners for buttons and profile image actions.
+     */
     private void setupListeners() {
         profileImageView.setOnClickListener(v -> handleProfileImageClick());
 
@@ -110,6 +133,9 @@ public class ProfileFragment extends Fragment {
         buttonDelete.setOnClickListener(v -> deleteUserData());
     }
 
+    /**
+     * Handles the profile image click. Allows the user to either upload a new picture or delete the current one.
+     */
     private void handleProfileImageClick() {
         if (isGalleryImage) {
             confirmDeleteProfileImage();
@@ -118,6 +144,9 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows an AlertDialog with options to upload a new profile picture or reset to the default.
+     */
     private void showImageOptions() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Profile Picture")
@@ -127,6 +156,9 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Confirms whether the user wants to delete the current profile picture.
+     */
     private void confirmDeleteProfileImage() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Delete Profile Picture")
@@ -136,28 +168,49 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Resets the profile picture to the default initials-based placeholder.
+     */
     private void resetToDefaultProfilePicture() {
         setDefaultProfilePicture();
         isGalleryImage = false;
         updateUserData(null); // Clear image URL in Firestore
     }
 
+    /**
+     * Opens the device gallery to allow the user to pick an image.
+     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Sets a default profile picture using the user's initials.
+     */
     private void setDefaultProfilePicture() {
         if (userName != null && !userName.isEmpty()) {
             profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
         }
     }
 
+    /**
+     * Extracts initials from a user's name.
+     *
+     * @param name The user's name.
+     * @return A string containing the initials.
+     */
     private String getInitials(String name) {
         String[] parts = name.split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
+    /**
+     * Creates a drawable containing the user's initials.
+     *
+     * @param initials The initials to display.
+     * @return A Drawable containing the initials.
+     */
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -169,6 +222,9 @@ public class ProfileFragment extends Fragment {
         return new BitmapDrawable(getResources(), bitmap);
     }
 
+    /**
+     * Handles the result of the gallery activity for picking an image.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -178,6 +234,11 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Processes the result from the gallery and uploads the image to Firebase.
+     *
+     * @param imageUri The URI of the selected image.
+     */
     private void handleGalleryResult(Uri imageUri) {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
@@ -190,6 +251,11 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Uploads the selected profile picture to Firebase Storage.
+     *
+     * @param bitmap The bitmap of the selected image.
+     */
     private void uploadProfilePictureToFirebase(Bitmap bitmap) {
         byte[] data = getImageData(bitmap);
         StorageReference profileRef = storageReference.child("profile_pictures/" + deviceID + ".jpg");
@@ -199,12 +265,21 @@ public class ProfileFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
     }
 
+    /**
+     * Converts a bitmap into a byte array for uploading.
+     *
+     * @param bitmap The bitmap to convert.
+     * @return A byte array representation of the bitmap.
+     */
     private byte[] getImageData(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();
     }
 
+    /**
+     * Loads the user's data from Firestore and populates the UI fields.
+     */
     private void loadUserData() {
         DocumentReference docRef = db.collection("user").document(deviceID);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -227,6 +302,11 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Updates the user's data in Firestore, including an optional profile image URL.
+     *
+     * @param imageUrl The URL of the uploaded profile image, if any.
+     */
     private void updateUserData(@Nullable String imageUrl) {
         String name = editTextName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
@@ -244,6 +324,7 @@ public class ProfileFragment extends Fragment {
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
+        addLists(deviceID);
         if (imageUrl != null) {
             userDetails.put("profileImageUrl", imageUrl);
         }
@@ -257,6 +338,9 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Deletes the user's data from Firestore.
+     */
     private void deleteUserData() {
         db.collection("user").document(deviceID).delete()
                 .addOnSuccessListener(aVoid -> {
@@ -269,10 +353,33 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Navigates the user to the signup screen after account deletion.
+     */
     private void navigateToSignupScreen() {
         Intent intent = new Intent(getContext(), SignupActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         requireActivity().finish();
+    }
+
+    /**
+     * Adds default lists (waitList, entrantList, createdList) to the user's Firestore document if they don't exist.
+     *
+     * @param deviceID The unique ID of the user's device.
+     */
+    public void addLists(String deviceID) {
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                if (!data.containsKey("waitList")) {
+                    DocumentReference mydoc = db.collection("user").document(deviceID);
+                    mydoc.update("waitList", new ArrayList<String>());
+                    mydoc.update("entrantList", new ArrayList<String>());
+                    mydoc.update("createdList", new ArrayList<String>());
+                }
+            }
+        });
     }
 }

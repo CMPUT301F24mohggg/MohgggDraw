@@ -11,6 +11,15 @@ android {
     viewBinding{
         enable = true
     }
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+
+        )
+        )
+    }
 
     defaultConfig {
         applicationId = "com.example.mohgggdraw"
@@ -58,6 +67,8 @@ dependencies {
     // Kotlin and Glide
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     implementation("com.github.bumptech.glide:glide:4.13.2")
+    implementation(libs.play.services.maps)
+    androidTestImplementation(libs.junit.jupiter)
     implementation(libs.play.services.location)
     annotationProcessor("com.github.bumptech.glide:compiler:4.13.2")
 
@@ -86,6 +97,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation (libs.cardview.v7)
 
+    //map
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.android.material:material:1.9.0")
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
+
     // Additional libraries from libs
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -105,7 +121,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.1.1")
 
     // Additional testing dependencies
-    androidTestImplementation("androidx.fragment:fragment-testing:1.8.5")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     testImplementation("org.hamcrest:hamcrest-library:1.3")
     androidTestImplementation("org.hamcrest:hamcrest-library:1.3")

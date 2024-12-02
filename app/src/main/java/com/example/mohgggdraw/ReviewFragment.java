@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import android.provider.Settings;
+import com.google.firebase.Timestamp;
 
 /***
  This fragment provides a review of all entered event details. It:
@@ -91,6 +92,11 @@ public class ReviewFragment extends Fragment {
             if (startTime != null) startTimeView.setText(startTime);
         });
 
+        sharedViewModel.getEventEndTime().observe(getViewLifecycleOwner(), endTime -> {
+            TextView endTimeView = view.findViewById(R.id.text_event_end_date);
+            if (endTime != null) endTimeView.setText(endTime);
+        });
+
         // Max Pooling Sample
         sharedViewModel.getMaxPoolingSample().observe(getViewLifecycleOwner(), maxSample -> {
             TextView maxSampleTextView = view.findViewById(R.id.text_max_pooling_sample);
@@ -110,9 +116,22 @@ public class ReviewFragment extends Fragment {
         });
     }
 
+    void createEventInFirebase() {
+        // Validate that all fields are filled before proceeding
+        if (sharedViewModel.getEventTitle().getValue() == null ||
+                sharedViewModel.getEventLocation().getValue() == null ||
+                sharedViewModel.getEventDetail().getValue() == null ||
+                sharedViewModel.getRegistrationOpen().getValue() == null ||
+                sharedViewModel.getRegistrationDeadline().getValue() == null ||
+                sharedViewModel.getEventStartTime().getValue() == null ||
+                sharedViewModel.getEventEndTime().getValue() == null ||
+                sharedViewModel.getMaxPoolingSample().getValue() == null ||
+                sharedViewModel.getMaxEntrants().getValue() == null ||
+                sharedViewModel.getImageUrl().getValue() == null) {
 
-    private void createEventInFirebase() {
-        String eventTitle = sharedViewModel.getEventTitle().getValue();
+            Toast.makeText(getContext(), "Please ensure all fields are filled before creating the event.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         Toast.makeText(getContext(), "Creating Event...", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Create Event button clicked");
@@ -123,17 +142,40 @@ public class ReviewFragment extends Fragment {
         // Reference to Firestore's "Events" collection
         CollectionReference eventsRef = FirebaseFirestore.getInstance().collection("Events");
 
+        // Convert the dates to Firestore Timestamps
+        Timestamp registrationOpenTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationOpen().getValue()));
+        Timestamp registrationDeadlineTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getRegistrationDeadline().getValue()));
+        Timestamp eventStartTimeTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getEventStartTime().getValue()));
+        Timestamp eventEndTimeTimestamp = new Timestamp(new java.util.Date(sharedViewModel.getEventEndTime().getValue()));
+
+        // Convert maxPoolingSample and maxEntrants to integers
+        int maxPoolingSampleValue = 0;
+        int maxEntrantsValue = 0;
+
+        try {
+            maxPoolingSampleValue = Integer.parseInt(sharedViewModel.getMaxPoolingSample().getValue());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error parsing maxPoolingSample, defaulting to 0", e);
+        }
+
+        try {
+            maxEntrantsValue = Integer.parseInt(sharedViewModel.getMaxEntrants().getValue());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error parsing maxEntrants, defaulting to 0", e);
+        }
+
         // Prepare all event data to save to Firestore
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("organizerId", deviceID);  // Use the device ID as organizer ID
-        eventData.put("eventTitle", eventTitle);
+        eventData.put("eventTitle", sharedViewModel.getEventTitle().getValue());
         eventData.put("eventLocation", sharedViewModel.getEventLocation().getValue());
         eventData.put("eventDetail", sharedViewModel.getEventDetail().getValue());
-        eventData.put("registrationOpen", sharedViewModel.getRegistrationOpen().getValue());
-        eventData.put("registrationDeadline", sharedViewModel.getRegistrationDeadline().getValue());
-        eventData.put("startTime", sharedViewModel.getEventStartTime().getValue());
-        eventData.put("maxPoolingSample", sharedViewModel.getMaxPoolingSample().getValue());
-        eventData.put("maxEntrants", sharedViewModel.getMaxEntrants().getValue());
+        eventData.put("registrationOpen", registrationOpenTimestamp);  // Use Timestamp
+        eventData.put("registrationDeadline", registrationDeadlineTimestamp);  // Use Timestamp
+        eventData.put("startTime", eventStartTimeTimestamp);  // Use Timestamp
+        eventData.put("endTime", eventEndTimeTimestamp);  // Use Timestamp
+        eventData.put("maxPoolingSample", maxPoolingSampleValue);
+        eventData.put("maxEntrants", maxEntrantsValue);
         eventData.put("createDate", System.currentTimeMillis());
         eventData.put("geoLocationEnabled", sharedViewModel.getEnableGeolocation().getValue());
         eventData.put("imageUrl", sharedViewModel.getImageUrl().getValue());
@@ -143,18 +185,21 @@ public class ReviewFragment extends Fragment {
         eventData.put("EventCancelledlist", new ArrayList<>());
         eventData.put("EventConfirmedlist", new ArrayList<>());
 
-
         // Add the new event data to Firestore
         eventsRef.add(eventData)
                 .addOnSuccessListener(documentReference -> {
                     String eventId = documentReference.getId();  // Get the documentId
 
                     // Generate QR code and put QR hash
-                    eventQr = new EventQr(eventId, eventTitle);
+                    eventQr = new EventQr(eventId, sharedViewModel.getEventTitle().getValue());
                     eventQr.generateQr();
                     qrHash = eventQr.getQrHash();
                     documentReference.update("QRhash", qrHash);
                     sharedViewModel.setEventQr(eventQr);
+
+                    // Add eventId to the user's document in Firestore
+                    updateUserWithEvent(deviceID, eventId);
+
                     Toast.makeText(getContext(), "Event successfully created and uploaded to Firestore!", Toast.LENGTH_SHORT).show();
 
                     // Swap to next fragment
@@ -164,6 +209,19 @@ public class ReviewFragment extends Fragment {
                     Toast.makeText(getContext(), "Failed to create event. Please try again.", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Error uploading event: ", e);
                 });
+    }
 
+    /**
+     * Adds the created eventId to the organizer's user document in Firestore.
+     */
+    private void updateUserWithEvent(String deviceID, String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("user");
+
+        // Locate the user document by device ID
+        usersRef.document(deviceID)
+                .update("createdList", com.google.firebase.firestore.FieldValue.arrayUnion(eventId))
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Event ID added to user document successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to add event ID to user document", e));
     }
 }

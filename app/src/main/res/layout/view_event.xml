@@ -1,168 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
+    <!-- Organizer Event Poster -->
     <ImageView
-        android:id="@+id/location"
-        android:layout_width="25dp"
-        android:layout_height="21dp"
-        android:src="@drawable/img_9"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.082"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.459"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/eventimage"
-        android:layout_width="412dp"
-        android:layout_height="268dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:contentDescription="Event Poster"
+        android:focusable="true"
         android:scaleType="centerCrop"
-        android:foregroundGravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/eventpage_banner_placeholder"
         app:layout_constraintTop_toTopOf="parent"
-
-        app:layout_constraintVertical_bias="0.0"
-        app:shapeAppearanceOverlay="@style/SpecificCornerRounded"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
-
-    <TextView
-        android:id="@+id/eventInfoTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="13dp"
-        android:gravity="left"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.162"
-        app:layout_constraintStart_toEndOf="@+id/timeevent"
-        app:layout_constraintTop_toBottomOf="@+id/eventInfoDay"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintBottom_toTopOf="@id/eventtitle" />
+
+    <!-- Event Title -->
+
+    <!-- Location Icon -->
 
     <TextView
         android:id="@+id/eventtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:text="TextView"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.099"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventimage"
-        app:layout_constraintVertical_bias="0.054" />
-
-    <TextView
-        android:id="@+id/eventInfoDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="left"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.162"
-        app:layout_constraintStart_toEndOf="@+id/dayevent"
-        app:layout_constraintTop_toBottomOf="@+id/eventInfoLocation"
-        app:layout_constraintVertical_bias="0.002" />
-
-    <TextView
-        android:id="@+id/eventInfoLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.162"
-        app:layout_constraintStart_toEndOf="@+id/location"
-        app:layout_constraintTop_toBottomOf="@+id/eventtitle"
-        app:layout_constraintVertical_bias="0.017" />
-
-    <ImageView
-        android:id="@+id/dayevent"
-        android:layout_width="25dp"
-        android:layout_height="21dp"
-        android:layout_marginTop="9dp"
-        android:src="@drawable/img_9"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.082"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location"
-        app:layout_constraintVertical_bias="0.005" />
-
-    <ImageView
-        android:id="@+id/timeevent"
-        android:layout_width="25dp"
-        android:layout_height="21dp"
-        android:layout_marginTop="11dp"
-        android:src="@drawable/img_9"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.082"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dayevent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/maxcapacityevent"
-        android:layout_width="25dp"
-        android:layout_height="21dp"
-        android:src="@drawable/img_9"
-        app:layout_constraintBottom_toTopOf="@+id/eventInfoButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.082"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeevent"
-        app:layout_constraintVertical_bias="0.303" />
-
-    <TextView
-        android:id="@+id/eventInfoPeople"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="30dp"
-        android:gravity="left"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/eventInfoButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.162"
-        app:layout_constraintStart_toEndOf="@+id/maxcapacityevent"
-        app:layout_constraintTop_toBottomOf="@+id/eventInfoTime"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/eventInfoButton"
-        android:layout_width="184dp"
-        android:layout_height="60dp"
-
-        android:clickable="true"
-        android:focusable="true"
-        android:paddingTop="10dp"
-        android:text="eventInfoButton"
-        android:textColor="#7257FF"
+        android:layout_marginTop="16dp"
+        android:text="Event Title"
+        android:textColor="@color/purple_500"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.023"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eventimage" />
+
+    <ImageView
+        android:id="@+id/location"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_location"
+        app:layout_constraintTop_toBottomOf="@id/eventtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.1" />
+
+    <!-- Location Details -->
+    <TextView
+        android:id="@+id/eventInfoLocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Location"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/location"
+        app:layout_constraintStart_toEndOf="@id/location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <!-- Date Icon -->
+    <ImageView
+        android:id="@+id/dayevent"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/calendar_icon"
+        app:layout_constraintTop_toBottomOf="@id/eventInfoLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.1" />
+
+    <!-- Event Date -->
+    <TextView
+        android:id="@+id/eventInfoDay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Date"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/dayevent"
+        app:layout_constraintStart_toEndOf="@id/dayevent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <!-- Time Icon -->
+    <ImageView
+        android:id="@+id/timeevent"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintTop_toBottomOf="@id/eventInfoDay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.1" />
+
+    <!-- Event Time -->
+    <TextView
+        android:id="@+id/eventInfoTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="00:00"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/timeevent"
+        app:layout_constraintStart_toEndOf="@id/timeevent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <!-- Capacity Icon -->
+    <ImageView
+        android:id="@+id/maxcapacityevent"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_people"
+        app:layout_constraintTop_toBottomOf="@id/eventInfoTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.1" />
+
+    <!-- Maximum Capacity -->
+    <TextView
+        android:id="@+id/eventInfoPeople"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="100 peoples"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/maxcapacityevent"
+        app:layout_constraintStart_toEndOf="@id/maxcapacityevent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+    <!-- Leave Event Button -->
+    <Button
+        android:id="@+id/eventInfoButton"
+        android:layout_width="182dp"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/purple_500"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:text="Event Info"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.709" />
+        app:layout_constraintTop_toBottomOf="@id/eventInfoPeople" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
