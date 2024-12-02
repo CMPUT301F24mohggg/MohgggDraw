@@ -13,6 +13,9 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ *Fragment for viewing events that an organizer has created
+ * */
 public class EventListCreatedFragment extends Fragment implements EventListView{
 
     private ArrayList<Event> dataList;

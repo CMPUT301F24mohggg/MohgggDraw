@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * user waitlist adapter from string user id for selected users. These users are the ones with the clickable buttons
+ * */
 public class WaitlistEntrantContentSelectedAdapter extends ArrayAdapter<String> {
     private SetListView fragment;
     private ArrayList<String> selectedList;
@@ -33,10 +36,12 @@ public class WaitlistEntrantContentSelectedAdapter extends ArrayAdapter<String> 
         if (view == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.entrant_item_layout, parent, false);
         }
+        //setting view fields
         String entrant = getItem(position);
         TextView userName = view.findViewById(R.id.userName);
         ImageView image = view.findViewById(R.id.profile_placeholder);
         CheckBox button = view.findViewById(R.id.selectCheckBox);
+        //selected checkbox
         button.setOnClickListener(v -> {
             (fragment).updateSelectedList(entrant);
 

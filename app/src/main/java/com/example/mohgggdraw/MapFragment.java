@@ -21,6 +21,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ *Map fragment to view general area where joined
+ * */
 public class MapFragment extends Fragment {
 
     private ImageView mapImage;

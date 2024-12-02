@@ -12,6 +12,10 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
+
+/**
+ *Entrant view to see events registered in
+ * */
 public class EventListConfirmFragment extends Fragment implements EventListView{
 
     private ArrayList<Event> dataList;
@@ -29,9 +33,8 @@ public class EventListConfirmFragment extends Fragment implements EventListView{
     public void setEventList(ArrayList<Event> events) {
         dataList = events;
         dataChange();
-
-
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +45,9 @@ public class EventListConfirmFragment extends Fragment implements EventListView{
     }
     //return inflater.inflate(R.layout.fragment_home, container, false);
 
+    /**
+     *creating the view for entrants registered list
+     * */
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
 

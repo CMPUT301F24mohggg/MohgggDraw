@@ -5,6 +5,10 @@ import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 
+
+/**
+ *interface for the fragments that have listviews for userLists
+ * */
 public interface SetListView {
 
 

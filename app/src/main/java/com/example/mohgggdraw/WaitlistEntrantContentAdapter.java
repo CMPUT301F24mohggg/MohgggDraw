@@ -14,7 +14,9 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
-
+/***
+ * Array adapter that takes the string id of a user and outputs an array adapter user
+ * ***/
 public class WaitlistEntrantContentAdapter extends ArrayAdapter<String> {
     private SetListView fragment;
     private ArrayList<String> selectedList;
