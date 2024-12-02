@@ -24,6 +24,8 @@ public class Event{
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
+    private Integer flag=-1;
+
     public Event(String eventId, String title, String location, String posterUrl, String registrationDetails, String participationSettings) {}
     // Required empty constructor for Firebase
     public Event() {
@@ -52,6 +54,14 @@ public class Event{
         this.participationSettings = participationSettings;
 
 
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public Integer getFlag(){
+        return flag;
     }
 
     public String getDate() {

@@ -344,4 +344,68 @@ public class WaitinglistDB {
             }
         });
     }
+
+
+    public void setAllUserLists(EventListView fragment, ArrayList<String> waitList, ArrayList<String> createList, ArrayList<String> entrantList) {
+        ArrayList<Event> events = new ArrayList<>(); // Use method-local list
+
+        if(entrantList == null) {
+            entrantList = new ArrayList<>();
+        }
+
+        for (String eventId : entrantList) {
+            waitlistRef.document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Event event = docSnapshotToEvent(documentSnapshot);
+                    if (event != null) {
+                        event.setFlag(2);
+                        events.add(event);
+                        fragment.setEventList(events); // Update UI safely
+                    }
+                } else {
+                    Log.e(TAG, "Document with ID " + eventId + " does not exist.");
+                }
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
+        }
+
+        if(waitList == null) {
+            waitList = new ArrayList<>();
+        }
+
+        for (String eventId : waitList) {
+            waitlistRef.document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Event event = docSnapshotToEvent(documentSnapshot);
+                    if (event != null) {
+                        event.setFlag(1);
+                        events.add(event);
+                        fragment.setEventList(events); // Update UI safely
+                    }
+                } else {
+                    Log.e(TAG, "Document with ID " + eventId + " does not exist.");
+                }
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
+        }
+        if(createList == null) {
+            createList = new ArrayList<>();
+        }
+
+        for (String eventId : createList) {
+            waitlistRef.document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Event event = docSnapshotToEvent(documentSnapshot);
+                    if (event != null) {
+                        event.setFlag(0);
+                        events.add(event);
+                        fragment.setEventList(events); // Update UI safely
+                    }
+                } else {
+                    Log.e(TAG, "Document with ID " + eventId + " does not exist.");
+                }
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch event data: " + e.getMessage()));
+        }
+
+    }
 }
+
+

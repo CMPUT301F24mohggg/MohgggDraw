@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -13,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /***
  * Fragment to display Array of lists
@@ -55,10 +57,13 @@ public class EventListDisplayFragment extends Fragment implements EventListView{
 
         //pulling all data for test purpose
         //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
+        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+
 
 
         eventList = view.findViewById(R.id.eventList);
-        new UserDB().queryList("waitList",this,deviceID);
+        new UserDB().queryAllListFromUser(deviceID,this);
         eventAdapter = new EventAdapter(this.getContext(), dataList);
         eventList.setAdapter(eventAdapter);
 
@@ -75,6 +80,9 @@ public class EventListDisplayFragment extends Fragment implements EventListView{
     }
     //updates list when data is changed
     public void dataChange(){
+
+
+        Collections.sort(dataList, (n1, n2) -> n2.getFlag().compareTo(n1.getFlag()));
 
         eventAdapter = new EventAdapter(this.getContext(), dataList);
 

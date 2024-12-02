@@ -89,15 +89,16 @@ public class WaitlistFragment extends Fragment {
          day = view.findViewById(R.id.eventInfoDay);
          capacity = view.findViewById(R.id.eventInfoPeople);
          location = view.findViewById(R.id.eventInfoLocation);
-        if(home !=null) {
+        if(event !=null) {
             name.setText(event.getTitle());
             time.setText(event.getStartTime().toString());
             day.setText(event.getDate());
             capacity.setText(String.valueOf(event.getMaxCapacity()));
             location.setText(event.getLocation());
 
+
             // Pulling and creating image
-            iv = view.findViewById(R.id.organizer_event_poster);
+            iv = view.findViewById(R.id.eventimage);
             if (iv != null) {
                 StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
                 try {
@@ -124,6 +125,7 @@ public class WaitlistFragment extends Fragment {
                 updateJoinButton();
             }
         }
+
     }
 
     public void setImportant(Event event, HomeFragment home){

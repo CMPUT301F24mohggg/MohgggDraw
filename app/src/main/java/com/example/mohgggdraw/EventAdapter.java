@@ -63,6 +63,21 @@ public class EventAdapter extends ArrayAdapter<Event> {
         TextView eventDetails = view.findViewById(R.id.eventDetails);
         TextView eventDescription = view.findViewById(R.id.eventDescription);
         ImageView eventImage = view.findViewById(R.id.eventImage);
+        TextView title = view.findViewById(R.id.registeredTitle);
+
+        if(event.getFlag()!=-1){
+            if(event.getFlag() == 1){
+                title.setText("Waiting");
+
+            } else if (event.getFlag()==2) {
+                title.setText("Registered");
+
+            } else if (event.getFlag() ==0) {
+                title.setText("Created Event");
+
+            }
+
+        }
 
         // Set event title
         eventTitle.setText(event.getTitle() != null ? event.getTitle() : "Untitled Event");
