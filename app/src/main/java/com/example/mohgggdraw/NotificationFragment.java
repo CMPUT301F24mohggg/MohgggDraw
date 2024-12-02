@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -200,9 +201,7 @@ public class NotificationFragment extends Fragment {
                                     showNotification(
                                             actualContext,
                                             updatedNotification.getTitle(),
-                                            updatedNotification.getMessage(),
-                                            updatedNotification.getTitle(),
-                                            updatedNotification.getStartTime()
+                                            updatedNotification.getMessage()
                                     );
                                 });
                             }
@@ -251,7 +250,8 @@ public class NotificationFragment extends Fragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String eventName = documentSnapshot.getString("eventTitle");
-                        String startTime = documentSnapshot.getString("startTime");
+                        Timestamp startTime = documentSnapshot.getTimestamp("startTime");
+                        Log.e("fetchEventDetails: start time", " " + startTime);
                         notification.setTitle(notification.getTitle());
                         notification.setEventDetail("Event: " + eventName + " starts at: " + startTime);
                         notification.setMessage(notification.getMessage());
@@ -369,10 +369,8 @@ public class NotificationFragment extends Fragment {
      * @param context The context used to display the notification.
      * @param title The title of the notification.
      * @param message The message of the notification.
-     * @param eventTitle The title of the event.
-     * @param startTime The start time of the event.
      */
-    public void showNotification(Context context, String title, String message, String eventTitle, String startTime) {
+    public void showNotification(Context context, String title, String message) {
         if (context == null) {
             Log.e(TAG, "Context is null, cannot show notification.");
             return;

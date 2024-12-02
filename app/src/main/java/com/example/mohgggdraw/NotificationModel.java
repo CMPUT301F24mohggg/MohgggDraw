@@ -21,7 +21,7 @@ public class NotificationModel {
     private String eventId;
     private String notificationId;
     private String deviceId;
-    private String startTime;
+    private Timestamp startTime;
     private String eventTitle;
     private String startMonth;
     private String startDate;
@@ -100,7 +100,7 @@ public class NotificationModel {
 
 
 
-    public String getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
@@ -109,7 +109,7 @@ public class NotificationModel {
      *
      * @param startTime The start time to set.
      */
-    public void setStartTime(String startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
         splitStartTime(startTime); // Update startMonth and startDate when startTime changes
     }
@@ -136,24 +136,18 @@ public class NotificationModel {
      *
      * @param startTime The start time in the format "dd/MM/yyyy".
      */
-    private void splitStartTime(String startTime) {
-        if (startTime == null || startTime.isEmpty()) return;
+    private void splitStartTime(Timestamp startTime) {
+        if (startTime == null) return;
 
-        try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-            Date date = inputFormat.parse(startTime);
+        // Convert Timestamp to Date
+        Date date = startTime.toDate();
 
-            // Extract short month and day
-            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
-            SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
+        // Extract short month and day
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
 
-            this.startMonth = monthFormat.format(date); // Example: "Nov"
-            this.startDate = dayFormat.format(date); // Example: "21"
-        } catch (ParseException e) {
-            e.printStackTrace();
-            this.startMonth = "";
-            this.startDate = "";
-        }
+        this.startMonth = monthFormat.format(date); // Example: "Nov"
+        this.startDate = dayFormat.format(date); // Example: "21"
     }
 
     public void setStatus(String status) {

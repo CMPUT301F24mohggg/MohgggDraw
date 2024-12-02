@@ -12,11 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +35,7 @@ public class WaitlistFragment extends Fragment {
     private Bitmap bmp;
     private ImageView iv;
     private TextView joinButton;
-    private Button sendNotificationButton;
+    private ConstraintLayout sendNotificationButton;
     private HomeFragment home;
     private String deviceId;
 

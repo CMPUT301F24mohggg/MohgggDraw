@@ -159,10 +159,16 @@
     <!-- Recipient container with ScrollView for better scrolling -->
 
     <!-- Next button for proceeding -->
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Next"
-        android:layout_marginTop="16dp" />
+        android:background="@drawable/large_trail"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/purple_500"
+        android:textSize="16sp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:paddingVertical="12dp" />
 </LinearLayout>
