@@ -208,7 +208,6 @@ public class WaitinglistDB {
                     }
 
 
-
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
@@ -220,22 +219,18 @@ public class WaitinglistDB {
 
     public ArrayList<Event> queryAllWithWaitingList(EventListDisplayFragment fragment) {
         ArrayList<Event> myArray = new ArrayList<>();
+        Task query = waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
 
-        waitlistRef.orderBy("EventWaitinglist").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentSnapshot doc : queryDocumentSnapshots) {
+
                     myArray.add(docSnapshotToEvent(doc));
                 }
-
-                // Safely update the fragment
-                if (fragment.isAdded() && fragment.getContext() != null) {
-                    fragment.dataChange();
-                } else {
-                    Log.e("WaitinglistDB", "Fragment is not ready to update the data.");
-                }
+                fragment.dataChange();
             }
         });
+        ;
 
         return myArray;
     }
