@@ -17,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 /***
- * Content fragment to display.
+ * Content fragment to display for selected users
  */
 public class WaitlistEntrantContentSelectedFragment extends Fragment implements SetListView{
     private ArrayList<String> dataList;
@@ -36,11 +36,12 @@ public class WaitlistEntrantContentSelectedFragment extends Fragment implements 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //dataList = event.getWaitingList();
+
         entrantListContainer = view.findViewById(R.id.listContainer);
         deleteButton = view.findViewById(R.id.deleteButton);
         deleteButton.setVisibility(View.INVISIBLE);
 
+        //populating listview
         viewCreated = true;
         if(event!=null) {
             new WaitinglistDB().setListFromDBSelected("EventSelectedlist", this, event);
