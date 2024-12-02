@@ -97,7 +97,7 @@ public class WaitlistFragment extends Fragment {
             location.setText(event.getLocation());
 
             // Pulling and creating image
-            iv = view.findViewById(R.id.organizer_event_poster);
+            iv = view.findViewById(R.id.eventimage);
             if (iv != null) {
                 StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
                 try {
