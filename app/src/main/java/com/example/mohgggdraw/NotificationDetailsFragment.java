@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.app.AlertDialog;
 import android.health.connect.datatypes.Device;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,7 +21,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Make the send notification to another file so that i can call it from here
 public class NotificationDetailsFragment extends Fragment {
     private  List<String> selectedLists;
     private Event event;
@@ -48,12 +49,50 @@ public class NotificationDetailsFragment extends Fragment {
                 return;
             }
 
-            // Send notifications to selected recipients
-            sendNotifications(title, details);
+            // Show confirmation dialog
+            showConfirmationDialog(title, details);
         });
 
         return view;
     }
+
+    private void showConfirmationDialog(String title, String details) {
+        // Inflate the custom layout
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.join_event, null);
+
+        // Build the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Ensure rounded background and proper dimensions
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Get references to dialog buttons and texts
+        Button acceptButton = dialogView.findViewById(R.id.accept_terms_button);
+        TextView nevermindTextView = dialogView.findViewById(R.id.nevermindTextView);
+        TextView popUpTitle = dialogView.findViewById(R.id.titleTextView);
+        TextView popUpMessage = dialogView.findViewById(R.id.messageTextView);
+
+        popUpTitle.setText("Notify Entrant?");
+        popUpMessage.setText("Are you sure want to send notification to your chosen entrants?");
+
+        // Handle accept button click
+        acceptButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            sendNotifications(title, details);
+        });
+
+        // Handle "Nevermind" button click
+        nevermindTextView.setOnClickListener(v -> dialog.dismiss());
+
+        // Show the dialog
+        dialog.show();
+    }
+
 
     private void sendNotifications(String title, String details) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -71,26 +110,7 @@ public class NotificationDetailsFragment extends Fragment {
 
                             if (deviceIds != null) {
                                 // Use NotificationUtils to send notifications
-                                // TODO: Create a constructor to put all these in and feed that into sendNotification
                                 NotificationUtils.sendNotification(title, details, deviceIds, eventId, null);
-
-                                // Set the list in the Event object
-                                switch (selectedList) {
-                                    case "EventSelectedlist":
-                                        event.setSelectedList(deviceIds);
-                                        break;
-                                    case "EventConfirmedlist":
-                                        event.setConfirmedList(deviceIds);
-                                        break;
-                                    case "EventCancelledlist":
-                                        event.setCancelledList(deviceIds);
-                                        break;
-                                    case "EventWaitinglist":
-                                        event.setWaitingList(deviceIds);
-                                        break;
-                                    default:
-                                        Log.w("sendNotifications", "Unknown list: " + selectedList);
-                                }
                             } else {
                                 Log.w("sendNotifications", "List " + selectedList + " is null or empty.");
                             }
@@ -105,7 +125,26 @@ public class NotificationDetailsFragment extends Fragment {
 
         // Clear UI fields after sending notifications
         Toast.makeText(getContext(), "Notifications sent successfully", Toast.LENGTH_SHORT).show();
-        // TODO: Clear the title and details fields and reset checkboxes
+
+        // Clear UI fields after sending notifications
+        clearFields();
+        // Navigate back to the previous page
+        if (home != null) {
+            requireActivity().runOnUiThread(() -> {
+                home.getViewPager2().setCurrentItem(1, false);
+            });
+        }
+    }
+    private void clearFields() {
+        requireActivity().runOnUiThread(() -> {
+            if (getView() != null) {
+                EditText titleEditText = getView().findViewById(R.id.notification_title);
+                EditText detailsEditText = getView().findViewById(R.id.notification_detail);
+
+                titleEditText.setText("");
+                detailsEditText.setText("");
+            }
+        });
     }
 
 

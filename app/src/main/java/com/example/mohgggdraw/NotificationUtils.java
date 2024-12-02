@@ -18,10 +18,6 @@ public class NotificationUtils {
     public static void sendNotification(String title, String details, ArrayList<String> deviceIds, String eventId, String status) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Format the timestamp
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm:ss a z", Locale.US);
-//        String formattedTimestamp = dateFormat.format(new Date());
-        
         Timestamp fireStoreTimestamp = Timestamp.now();
 
         for (String deviceId : deviceIds) {

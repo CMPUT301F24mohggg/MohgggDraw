@@ -120,6 +120,9 @@ public class HomeFragment extends Fragment implements ListSelectionFragment.List
         adminView = true;
 
     }
+    public ViewPager2 getViewPager2() {
+        return viewPager2;
+    }
 
 
 }

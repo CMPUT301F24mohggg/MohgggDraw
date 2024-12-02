@@ -371,17 +371,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     /**
-     * Converts a month number to its abbreviated string representation.
-     *
-     * @param month The month number (1-12)
-     * @return Abbreviated month name or "N/A" for invalid month numbers
-     */
-    private String getShortMonth(int month) {
-        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        return (month >= 1 && month <= 12) ? months[month - 1] : "N/A";
-    }
-
-    /**
      * Interface for handling decline actions on notifications.
      */
     public interface DeclineActionListener {

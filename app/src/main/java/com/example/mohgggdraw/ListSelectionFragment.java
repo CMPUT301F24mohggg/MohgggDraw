@@ -38,25 +38,31 @@ public class ListSelectionFragment extends Fragment {
 
         View btnNext = view.findViewById(R.id.btn_next);
 
+        // Store references to checkboxes
+        CheckBox cbWaitingList = view.findViewById(R.id.cb_waiting_list);
+        CheckBox cbSelectedList = view.findViewById(R.id.cb_selected_list);
+        CheckBox cbConfirmedList = view.findViewById(R.id.cb_confirmed_list);
+        CheckBox cbCancelledList = view.findViewById(R.id.cb_cancelled_list);
+
         // Set up individual checkboxes with their containers
         setupCheckbox(
                 view.findViewById(R.id.ll_waiting_list),
-                view.findViewById(R.id.cb_waiting_list),
+                cbWaitingList,
                 "EventWaitinglist"
         );
         setupCheckbox(
                 view.findViewById(R.id.ll_selected_list),
-                view.findViewById(R.id.cb_selected_list),
+                cbSelectedList,
                 "EventSelectedlist"
         );
         setupCheckbox(
                 view.findViewById(R.id.ll_confirmed_list),
-                view.findViewById(R.id.cb_confirmed_list),
+                cbConfirmedList,
                 "EventConfirmedlist"
         );
         setupCheckbox(
                 view.findViewById(R.id.ll_cancelled_list),
-                view.findViewById(R.id.cb_cancelled_list),
+                cbCancelledList,
                 "EventCancelledlist"
         );
 
@@ -92,11 +98,6 @@ public class ListSelectionFragment extends Fragment {
         });
     }
 
-
-    public List<String> getSelectedLists() {
-        return new ArrayList<>(selectedLists); // Return a copy to avoid accidental modification
-    }
-
     public Event getEvent() {
         return event; // Provide access to the event
     }
@@ -105,4 +106,5 @@ public class ListSelectionFragment extends Fragment {
     public interface ListSelectionListener {
         void onListsSelected(Event event, List<String> selectedLists);
     }
+
 }

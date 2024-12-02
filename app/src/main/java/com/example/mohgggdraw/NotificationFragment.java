@@ -327,17 +327,28 @@ public class NotificationFragment extends Fragment {
         String eventId = notification.getEventId();
         String userId = deviceId;
 
-        DocumentReference eventRef = db.collection("Events").document(eventId);
-        db.runTransaction(transaction -> {
-            DocumentSnapshot snapshot = transaction.get(eventRef);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            List<String> selectedList = (List<String>) snapshot.get("EventSelectedlist");
-            List<String> confirmedList = (List<String>) snapshot.get("EventConfirmedlist");
+        // Create references to both Events and Users collections
+        DocumentReference eventRef = db.collection("Events").document(eventId);
+        DocumentReference userRef = db.collection("user").document(userId);
+
+        db.runTransaction(transaction -> {
+            // Fetch event snapshot
+            DocumentSnapshot eventSnapshot = transaction.get(eventRef);
+
+            // Fetch user snapshot
+            DocumentSnapshot userSnapshot = transaction.get(userRef);
+
+            // Get lists from event
+            List<String> selectedList = (List<String>) eventSnapshot.get("EventSelectedlist");
+            List<String> confirmedList = (List<String>) eventSnapshot.get("EventConfirmedlist");
 
             // Ensure the lists are not null
             if (selectedList == null) selectedList = new ArrayList<>();
             if (confirmedList == null) confirmedList = new ArrayList<>();
 
+            // Check if user is already confirmed
             if (confirmedList.contains(userId)) {
                 return "already_confirmed";
             }
@@ -346,8 +357,31 @@ public class NotificationFragment extends Fragment {
             selectedList.remove(userId);
             confirmedList.add(userId);
 
+            // Update event lists
             transaction.update(eventRef, "EventSelectedlist", selectedList);
             transaction.update(eventRef, "EventConfirmedlist", confirmedList);
+
+            // Handle user's entrantList
+            List<String> userEntrantList = (List<String>) userSnapshot.get("entrantList");
+            List<String> userWaitList = (List<String>) userSnapshot.get("waitList");
+
+            // Ensure lists are not null
+            if (userEntrantList == null) {
+                userEntrantList = new ArrayList<>();
+            }
+            if (userWaitList == null) {
+                userWaitList = new ArrayList<>();
+            }
+
+            // Remove event from waitList and add to entrantList
+            userWaitList.remove(eventId);
+            if (!userEntrantList.contains(eventId)) {
+                userEntrantList.add(eventId);
+            }
+
+            // Update user document
+            transaction.update(userRef, "waitList", userWaitList);
+            transaction.update(userRef, "entrantList", userEntrantList);
 
             return "accept_recorded";
         }).addOnSuccessListener(result -> {
@@ -358,6 +392,7 @@ public class NotificationFragment extends Fragment {
             }
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Error recording accept action", e);
+            Toast.makeText(getContext(), "Failed to accept event.", Toast.LENGTH_SHORT).show();
         });
     }
 
