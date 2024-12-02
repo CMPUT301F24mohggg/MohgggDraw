@@ -77,6 +77,7 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
 
         // Initialize dataList
         dataList = new ArrayList<>();
+        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // Initialize ListView
         eventList = view.findViewById(R.id.eventList);
@@ -84,7 +85,7 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         // Determine data fetching method
         if (deviceID != null) {
             // If deviceID is set, use UserDB to query list
-            new UserDB().queryList("waitList", this, deviceID);
+            new UserDB().queryAllListFromUser(deviceID,this);
         } else {
             // Otherwise, use WaitinglistDB to query all events
             dataList = new WaitinglistDB().queryAllWithWaitingList(this);
@@ -111,22 +112,6 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
     }
 
 
-    /**
-     * Updates the list data and refreshes the adapter.
-     */
-    public void dataChange() {
-        if (getContext() == null || eventList == null) {
-            Log.e("EventListDisplayFragment", "Context or eventList is null, skipping dataChange()");
-            return;
-        }
-
-        if (eventAdapter == null) {
-            eventAdapter = new EventAdapter(requireContext(), dataList);
-            eventList.setAdapter(eventAdapter);
-        } else {
-            eventAdapter.notifyDataSetChanged();
-        }
-    }
 
     /**
      * Sets the event list data and triggers a UI update.
@@ -143,43 +128,7 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
 
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-
-        return inflater.inflate(R.layout.event_adapter_layout, container, false);
-    }
-        //return inflater.inflate(R.layout.fragment_home, container, false);
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
-
-    dataList = new ArrayList<Event>();
-
-        //pulling all data for test purpose
-        //dataList = new WaitinglistDB().queryAllWithWaitingList(this);
-        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-
-
-
-
-        eventList = view.findViewById(R.id.eventList);
-        new UserDB().queryAllListFromUser(deviceID,this);
-        eventAdapter = new EventAdapter(this.getContext(), dataList);
-        eventList.setAdapter(eventAdapter);
-
-//onclick per event item
-        eventList.setOnItemClickListener(new  android.widget.AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> list, View view,
-                                    final int i, long id) {
-
-                Event event = (Event) list.getItemAtPosition(i);
-                fragment.goToNextPage(event);
-            }
-        });
-    }
     //updates list when data is changed
     public void dataChange(){
 
