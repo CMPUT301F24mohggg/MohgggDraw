@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
@@ -30,28 +31,43 @@ import java.util.Objects;
  * ***/
 public class QrWaitlistFragment extends Fragment {
     private int version;
-    Event event = new Event("olKgM5GAgkLRUqo97eVS","testname","testname","https://firebasestorage.googleapis.com/v0/b/mohgggdraw.appspot.com/o/event_images%2F1730963184849.jpg?alt=media&token=8c93f3c0-2e18-494a-95ec-a95b864ccdbd","testname","testname","testname","testname","testname",true);
-    User user = new User();
     String path;
-    Bitmap bmp;
-    ImageView iv;
-    StorageReference storageReference;
     private ViewPager2 viewPager2;
-    TextView joinButton;
+
+
+    private Event event;
+    private User user;
+    private Bitmap bmp;
+    private ImageView iv;
+    private TextView joinButton;
+    private ConstraintLayout sendNotificationButton;
+    private String deviceId;
+
+    // TextViews for event details
+    private TextView name;
+    private TextView time;
+    private TextView day;
+    private TextView capacity;
+    private TextView location;
+
     private ScannerViewModel scannerViewModel;
     private SharedViewModel sharedViewModel;
 
 
+    /**
+     * Default constructor. Initializes version and User
+     */
     public QrWaitlistFragment(int version){
         super();
         this.version = version;
+        this.user = new User();
     }
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get the device ID and set it as the user's UID
-        String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         user.setUid(deviceId);  // Setting the device ID as Uid
 
         if (version == 0) {
@@ -60,22 +76,24 @@ public class QrWaitlistFragment extends Fragment {
             sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         }
 
-        //mainly for testing purpose as i can build objects from the arguments
-        if(getArguments() != null) {
+
+        // Handle test arguments if needed
+        if (getArguments() != null) {
             Bundle args = getArguments();
-            if (getArguments().getBoolean("Geo")) {
+            if (args.getBoolean("Geo")) {
                 event.setGeolocation(true);
                 user.setUid("geotest");
-            } else if (getArguments().getBoolean("Geo") == false) {
-                user.setUid("mewoowww normal");
+            } else {
+                user.setUid("device_user");
                 event.setGeolocation(false);
             }
-            if (getArguments().getBoolean("Org")){
-                event.setOrgID("Uaf");
-                ArrayList<String> list = new ArrayList<String>();
-                list.add("meow1");
-                list.add("meow2");
-                list.add("meow3");
+
+            if (args.getBoolean("Org")) {
+                event.setOrgID(deviceId);
+                ArrayList<String> list = new ArrayList<>();
+                list.add("test_user1");
+                list.add("test_user2");
+                list.add("test_user3");
                 event.setWaitingList(list);
             }
         }
@@ -103,118 +121,189 @@ public class QrWaitlistFragment extends Fragment {
                     refreshUi(view);
                 });
             }
+
+
+            // Initialize view components
+            initializeViews(view);
+
+
+            if (event != null) {// Set event details
+                setEventDetails();
+
+                // Load event image
+                loadEventImage();
+
+                // Set up join/leave button logic
+                setupJoinButton();
+            }
+
         }
 
+    /**
+     * Initializes the views in the layout.
+     *
+     * @param view The root view of the fragment.
+     */
+    private void initializeViews(View view) {
+        name = view.findViewById(R.id.eventtitle);
+        time = view.findViewById(R.id.eventInfoTime);
+        day = view.findViewById(R.id.eventInfoDay);
+        capacity = view.findViewById(R.id.eventInfoPeople);
+        location = view.findViewById(R.id.eventInfoLocation);
+        iv = view.findViewById(R.id.eventimage);
+        joinButton = view.findViewById(R.id.eventInfoButton);
+        sendNotificationButton = view.findViewById(R.id.send_notification_button);
+    }
+
+    /**
+     * Populates the event details in the UI.
+     */
+    private void setEventDetails() {
+        name.setText(event.getTitle());
+        // Different time method from the second implementation
+        time.setText(event.getStartTime() != null ? event.getStartTime().toString() : event.getTime());
+        day.setText(event.getDate());
+        capacity.setText(String.valueOf(event.getMaxCapacity()));
+        location.setText(event.getLocation());
+    }
+
+    /**
+     * Downloads and displays the event's poster image if available.
+     */
+    private void loadEventImage() {
+        if (event.getPosterUrl() != null) {
+            StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+            try {
+                File eventImage = File.createTempFile(event.getTitle(), ".png");
+                myImage.getFile(eventImage)
+                        .addOnSuccessListener(taskSnapshot -> {
+                            Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
+                            iv.setImageBitmap(bitmap);
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Sets up the join/leave button logic based on the user's role and event status.
+     */
+    private void setupJoinButton() {
+        if (Objects.equals(event.getOrgID(), deviceId)) {
+            // If organizer, view waitlist
+            setupOrganizerButton();
+        } else {
+            updateJoinButton();
+        }
+    }
+
+    /**
+     * Configures the button for organizers to view the waitlist and send notifications.
+     */
+    private void setupOrganizerButton() {
+        joinButton.setVisibility(View.INVISIBLE);
+//        joinButton.setText("View waitlist");
+//        joinButton.setOnClickListener(v -> {
+//            if (home != null) home.goToWaitlistView(event);
+//        });
+//
+        if (sendNotificationButton != null) {
+            sendNotificationButton.setVisibility(View.INVISIBLE);
+//            sendNotificationButton.setVisibility(View.VISIBLE);
+//            sendNotificationButton.setOnClickListener(v -> {
+//                if (home != null) home.goToSendNotificationView(event);
+//            });
+        }
+    }
 
 
-    public void onDialogueFinished(){
-        //refresh page after dialogue to update teh buttons
-        if (event.getWaitingList().contains(user.getUid())){
+    /**
+     * Updates the join button text and functionality for regular users.
+     */
+    private void updateJoinButton() {
+        joinButton.setVisibility(View.VISIBLE);
+
+        if (event.getWaitingList().contains(user.getUid())) {
+            // If in event, leave waitlist
             joinButton.setText("Leave event");
-            joinButton.setOnClickListener(v->{
-                        new QrLeaveEventButton(event, user,this).show(getActivity().getSupportFragmentManager(),"join");
-                    }
+            joinButton.setOnClickListener(v ->
+                    new QrLeaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join")
             );
-
-
-        }else {
+        } else {
+            // If not in waitlist, join
             joinButton.setText("Join event");
             joinButton.setOnClickListener(v -> {
-
+                // Logic for geolocation
                 if (event.isGeolocation()) {
                     new QrJoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
                 } else {
                     new WaitinglistController(event).addUser(user);
+                    new UserDB().addEventToUserList(event.getEventId(), deviceId);
                     onDialogueFinished();
-
                 }
             });
         }
-
-
-
     }
 
+
+
+    /**
+     * Refreshes the page after an action to update the join button state.
+     */
+    public void onDialogueFinished() {
+        // Refresh page after dialogue to update the buttons
+        updateJoinButton();
+    }
+
+
+    /**
+     * Refreshes the UI with the latest event details.
+     *
+     * @param view The root view of the fragment.
+     */
     private void refreshUi(View view) {
-        if (event != null) {
-            this.event = event;
+        if (event == null) return;
 
+        // Update event details
+        name.setText(event.getTitle());
+        time.setText(event.getStartTime() != null ? event.getStartTime().toString() : event.getTime());
+        day.setText(event.getDate());
+        capacity.setText(String.valueOf(event.getMaxCapacity()));
+        location.setText(event.getLocation());
 
-            TextView name = (TextView) view.findViewById(R.id.eventtitle);
-            TextView time = (TextView) view.findViewById(R.id.eventInfoTime);
-            TextView day = (TextView) view.findViewById(R.id.eventInfoDay);
-            TextView capacity = (TextView) view.findViewById(R.id.eventInfoPeople);
-            TextView location = (TextView) view.findViewById(R.id.eventInfoLocation);
+        // Load the event image
+        loadEventImage();
 
-
-            name.setText(event.getTitle());
-            time.setText(event.getTime());
-            day.setText(event.getDate());
-            capacity.setText(String.valueOf(event.getMaxCapacity()));
-            location.setText(event.getLocation());
-
-            // pulling and creating image
-            path = event.getPosterUrl();
-            iv = (ImageView) view.findViewById(R.id.eventimage);
-            StorageReference myimage = new WaitinglistDB().getImage(path);
-            try{
-                File eventImage = File.createTempFile(event.getTitle(),".png");
-                myimage.getFile(eventImage)
-                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
-                                iv.setImageBitmap(bitmap);
-
-                            }
-                        });{
-
-                }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            // logic to decide if button is join leave or view waitlist
-            joinButton = view.findViewById(R.id.eventInfoButton);
-
-
-            if (event.getWaitingList().contains(user.getUid())) {
-                //if in event leave waitlist
-                joinButton.setText("Leave event");
-                joinButton.setOnClickListener(v -> {
-                            new QrLeaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
-                        }
-                );
-
-
-            } else {
-                //if not in waitlist join
-                joinButton.setText("Join event");
-                joinButton.setOnClickListener(v -> {
-
-                    //logic for geolocation
-                    if (event.isGeolocation()) {
-                        new QrJoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
-                    } else {
-                        new WaitinglistController(event).addUser(user);
-                        onDialogueFinished();
-
-                    }
-                });
-            }
-
-        }
+        // Update the join button based on the user's role and event state
+        setupJoinButton();
     }
 
+    /**
+     * Sets the device ID for testing purposes.
+     *
+     * @param deviceId The device ID to set.
+     */
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 
-    public Event getEvent(){
+    /**
+     * Retrieves the associated event.
+     *
+     * @return The event object.
+     */
+    public Event getEvent() {
         return event;
     }
-    public User getUser(){
+
+    /**
+     * Retrieves the user object.
+     *
+     * @return The user object.
+     */
+    public User getUser() {
         return user;
     }
-
-    public void setEvent(Event event) {
-        this.event = event;
-    }
 }
+

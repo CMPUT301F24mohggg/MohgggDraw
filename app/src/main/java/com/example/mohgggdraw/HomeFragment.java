@@ -70,7 +70,12 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-    //goes to eventview
+
+    /**
+     * Navigates to the event view page.
+     *
+     * @param event The selected event.
+     */
     public void goToNextPage(Event event){
 
         waitlistAdapter.setEvent(event);

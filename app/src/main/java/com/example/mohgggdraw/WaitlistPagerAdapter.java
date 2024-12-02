@@ -63,4 +63,10 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     public void setAdminView() {
         adminView = true;
     }
+
+    public void refresh() {
+
+    }
 }
+}
+
