@@ -11,16 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
 /**
  * Adapter for displaying notifications in a RecyclerView.
  * Each notification item can include a title, message, event details, and action buttons
@@ -260,13 +253,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.declineButton.setVisibility(View.GONE);
 
             // Show the status based on the conditions
-            if(notification.getStatus() != null && (Objects.equals(notification.getStatus(), "selected"))) {
+            if(notification.getStatus() != null) {
                 if (isAccepted) {
                     holder.eventStatus.setText("You have joined!");
                     holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_success)); // Green color
                     holder.eventStatus.setVisibility(View.VISIBLE);
                 } else if (isDeclined) {
-                    holder.eventStatus.setText("You have declined!");
+                    holder.eventStatus.setText("You have declined/canceled!");
                     holder.eventStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_error)); // Red color
                     holder.eventStatus.setVisibility(View.VISIBLE);
                 }
@@ -289,22 +282,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
      * @param holder           The ViewHolder to update.
      */
     private void updateEventDateTime(DocumentSnapshot documentSnapshot, NotificationViewHolder holder) {
-        // First, try to get the Timestamp directly from the document
-        Timestamp startTimeTimestamp = documentSnapshot.getTimestamp("startTime");
-
-        if (startTimeTimestamp != null) {
-            // Convert Timestamp to Date
-            Date startDate = startTimeTimestamp.toDate();
-
-            // Create formatters
-            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
-            SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.ENGLISH);
-
-            // Set month and date
-            holder.eventStartMonth.setText(monthFormat.format(startDate));
-            holder.eventStartDate.setText(dayFormat.format(startDate));
+        String startTime = documentSnapshot.getString("startTime");
+        if (startTime != null && !startTime.isEmpty()) {
+            String[] dateParts = startTime.split("/");
+            if (dateParts.length == 3) {
+                // Update month and date
+                holder.eventStartMonth.setText(getShortMonth(Integer.parseInt(dateParts[1])));
+                holder.eventStartDate.setText(dateParts[0]);
+            } else {
+                // Fallback if date format is incorrect
+                holder.eventStartMonth.setText("N/A");
+                holder.eventStartDate.setText("N/A");
+            }
         } else {
-            // Fallback if no Timestamp is found
+            // No start time provided
             holder.eventStartMonth.setText("N/A");
             holder.eventStartDate.setText("N/A");
         }
@@ -368,6 +359,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             acceptButton = itemView.findViewById(R.id.accept_button);
             declineButton = itemView.findViewById(R.id.decline_button);
         }
+    }
+
+    /**
+     * Converts a month number to its abbreviated string representation.
+     *
+     * @param month The month number (1-12)
+     * @return Abbreviated month name or "N/A" for invalid month numbers
+     */
+    private String getShortMonth(int month) {
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        return (month >= 1 && month <= 12) ? months[month - 1] : "N/A";
     }
 
     /**

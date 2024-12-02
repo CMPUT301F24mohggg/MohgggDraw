@@ -24,20 +24,6 @@
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Facility Name Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayoutFacility"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:hintEnabled="true"
-            android:hint="Facility Name"
-            android:visibility="gone">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextFacilityName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Phone Number Field -->
         <com.google.android.material.textfield.TextInputLayout

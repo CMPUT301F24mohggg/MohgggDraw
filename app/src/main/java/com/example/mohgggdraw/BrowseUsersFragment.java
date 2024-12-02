@@ -1,6 +1,5 @@
 package com.example.mohgggdraw;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 /**
  * BrowseUsersFragment manages the UI and functionality for browsing and managing user profiles of type "entrant".
- * <p>
  * Features:
  * - Displays a list of users with userType 0 (entrants) in a ListView.
  * - Allows multiple users to be selected and deleted.
@@ -99,7 +98,7 @@ public class BrowseUsersFragment extends Fragment {
     }
 
     /**
-     * Displays a confirmation dialog to confirm the deletion of selected users.
+     * Displays a custom confirmation dialog to confirm the deletion of selected users.
      */
     private void showDeleteConfirmationDialog() {
         ArrayList<String> selectedIds = new ArrayList<>();
@@ -116,30 +115,36 @@ public class BrowseUsersFragment extends Fragment {
             return;
         }
 
-        // Inflate the custom layout for the confirmation dialog
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        View dialogView = inflater.inflate(R.layout.dialog_confirmation, null);
+        // Inflate the custom layout for the dialog
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_confirmation_dialog, null);
 
-        // Set up dialog views
-        TextView title = dialogView.findViewById(R.id.dialog_title);
-        TextView message = dialogView.findViewById(R.id.dialog_message);
-        TextView btnYes = dialogView.findViewById(R.id.btn_yes);
-        TextView btnNevermind = dialogView.findViewById(R.id.btn_nevermind);
-
-        title.setText("Delete Selected?");
-        message.setText("Are you sure you want to delete the selected users?");
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
+        // Build the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setCancelable(true)
+                .setCancelable(false)
                 .create();
 
+        // Ensure rounded background and proper dimensions
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Set up dialog views
+        TextView titleTextView = dialogView.findViewById(R.id.title_text_view);
+        TextView messageTextView = dialogView.findViewById(R.id.message_text_view);
+        TextView cancelTextView = dialogView.findViewById(R.id.cancel_text_view);
+        View confirmButton = dialogView.findViewById(R.id.confirm_button);
+
+        // Customize dialog text
+        titleTextView.setText("Delete Selected?");
+        messageTextView.setText("Are you sure you want to delete the selected users?");
+
         // Set up dialog button listeners
-        btnYes.setOnClickListener(v -> {
+        confirmButton.setOnClickListener(v -> {
             deleteSelectedUsers(selectedIds);
             dialog.dismiss();
         });
-        btnNevermind.setOnClickListener(v -> dialog.dismiss());
+        cancelTextView.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
     }

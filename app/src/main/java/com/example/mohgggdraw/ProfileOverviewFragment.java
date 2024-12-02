@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -25,8 +27,13 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.List;
 
 /**
  * ProfileOverviewFragment displays an overview of the user's profile, including:
@@ -43,6 +50,7 @@ public class ProfileOverviewFragment extends Fragment {
     private ImageView profileImageView;
     private FirebaseFirestore db;
     private String deviceID;
+    private Switch notificationSwitch;
 
     /**
      * Inflates the layout for the fragment.
@@ -72,15 +80,18 @@ public class ProfileOverviewFragment extends Fragment {
         userEmailTextView = view.findViewById(R.id.userEmailTextView);
         profileImageView = view.findViewById(R.id.profileImageView);
         db = FirebaseFirestore.getInstance();
+        notificationSwitch = view.findViewById(R.id.notificationSwitch);
         deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
+        notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> updateNotification(isChecked));
+        notificationPreference();
         // Load user data
         loadUserData();
 
         // Initialize buttons and switches
         Button buttonEditProfile = view.findViewById(R.id.buttonEditProfile);
         Button buttonLogout = view.findViewById(R.id.buttonLogout);
-        Switch switchNotifications = view.findViewById(R.id.switchNotifications);
+
 
         // Set onClickListener for Edit Profile button to navigate to ProfileFragment
         buttonEditProfile.setOnClickListener(v -> {
@@ -113,13 +124,23 @@ public class ProfileOverviewFragment extends Fragment {
                 userEmailTextView.setText(userEmail != null ? userEmail : "user@example.com");
 
                 if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                    // Load profile image from URL using Glide
                     Glide.with(this)
+                            .asBitmap()
                             .load(profileImageUrl)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(createInitialsDrawable(getInitials(userName))) // Placeholder while loading
-                            .error(createInitialsDrawable(getInitials(userName))) // Fallback if image load fails
-                            .into(profileImageView);
+                            .placeholder(createInitialsDrawable(getInitials(userName)))
+                            .error(createInitialsDrawable(getInitials(userName)))
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    profileImageView.setImageBitmap(circularBitmap(resource));
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    profileImageView.setImageDrawable(placeholder);
+                                }
+                            });
                 } else {
                     // Show initials if no profile image is set
                     profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
@@ -132,6 +153,30 @@ public class ProfileOverviewFragment extends Fragment {
             Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
         });
     }
+
+    /**
+     * Creates a circular version of the bitmap
+     * @param bitmap
+     * @return circular cropped bitmap object
+     */
+    private Bitmap circularBitmap(Bitmap bitmap) {
+        int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+
+        float radius = size / 2f;
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, -((bitmap.getWidth() - size) / 2f), -((bitmap.getHeight() - size) / 2f), paint);
+
+        return output;
+    }
+
 
     /**
      * Extracts the initials from the user's name for use in a default profile image.
@@ -161,5 +206,39 @@ public class ProfileOverviewFragment extends Fragment {
         paint.setAntiAlias(true); // Smooth text rendering
         canvas.drawText(initials, 50, 65, paint);
         return new BitmapDrawable(getResources(), bitmap);
+    }
+
+    /**
+     * Updates the user's notification preferences in the Firestore database.
+     * @param isEnabled boolean checking if the notifications are enabled
+     */
+    private void updateNotification(boolean isEnabled) {
+        if (!isEnabled) {
+            db.collection("notification").document("notificationOptOut")
+                    .update("deviceIds", FieldValue.arrayUnion(deviceID))
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted out of notifications"))
+                    .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting out", e));
+        } else {
+            db.collection("notification").document("notificationOptOut")
+                    .update("deviceIds", FieldValue.arrayRemove(deviceID))
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "Opted in to notifications"))
+                    .addOnFailureListener(e -> Log.e("ProfileFragment", "Error opting in", e));
+        }
+    }
+
+    /**
+     * Loads the user's notification preference from the Firestore database and updates the notification switch UI accordingly.
+     * retrieves the list of users who opted out of receiving notifications from document "notificationOptOut"
+     */
+    private void notificationPreference() {
+        db.collection("notification").document("notificationOptOut")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> deviceIDs = (List<String>) documentSnapshot.get("deviceId");
+                        notificationSwitch.setChecked(!(deviceIDs != null && deviceIDs.contains(deviceID)));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error loading preference", e));
     }
 }
