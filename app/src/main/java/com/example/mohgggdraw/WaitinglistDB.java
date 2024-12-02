@@ -179,6 +179,21 @@ public class WaitinglistDB {
         return ref;
     }
 
+    public void setAllEventsView(AdminEventView frag){
+
+        Task query = waitlistRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                ArrayList<Event> array= new ArrayList();
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                    array.add(docSnapshotToEvent(doc));
+                }
+                frag.setDataList(array);
+            }
+        });
+
+    }
+
     //updates waitlist of event. gets doc snapshot and rebuilds waitinglist
     public void updateWaitlistInEvent(Event event) {
         boolean present = false;

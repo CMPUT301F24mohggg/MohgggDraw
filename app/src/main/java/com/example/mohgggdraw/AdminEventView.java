@@ -47,7 +47,8 @@ public class AdminEventView extends Fragment {
         eventsRef = firestore.collection("Events");
 
         // Fetch all events in real-time
-        fetchAllEventsInRealTime();
+        //fetchAllEventsInRealTime();
+        new WaitinglistDB().setAllEventsView(this);
 
         // Handle click on events to navigate to AdminEventDetails
         eventList.setOnItemClickListener((parent, itemView, position, id) -> {
@@ -150,5 +151,15 @@ public class AdminEventView extends Fragment {
         transaction.replace(R.id.fragment_container, detailsFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    public void setDataList(ArrayList<Event> dataList){
+        this.dataList = dataList;
+        dataChange();
+
+    }
+    public void dataChange() {
+        eventAdapter = new EventAdapter(this.getContext(), dataList);
+        eventList.setAdapter(eventAdapter);
     }
 }
