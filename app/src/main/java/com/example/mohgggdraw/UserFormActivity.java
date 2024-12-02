@@ -184,7 +184,6 @@ public class UserFormActivity extends AppCompatActivity {
      */
     private void submitUserData() {
         String name = editTextName.getText().toString().trim();
-        String facilityName = editTextFacilityName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
