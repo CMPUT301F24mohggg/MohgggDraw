@@ -27,14 +27,12 @@
         <!-- Profile Picture -->
         <ImageView
             android:id="@+id/profileImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:src="@drawable/user"
-            android:scaleType="centerCrop"
-            android:contentDescription="Profile picture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:background="@drawable/circle_background"
-            android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Profile Image"
+            android:layout_marginBottom="8dp" />
 
         <!-- Pen Icon for Editing -->
         <ImageView
@@ -74,51 +72,78 @@
         android:padding="16dp"
         android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/editTextName"
+        <!-- Name Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name"
-            android:inputType="textPersonName" />
+            android:hint="Name">
 
-        <EditText
-            android:id="@+id/editTextPhone"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Phone Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Phone Number"
-            android:inputType="phone"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/editTextEmail"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Email Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp">
 
-        <EditText
-            android:id="@+id/editTextLocation"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Location Input (Hidden) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Location"
-            android:inputType="text"
-            android:layout_marginTop="16dp" />
+            android:visibility="gone"
+            android:layout_marginTop="16dp">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Update Profile Button -->
         <Button
             android:id="@+id/buttonSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Update Profile"
             android:layout_marginTop="24dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:enabled="false"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white" />
 
-        <Button
-            android:id="@+id/buttonDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete Profile"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal" />
     </LinearLayout>
+
 </RelativeLayout>

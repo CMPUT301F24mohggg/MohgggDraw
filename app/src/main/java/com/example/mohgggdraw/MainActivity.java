@@ -1,6 +1,5 @@
 package com.example.mohgggdraw;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -22,16 +21,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * MainActivity is the entry point of the application after a user logs in or signs up.
- * This activity manages:
- * <ul>
- * <li>Fragment navigation through BottomNavigationView for entrants, organizers, and admins.</li>
- * <li>User authentication and role-based navigation.</li>
- * <li>Fragment transactions and lifecycle management.</li>
- * <li>Signup redirection if the user is not logged in.</li>
- * </ul>
- */
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout signupLayout;
@@ -47,11 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private long lastClickTime = 0;
     private Button signupButton;
 
-    /**
-     * Initializes the activity, sets up Firebase, BottomNavigationView, and user role-based navigation.
-     *
-     * @param savedInstanceState A Bundle containing the saved state of the activity.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
@@ -64,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentContainer = findViewById(R.id.fragment_container);
         signupButton = findViewById(R.id.signup_button);
 
-        // Check for UI component initialization
+        // Ensure views are initialized
         if (signupLayout == null || bottomNavigationView == null || fragmentContainer == null || signupButton == null) {
             Toast.makeText(this, "Failed to initialize UI components.", Toast.LENGTH_SHORT).show();
             return;
@@ -82,26 +66,24 @@ public class MainActivity extends AppCompatActivity {
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d("MainActivity", "Device ID: " + deviceID);
 
-        // Initialize fragment maps
+        // Initialize fragments
         initializeFragments();
 
-        // Set up signup button listener
+        // Set up signup button
         signupButton.setOnClickListener(v -> {
             Intent signupIntent = new Intent(MainActivity.this, SignupActivity.class);
             startActivity(signupIntent);
         });
 
-        // Check if user is logged in and initialize role-based navigation
+        // Check if the user is logged in
         checkAndInitializeUser(deviceID);
 
+        // Restore active fragment on configuration changes
         if (savedInstanceState != null) {
             activeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "activeFragment");
         }
     }
 
-    /**
-     * Initializes fragments for different user roles (entrant, organizer, admin).
-     */
     private void initializeFragments() {
         // Fragments for entrants
         entrantFragmentMap.put(R.id.nav_home, new HomeFragment());
@@ -118,17 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Fragments for admins
         adminFragmentMap.put(R.id.nav_home, new HomeFragment());
-        adminFragmentMap.put(R.id.nav_create, new BrowseProfilesFragment());
+        adminFragmentMap.put(R.id.nav_tool, new BrowseProfilesFragment());
         adminFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         adminFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         adminFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
     }
 
-    /**
-     * Checks if the user is logged in and sets up navigation based on their role.
-     *
-     * @param deviceID The unique device ID to identify the user.
-     */
     private void checkAndInitializeUser(String deviceID) {
         db.collection("user").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -167,18 +144,12 @@ public class MainActivity extends AppCompatActivity {
         }).addOnFailureListener(e -> Log.e("MainActivity", "Failed to fetch user data: " + e.getMessage()));
     }
 
-    /**
-     * Shows the signup layout for new users or when no user is logged in.
-     */
     private void showSignupLayout() {
         signupLayout.setVisibility(View.VISIBLE);
         fragmentContainer.setVisibility(View.GONE);
         bottomNavigationView.setVisibility(View.GONE);
     }
 
-    /**
-     * Initializes the navigation for the BottomNavigationView.
-     */
     private void initializeNavigation() {
         signupLayout.setVisibility(View.GONE);
         fragmentContainer.setVisibility(View.VISIBLE);
@@ -186,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if (!isClickAllowed()) return false;
+
             if (activeFragmentMap == null) return false;
             Fragment selectedFragment = activeFragmentMap.get(item.getItemId());
             if (selectedFragment != null) {
@@ -204,9 +176,6 @@ public class MainActivity extends AppCompatActivity {
         preLoadNotifications();
     }
 
-    /**
-     * Preloads the notifications fragment for better user experience.
-     */
     private void preLoadNotifications() {
         Fragment notificationFragment = activeFragmentMap.get(R.id.nav_notifications);
         if (notificationFragment == null) {
@@ -215,38 +184,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Switches to the selected fragment.
-     *
-     * @param fragment The fragment to switch to.
-     */
     private void switchFragment(@NonNull Fragment fragment) {
-        if (activeFragment != null && activeFragment.equals(fragment)) return;
+        String tag = fragment.getClass().getSimpleName();
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setReorderingAllowed(true);
+        transaction.replace(R.id.fragment_container, fragment, tag);
+        transaction.addToBackStack(tag); // Add to back stack
+        transaction.commit();
 
-        if (activeFragment != null) transaction.hide(activeFragment);
-
-        String tag = fragment.getClass().getSimpleName();
-        Fragment existingFragment = getSupportFragmentManager().findFragmentByTag(tag);
-
-        if (existingFragment != null) {
-            transaction.show(existingFragment);
-            activeFragment = existingFragment;
-        } else {
-            transaction.add(R.id.fragment_container, fragment, tag);
-            activeFragment = fragment;
-        }
-
-        transaction.commitNowAllowingStateLoss();
+        activeFragment = fragment;
     }
 
-    /**
-     * Prevents rapid clicks to avoid multiple fragment replacements.
-     *
-     * @return True if the click is allowed, false otherwise.
-     */
     private boolean isClickAllowed() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastClickTime > 500) {

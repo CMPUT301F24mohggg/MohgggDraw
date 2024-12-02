@@ -74,7 +74,8 @@
             android:layout_height="wrap_content"
             android:text="Log out"
             android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:visibility="invisible"/>
 
     </LinearLayout>
 </ScrollView>
