@@ -89,5 +89,6 @@ public class WaitlistPagerAdapter extends FragmentStateAdapter {
     }
 
     public void refresh() {
+
     }
 }

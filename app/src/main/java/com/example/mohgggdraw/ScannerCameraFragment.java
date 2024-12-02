@@ -27,9 +27,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 /***
- This fragment starts an Intent for QR scanner. It:
- - Uses the camera to scan a QR code
- - Displays the event details if the QR code is valid
+ * This fragment starts an Intent for QR scanner. It:
+ * - Uses the camera to scan a QR code
+ * - Displays the event details if the QR code is valid
  ***/
 public class ScannerCameraFragment extends Fragment {
     private ScannerViewModel scannerViewModel;
@@ -37,6 +37,14 @@ public class ScannerCameraFragment extends Fragment {
     private WaitinglistDB waitinglistDB = new WaitinglistDB();
     private CollectionReference eventRef = waitinglistDB.getWaitlistRef();
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater LayoutInflater to inflate the views in this fragment.
+     * @param container The parent view to attach this fragment to.
+     * @param savedInstanceState The previously saved state of the fragment, if any.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,6 +52,9 @@ public class ScannerCameraFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_scanner_camera, container, false);
     }
 
+    /**
+     * Resumes the fragment and starts the QR scanner if required.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -53,9 +64,17 @@ public class ScannerCameraFragment extends Fragment {
         }
     }
 
+    /**
+     * Launches the scanner activity and handles the result.
+     */
     ActivityResultLauncher<Intent> ScannerActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
+                /**
+                 * Handles the result from the scanner activity.
+                 *
+                 * @param result The result from the scanner activity.
+                 */
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -68,6 +87,11 @@ public class ScannerCameraFragment extends Fragment {
                 }
             });
 
+    /**
+     * Validates the QR hash and retrieves the event details.
+     *
+     * @param qrHash The hash extracted from the scanned QR code.
+     */
     private void validQrHash(String qrHash) {
         // Validate the QR hash format: numeric characters, optionally starting with a "-"
         if (qrHash == null || !qrHash.matches("^-?[0-9]+$")) {
@@ -80,6 +104,11 @@ public class ScannerCameraFragment extends Fragment {
         // Query Firestore to find the document with the matching QR hash
         Query query = eventRef.whereEqualTo("QRhash", qrHash);
         query.get().addOnCompleteListener(new OnCompleteListener<com.google.firebase.firestore.QuerySnapshot>() {
+            /**
+             * Handles the result of the Firestore query for the QR hash.
+             *
+             * @param task The task representing the Firestore query result.
+             */
             @Override
             public void onComplete(@NonNull Task<com.google.firebase.firestore.QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -114,16 +143,30 @@ public class ScannerCameraFragment extends Fragment {
         });
     }
 
+    /**
+     * Navigates to the specified page.
+     *
+     * @param position The page position to navigate to.
+     */
     private void setToPage(int position) {
         ((ScannerFragment) requireParentFragment()).swapToFragment(position);
     }
 
+    /**
+     * Starts the QR scanner activity.
+     */
     private void startScanner() {
         // Start QR scanner Activity
         Intent intent = new Intent(getActivity(), ScannerActivity.class);
         ScannerActivityResultLauncher.launch(intent);
     }
 
+    /**
+     * Converts a Firestore DocumentSnapshot into an Event object.
+     *
+     * @param document The Firestore document to convert.
+     * @return The Event object created from the document.
+     */
     private Event returnEvent(DocumentSnapshot document) {
         Event event = waitinglistDB.docSnapshotToEvent(document);
         return event;
