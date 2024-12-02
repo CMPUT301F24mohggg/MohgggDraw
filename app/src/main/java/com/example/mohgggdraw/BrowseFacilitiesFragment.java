@@ -19,6 +19,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * BrowseFacilitiesFragment manages the display, selection, and deletion of facilities in the app.
+ * <p>
+ * This fragment retrieves facilities from the Firestore database where the user type is 1 (organizer)
+ * and displays them in a multi-selectable list view. Users can select multiple facilities and delete them
+ * with a confirmation dialog.
+ */
 public class BrowseFacilitiesFragment extends Fragment {
 
     private ListView facilityListView;
@@ -28,6 +35,14 @@ public class BrowseFacilitiesFragment extends Fragment {
     private FirebaseFirestore db;
     private View fabDelete;
 
+    /**
+     * Creates and initializes the view hierarchy for the fragment.
+     *
+     * @param inflater           The LayoutInflater object to inflate views in the fragment.
+     * @param container          The parent view that this fragment's UI will be attached to.
+     * @param savedInstanceState If non-null, contains data from the previous saved state.
+     * @return The created view for the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_tab, container, false);
@@ -50,6 +65,9 @@ public class BrowseFacilitiesFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches facilities from Firestore where the userType is 1 (organizer) and populates the list view.
+     */
     private void fetchFacilities() {
         db.collection("user").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -73,6 +91,17 @@ public class BrowseFacilitiesFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays a custom confirmation dialog for deleting the selected facilities.
+     * <p>
+     * The dialog includes:
+     * <ul>
+     * <li>A title indicating the action ("Delete Selected?")</li>
+     * <li>A message asking for confirmation</li>
+     * <li>A "Yes" button to proceed with deletion</li>
+     * <li>A "Nevermind" button to cancel the action</li>
+     * </ul>
+     */
     private void showDeleteConfirmationDialog() {
         ArrayList<String> selectedIds = new ArrayList<>();
         for (int i = 0; i < facilityListView.getCount(); i++) {
@@ -114,6 +143,11 @@ public class BrowseFacilitiesFragment extends Fragment {
         dialog.show();
     }
 
+    /**
+     * Deletes the selected facilities from Firestore and updates the list view.
+     *
+     * @param selectedIds A list of Firestore document IDs for the selected facilities.
+     */
     private void deleteSelectedFacilities(ArrayList<String> selectedIds) {
         for (String id : selectedIds) {
             db.collection("user").document(id).delete().addOnSuccessListener(aVoid -> {

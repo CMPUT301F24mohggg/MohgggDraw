@@ -26,6 +26,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * BrowseImagesFragment manages the display and deletion of images stored in Firebase Storage.
+ * <p>
+ * Users can view images in a grid layout, select multiple images using checkboxes, and delete the selected images
+ * with confirmation through a custom dialog.
+ */
 public class BrowseImagesFragment extends Fragment {
 
     private GridView gridView;
@@ -35,6 +41,14 @@ public class BrowseImagesFragment extends Fragment {
     private ImageAdapter adapter;
     private View fabDelete;
 
+    /**
+     * Creates and initializes the view hierarchy for the fragment.
+     *
+     * @param inflater           The LayoutInflater object to inflate views in the fragment.
+     * @param container          The parent view that this fragment's UI will be attached to.
+     * @param savedInstanceState If non-null, contains data from the previous saved state.
+     * @return The created view for the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,15 +74,18 @@ public class BrowseImagesFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches images from the "event_images" folder in Firebase Storage.
+     * <p>
+     * The images are added to a list and displayed in the GridView.
+     */
     private void fetchImages() {
         StorageReference storageRef = storage.getReference().child("event_images");
 
-        // List all items in the "event_images" folder
         storageRef.listAll().addOnSuccessListener((ListResult listResult) -> {
             imageItems.clear(); // Clear the list to avoid duplicates
             for (StorageReference item : listResult.getItems()) {
                 item.getDownloadUrl().addOnSuccessListener(uri -> {
-                    // Add image to the list and notify the adapter
                     imageItems.add(new ImageItem(uri.toString(), item));
                     adapter.notifyDataSetChanged(); // Notify the adapter after adding each image
                 }).addOnFailureListener(e -> Log.e("BrowseImagesFragment", "Failed to fetch image URL", e));
@@ -79,6 +96,17 @@ public class BrowseImagesFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays a custom confirmation dialog for deleting the selected images.
+     * <p>
+     * The dialog includes:
+     * <ul>
+     * <li>A title indicating the action ("Delete Selected?")</li>
+     * <li>A message asking for confirmation</li>
+     * <li>A "Yes" button to proceed with deletion</li>
+     * <li>A "Nevermind" button to cancel the action</li>
+     * </ul>
+     */
     private void showDeleteConfirmationDialog() {
         if (selectedImages.isEmpty()) {
             Toast.makeText(getContext(), "No images selected for deletion.", Toast.LENGTH_SHORT).show();
@@ -99,25 +127,24 @@ public class BrowseImagesFragment extends Fragment {
         title.setText("Delete Selected?");
         message.setText("Are you sure you want to delete the selected images?");
 
-        // Create the AlertDialog
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(dialogView)
                 .setCancelable(true)
                 .create();
 
-        // Set up Yes button
         btnYes.setOnClickListener(v -> {
             deleteSelectedImages();
             dialog.dismiss();
         });
 
-        // Set up Nevermind button
         btnNevermind.setOnClickListener(v -> dialog.dismiss());
 
-        // Show the dialog
         dialog.show();
     }
 
+    /**
+     * Deletes the selected images from Firebase Storage and updates the GridView.
+     */
     private void deleteSelectedImages() {
         ArrayList<ImageItem> imagesToDelete = new ArrayList<>(selectedImages); // Copy to avoid modification issues
 
@@ -134,7 +161,15 @@ public class BrowseImagesFragment extends Fragment {
         }
     }
 
-    // Inner class to represent each image item
+    /**
+     * Inner class representing an image item.
+     * <p>
+     * Each image item contains:
+     * <ul>
+     * <li>A URL for displaying the image</li>
+     * <li>A reference to the Firebase Storage location</li>
+     * </ul>
+     */
     private class ImageItem {
         private final String url;
         private final StorageReference storageReference;
@@ -166,7 +201,9 @@ public class BrowseImagesFragment extends Fragment {
         }
     }
 
-    // Adapter to display images in the GridView
+    /**
+     * Adapter class for displaying images in the GridView.
+     */
     private class ImageAdapter extends BaseAdapter {
 
         @Override
@@ -196,9 +233,7 @@ public class BrowseImagesFragment extends Fragment {
             ImageItem imageItem = imageItems.get(position);
 
             // Load the image into the ImageView using Glide
-            Glide.with(getContext())
-                    .load(imageItem.getUrl())
-                    .into(imageView);
+            Glide.with(getContext()).load(imageItem.getUrl()).into(imageView);
 
             // Set up the checkbox
             checkBox.setOnCheckedChangeListener(null); // Remove existing listener to avoid interference

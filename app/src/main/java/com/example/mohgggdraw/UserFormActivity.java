@@ -24,25 +24,35 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * UserFormActivity handles the user registration process.
+ * This activity allows the user to fill in their details (Name, Phone, Email, Location).
+ * If the user type is "organizer," they must also provide a facility name.
+ * User data is saved in Firestore after validation.
+ *
+ * It also ensures the app has the necessary location permissions to retrieve the user's current location.
+ */
 public class UserFormActivity extends AppCompatActivity {
 
     private TextInputEditText editTextName, editTextFacilityName, editTextPhone, editTextEmail, editTextLocation;
     private TextInputLayout facilityNameLayout;
     private Button buttonSubmit;
-    private String userType; // The type of user: "entrant", "organizer", or "admin"
+    private String userType; // Type of user (entrant, organizer, admin)
     private FirebaseFirestore db;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private static final int REQUEST_CHECK_SETTINGS = 2000;
 
+    /**
+     * Initializes the activity, setting up the form fields, location services, and user type-specific behavior.
+     *
+     * @param savedInstanceState Bundle containing saved state data.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,21 +78,21 @@ public class UserFormActivity extends AppCompatActivity {
         if ("organizer".equals(userType)) {
             facilityNameLayout.setVisibility(TextInputLayout.VISIBLE);
             editTextName.setHint("Name");
-        } else if ("admin".equals(userType)) {
-            editTextName.setHint("Name");
-            facilityNameLayout.setVisibility(TextInputLayout.GONE);
         } else {
-            editTextName.setHint("Name");
             facilityNameLayout.setVisibility(TextInputLayout.GONE);
+            editTextName.setHint("Name");
         }
 
         // Request location permission
         requestLocationPermission();
 
-        // Set up submit button listener
+        // Set up the submit button listener
         buttonSubmit.setOnClickListener(view -> submitUserData());
     }
 
+    /**
+     * Requests the user to grant location permission.
+     */
     private void requestLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
@@ -91,6 +101,13 @@ public class UserFormActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Handles the result of the location permission request.
+     *
+     * @param requestCode  The request code passed in the permission request.
+     * @param permissions  The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -103,6 +120,9 @@ public class UserFormActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks whether the location settings meet the app's requirements.
+     */
     private void checkLocationSettings() {
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -119,13 +139,20 @@ public class UserFormActivity extends AppCompatActivity {
                         try {
                             ResolvableApiException resolvable = (ResolvableApiException) exception;
                             resolvable.startResolutionForResult(UserFormActivity.this, REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException sendEx) {
-                            Log.e("UserFormActivity", "Error resolving location settings", sendEx);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.e("UserFormActivity", "Error resolving location settings", e);
                         }
                     }
                 });
     }
 
+    /**
+     * Handles the result of the location settings resolution.
+     *
+     * @param requestCode The request code passed in the resolution.
+     * @param resultCode  The result code returned by the resolution activity.
+     * @param data        Additional data from the resolution activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -136,6 +163,9 @@ public class UserFormActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Retrieves the user's current location and updates the location field.
+     */
     private void getUserLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
@@ -147,6 +177,9 @@ public class UserFormActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Validates the user input, constructs the user data, and saves it to Firestore.
+     */
     private void submitUserData() {
         String name = editTextName.getText().toString().trim();
         String facilityName = editTextFacilityName.getText().toString().trim();
@@ -184,6 +217,12 @@ public class UserFormActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Maps the user type to its corresponding numeric code.
+     *
+     * @param userType The user type (entrant, organizer, admin).
+     * @return Numeric code representing the user type.
+     */
     int getUserTypeCode(String userType) {
         switch (userType) {
             case "organizer":
@@ -196,6 +235,9 @@ public class UserFormActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Navigates the user to the main activity after successful data submission.
+     */
     private void navigateToHomeScreen() {
         Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
