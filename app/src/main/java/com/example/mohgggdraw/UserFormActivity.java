@@ -188,7 +188,7 @@ public class UserFormActivity extends AppCompatActivity {
         String email = editTextEmail.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
 
-        if (name.isEmpty() || phone.isEmpty() || email.isEmpty() || location.isEmpty()) {
+        if (name.isEmpty() || phone.isEmpty() || email.isEmpty()) {
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return;
         }
