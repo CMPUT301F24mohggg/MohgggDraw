@@ -59,8 +59,7 @@ public class ParticipationSettingsFragment extends Fragment {
     }
 
     public boolean isFormValid() {
-        return !maxPoolingSampleEditText.getText().toString().isEmpty()
-                && !maxEntrantsEditText.getText().toString().isEmpty();
+        return !maxPoolingSampleEditText.getText().toString().isEmpty();
     }
 
     private void updateNextButtonState() {
