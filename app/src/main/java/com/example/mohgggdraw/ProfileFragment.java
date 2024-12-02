@@ -41,17 +41,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+/***
+ This fragment represents the user's profile screen. It:
+ - Inflates the layout for the profile screen
+ - Sets up any necessary UI components or listeners
+ ***/
 
-/**
- * ProfileFragment handles the user's profile management functionality.
- * <p>
- * Features include:
- * <ul>
- * <li>Viewing and updating profile information</li>
- * <li>Uploading, deleting, or resetting profile pictures</li>
- * <li>Deleting the user's profile</li>
- * </ul>
- */
 public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -68,19 +63,11 @@ public class ProfileFragment extends Fragment {
     private String userName;
     private boolean isGalleryImage = false;
 
-    /**
-     * Inflates the layout for the fragment and initializes UI elements.
-     *
-     * @param inflater           The LayoutInflater used to inflate the layout.
-     * @param container          The parent view that this fragment's UI is attached to.
-     * @param savedInstanceState The saved state of the fragment, if available.
-     * @return The created View for the fragment.
-     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        // Initialize views and Firebase
+        // Initialize UI elements and Firebase instances
         initViews(view);
         db = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -88,20 +75,15 @@ public class ProfileFragment extends Fragment {
         // Get device ID
         deviceID = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // Load user data
+        // Load existing user data
         loadUserData();
 
-        // Set up listeners
+        // Set up click listeners
         setupListeners();
 
         return view;
     }
 
-    /**
-     * Initializes the UI components for the profile screen.
-     *
-     * @param view The root view of the fragment.
-     */
     private void initViews(View view) {
         profileImageView = view.findViewById(R.id.profileImageView);
         nameTextView = view.findViewById(R.id.nameTextView);
@@ -113,7 +95,7 @@ public class ProfileFragment extends Fragment {
         buttonDelete = view.findViewById(R.id.buttonDelete);
         toolbar = view.findViewById(R.id.toolbar);
 
-        // Setup toolbar navigation
+        // Set up the toolbar with back button functionality
         if (getActivity() instanceof AppCompatActivity) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
             if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
@@ -125,18 +107,13 @@ public class ProfileFragment extends Fragment {
         toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
     }
 
-    /**
-     * Sets up listeners for profile image actions, updating profile data, and deleting the profile.
-     */
     private void setupListeners() {
         profileImageView.setOnClickListener(v -> handleProfileImageClick());
-        buttonSubmit.setOnClickListener(v -> updateUserData(null)); // No image URL to update initially
+
+        buttonSubmit.setOnClickListener(v -> updateUserData(null)); // Initially no image URL to update
         buttonDelete.setOnClickListener(v -> deleteUserData());
     }
 
-    /**
-     * Handles profile image click actions (upload, delete, or reset to default).
-     */
     private void handleProfileImageClick() {
         if (isGalleryImage) {
             confirmDeleteProfileImage();
@@ -145,9 +122,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Displays options for uploading a profile picture or resetting to default.
-     */
     private void showImageOptions() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Profile Picture")
@@ -157,9 +131,6 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
-    /**
-     * Confirms if the user wants to delete the current profile picture.
-     */
     private void confirmDeleteProfileImage() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Delete Profile Picture")
@@ -169,49 +140,28 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
-    /**
-     * Resets the profile picture to the default initials-based image.
-     */
     private void resetToDefaultProfilePicture() {
         setDefaultProfilePicture();
         isGalleryImage = false;
         updateUserData(null); // Clear image URL in Firestore
     }
 
-    /**
-     * Opens the device gallery to allow the user to select a profile picture.
-     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    /**
-     * Sets a default profile picture based on the user's initials.
-     */
     private void setDefaultProfilePicture() {
         if (userName != null && !userName.isEmpty()) {
             profileImageView.setImageDrawable(createInitialsDrawable(getInitials(userName)));
         }
     }
 
-    /**
-     * Extracts initials from the user's name for the default profile picture.
-     *
-     * @param name The user's full name.
-     * @return A string containing the initials.
-     */
     private String getInitials(String name) {
         String[] parts = name.split(" ");
         return parts.length >= 2 ? parts[0].substring(0, 1) + parts[1].substring(0, 1) : parts[0].substring(0, 1);
     }
 
-    /**
-     * Creates a drawable with the user's initials for the default profile picture.
-     *
-     * @param initials The initials to display.
-     * @return A Drawable object containing the initials.
-     */
     private Drawable createInitialsDrawable(String initials) {
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -223,31 +173,64 @@ public class ProfileFragment extends Fragment {
         return new BitmapDrawable(getResources(), bitmap);
     }
 
-    /**
-     * Loads the user's data from Firestore and populates the profile fields.
-     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            handleGalleryResult(data.getData());
+        }
+    }
+
+    private void handleGalleryResult(Uri imageUri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+            profileImageView.setImageBitmap(bitmap);
+            isGalleryImage = true;
+            uploadProfilePictureToFirebase(bitmap);
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
+            Log.e("ProfileFragment", "Error loading image", e);
+        }
+    }
+
+    private void uploadProfilePictureToFirebase(Bitmap bitmap) {
+        byte[] data = getImageData(bitmap);
+        StorageReference profileRef = storageReference.child("profile_pictures/" + deviceID + ".jpg");
+
+        profileRef.putBytes(data)
+                .addOnSuccessListener(taskSnapshot -> profileRef.getDownloadUrl().addOnSuccessListener(uri -> updateUserData(uri.toString())))
+                .addOnFailureListener(e -> Log.e("ProfileFragment", "Error uploading profile picture", e));
+    }
+
+    private byte[] getImageData(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
+    }
+
     private void loadUserData() {
         DocumentReference docRef = db.collection("user").document(deviceID);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
+                Log.d("ProfileFragment", "Document exists. Populating fields...");
                 editTextName.setText(documentSnapshot.getString("name"));
                 editTextPhone.setText(documentSnapshot.getString("phoneNumber"));
                 editTextEmail.setText(documentSnapshot.getString("email"));
                 editTextLocation.setText(documentSnapshot.getString("location"));
                 nameTextView.setText(documentSnapshot.getString("name") != null ? documentSnapshot.getString("name") : "User");
                 userName = documentSnapshot.getString("name");
-                setDefaultProfilePicture();
+                setDefaultProfilePicture(); // Set profile picture using user's name initials
             } else {
+                Log.d("ProfileFragment", "No user data found for this device ID.");
                 Toast.makeText(getContext(), "No user data found", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show());
+        }).addOnFailureListener(e -> {
+            Log.e("ProfileFragment", "Failed to load user data: " + e.getMessage(), e);
+            Toast.makeText(getContext(), "Failed to load user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 
-    /**
-     * Updates the user's data in Firestore with the entered details.
-     *
-     * @param imageUrl The URL of the profile picture, if updated.
-     */
     private void updateUserData(@Nullable String imageUrl) {
         String name = editTextName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
@@ -259,36 +242,57 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
+        // Create user data map with optional image URL
         Map<String, Object> userDetails = new HashMap<>();
         userDetails.put("name", name);
         userDetails.put("phoneNumber", phone);
         userDetails.put("email", email);
         userDetails.put("location", location);
+        addLists(deviceID);
         if (imageUrl != null) {
             userDetails.put("profileImageUrl", imageUrl);
         }
 
+        // Update user data in Firestore
         db.collection("user").document(deviceID).update(userDetails)
                 .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ProfileFragment", "Failed to update profile: " + e.getMessage());
+                });
     }
 
-    /**
-     * Deletes the user's profile from Firestore.
-     */
     private void deleteUserData() {
         db.collection("user").document(deviceID).delete()
-                .addOnSuccessListener(aVoid -> navigateToSignupScreen())
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Profile deleted successfully", Toast.LENGTH_SHORT).show();
+                    navigateToSignupScreen();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to delete profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ProfileFragment", "Failed to delete profile: " + e.getMessage());
+                });
     }
 
-    /**
-     * Navigates to the SignupActivity after deleting the user's profile.
-     */
     private void navigateToSignupScreen() {
         Intent intent = new Intent(getContext(), SignupActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         requireActivity().finish();
+    }
+    public void addLists(String deviceID){
+        DocumentReference mydoc = db.collection("user").document(deviceID);
+        Task<DocumentSnapshot> query = mydoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                if (!data.containsKey("waitList")) {
+                    DocumentReference mydoc = db.collection("user").document(deviceID);
+                    mydoc.update("waitList", new ArrayList<String>());
+                    mydoc.update("entrantList", new ArrayList<String>());
+                    mydoc.update("createdList", new ArrayList<String>());
+
+                }
+            }
+        });
     }
 }
