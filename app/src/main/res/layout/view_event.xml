@@ -229,26 +229,69 @@
     </LinearLayout>
 
     <!-- Leave Event Button -->
+
+
     <Button
         android:id="@+id/eventInfoButton"
-        android:layout_width="182dp"
-        android:layout_height="52dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="28dp"
         android:backgroundTint="@color/purple_500"
         android:drawablePadding="8dp"
         android:gravity="center"
-        android:paddingHorizontal="24dp"
+        android:paddingHorizontal="32dp"
         android:paddingVertical="12dp"
         android:text="Event Info"
         android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
+        android:textColor="#5336E2"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_event_details" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/send_notification_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/large_trail"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventInfoButton">
+
+        <!-- Button Text -->
+        <TextView
+            android:id="@+id/send_notification_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send Notification To"
+            android:textColor="#5336E2"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/icon_trailing"
+            app:layout_constraintHorizontal_bias="0.2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Trailing Icon -->
+        <ImageView
+            android:id="@+id/icon_trailing"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/icon___trailing"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/send_notification_text"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

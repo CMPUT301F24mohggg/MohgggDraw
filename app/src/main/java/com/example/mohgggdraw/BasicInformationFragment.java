@@ -85,6 +85,13 @@ public class BasicInformationFragment extends Fragment {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Handles the result of the image selection activity.
+     *
+     * @param requestCode The request code passed to startActivityForResult.
+     * @param resultCode The result code returned by the image selection activity.
+     * @param data The data returned by the activity.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -96,6 +103,9 @@ public class BasicInformationFragment extends Fragment {
         }
     }
 
+    /**
+     * Saves the data in the SharedViewModel.
+     */
     public void saveData() {
         sharedViewModel.setEventTitle(titleInput.getText().toString());
         sharedViewModel.setEventLocation(locationInput.getText().toString());

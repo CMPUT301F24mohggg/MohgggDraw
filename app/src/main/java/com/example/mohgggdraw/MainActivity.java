@@ -1,5 +1,6 @@
 package com.example.mohgggdraw;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -21,6 +22,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/***
+ This activity serves as the main entry point of the application. It:
+ - Initializes Firebase
+ - Sets up the bottom navigation view
+ - Manages fragment transactions for different navigation items
+ - Handles the display of notification badges
+ ***/
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout signupLayout;
@@ -34,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private View fragmentContainer;
     private boolean isUserLoggedIn = false;
     private long lastClickTime = 0;
-    private Button signupButton;
+    private Button signupButton; // Button for navigating to SignupActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +54,12 @@ public class MainActivity extends AppCompatActivity {
         signupLayout = findViewById(R.id.signup_layout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         fragmentContainer = findViewById(R.id.fragment_container);
-        signupButton = findViewById(R.id.signup_button);
+        signupButton = findViewById(R.id.signup_button); // Signup button initialization
 
-        // Ensure views are initialized
+        // Disable state restoration for BottomNavigationView
+        bottomNavigationView.setSaveEnabled(false);
+
+        // Check for null components
         if (signupLayout == null || bottomNavigationView == null || fragmentContainer == null || signupButton == null) {
             Toast.makeText(this, "Failed to initialize UI components.", Toast.LENGTH_SHORT).show();
             return;
@@ -59,51 +70,49 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setVisibility(View.GONE);
         signupLayout.setVisibility(View.GONE);
 
-        // Initialize Firebase Firestore
+        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
 
-        // Get device ID for user authentication
+        // Get device ID
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d("MainActivity", "Device ID: " + deviceID);
 
         // Initialize fragments
         initializeFragments();
 
-        // Set up signup button
+        // Set up the click listener for the signup button
         signupButton.setOnClickListener(v -> {
             Intent signupIntent = new Intent(MainActivity.this, SignupActivity.class);
             startActivity(signupIntent);
         });
 
-        // Check if the user is logged in
+        // Check and initialize user based on role
         checkAndInitializeUser(deviceID);
 
-        // Restore active fragment on configuration changes
         if (savedInstanceState != null) {
             activeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "activeFragment");
         }
     }
 
     private void initializeFragments() {
-        // Fragments for entrants
         entrantFragmentMap.put(R.id.nav_home, new HomeFragment());
         entrantFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         entrantFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         entrantFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
+        //((HomeFragment)entrantFragmentMap.get(R.id.nav_home)).setAdminView();
 
-        // Fragments for organizers
         organizerFragmentMap.put(R.id.nav_home, new HomeFragment());
         organizerFragmentMap.put(R.id.nav_create, new CreateFragment());
         organizerFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
         organizerFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         organizerFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
 
-        // Fragments for admins
         adminFragmentMap.put(R.id.nav_home, new HomeFragment());
-        adminFragmentMap.put(R.id.nav_tool, new BrowseProfilesFragment());
-        adminFragmentMap.put(R.id.nav_scanQr, new ScannerFragment());
+        adminFragmentMap.put(R.id.nav_create, new AdminFragment());
+        adminFragmentMap.put(R.id.nav_scanQr, new BrowseProfilesFragment());
         adminFragmentMap.put(R.id.nav_notifications, new NotificationFragment());
         adminFragmentMap.put(R.id.nav_profile, new ProfileOverviewFragment());
+        ((HomeFragment)adminFragmentMap.get(R.id.nav_home)).setAdminView();
     }
 
     private void checkAndInitializeUser(String deviceID) {
@@ -130,18 +139,23 @@ public class MainActivity extends AppCompatActivity {
                             bottomNavigationView.inflateMenu(R.menu.bottom_navigation_menu_admin);
                             break;
                         default:
+                            Toast.makeText(this, "Unknown user role. Showing signup.", Toast.LENGTH_SHORT).show();
                             showSignupLayout();
                             return;
                     }
                     initializeNavigation();
                 } else {
+                    Toast.makeText(this, "User role not defined. Showing signup.", Toast.LENGTH_SHORT).show();
                     showSignupLayout();
                 }
             } else {
                 isUserLoggedIn = false;
                 showSignupLayout();
             }
-        }).addOnFailureListener(e -> Log.e("MainActivity", "Failed to fetch user data: " + e.getMessage()));
+        }).addOnFailureListener(e -> {
+            Log.e("MainActivity", "Failed to fetch user data: " + e.getMessage());
+            Toast.makeText(MainActivity.this, "Error fetching user data.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void showSignupLayout() {
@@ -156,7 +170,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setVisibility(View.VISIBLE);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (!isClickAllowed()) return false;
+            if (!isClickAllowed()) {
+                Log.d("MainActivity", "Click blocked to avoid rapid interaction");
+                return false; // Block rapid clicks
+            }
 
             if (activeFragmentMap == null) return false;
             Fragment selectedFragment = activeFragmentMap.get(item.getItemId());
@@ -167,37 +184,73 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        // Default to HomeFragment, but avoid duplicate replacement
         Fragment defaultFragment = activeFragmentMap.getOrDefault(R.id.nav_home, new HomeFragment());
         if (activeFragment == null || !defaultFragment.equals(activeFragment)) {
             switchFragment(defaultFragment);
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            // Set default fragment to HomeFragment
+            Fragment homeFragment = activeFragmentMap.get(R.id.nav_home);
+            if (homeFragment == null) {
+                homeFragment = new HomeFragment();
+                activeFragmentMap.put(R.id.nav_home, homeFragment);
+            }
+            switchFragment(homeFragment);
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
-
+        // Pre-load notifications after navigation is set up
         preLoadNotifications();
     }
 
-    private void preLoadNotifications() {
+    private void preLoadNotifications () {
         Fragment notificationFragment = activeFragmentMap.get(R.id.nav_notifications);
         if (notificationFragment == null) {
             notificationFragment = new NotificationFragment();
             activeFragmentMap.put(R.id.nav_notifications, notificationFragment);
         }
+
+        // Call preLoadNotifications if it's a NotificationFragment
+        if (notificationFragment instanceof NotificationFragment) {
+            // Use getSupportFragmentManager() to get the attached context
+            Context context = getApplicationContext();
+            ((NotificationFragment) notificationFragment).preLoadNotifications(context);
+        }
     }
 
-    private void switchFragment(@NonNull Fragment fragment) {
-        String tag = fragment.getClass().getSimpleName();
+    private void switchFragment(@NonNull Fragment fragment){
+        if (activeFragment != null && activeFragment.equals(fragment)) {
+            Log.d("MainActivity", "Fragment is already active: " + fragment.getClass().getSimpleName());
+            return; // Avoid replacing the fragment if it's already active
+        }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment, tag);
-        transaction.addToBackStack(tag); // Add to back stack
-        transaction.commit();
+        transaction.setReorderingAllowed(true);
 
-        activeFragment = fragment;
+        if (activeFragment != null) {
+            // Hide the currently active fragment
+            transaction.hide(activeFragment);
+        }
+
+        String tag = fragment.getClass().getSimpleName();
+        Fragment existingFragment = getSupportFragmentManager().findFragmentByTag(tag);
+
+        if (existingFragment != null) {
+            // If fragment already exists, simply show it
+            transaction.show(existingFragment);
+            activeFragment = existingFragment;
+        } else {
+            // If fragment does not exist, add it and tag it
+            transaction.add(R.id.fragment_container, fragment, tag);
+            activeFragment = fragment;
+        }
+
+        // Commit the transaction
+        transaction.commitNowAllowingStateLoss();
     }
 
-    private boolean isClickAllowed() {
+    private boolean isClickAllowed () {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastClickTime > 500) {
+        if (currentTime - lastClickTime > 500) { // Allow clicks only after 500ms
             lastClickTime = currentTime;
             return true;
         }
@@ -205,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onSaveInstanceState (@NonNull Bundle outState){
         super.onSaveInstanceState(outState);
         if (activeFragment != null) {
             getSupportFragmentManager().putFragment(outState, "activeFragment", activeFragment);
@@ -213,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+    protected void onRestoreInstanceState (@NonNull Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState.containsKey("activeFragment")) {
             activeFragment = getSupportFragmentManager().getFragment(savedInstanceState, "activeFragment");
@@ -222,11 +275,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent (Intent intent){
         super.onNewIntent(intent);
         setIntent(intent);
 
-        if (!isClickAllowed()) return;
+        if (!isClickAllowed()) return; // Prevent rapid interactions
 
         boolean navigateToHomeFragment = intent.getBooleanExtra("navigateToHomeFragment", false);
         if (navigateToHomeFragment && activeFragmentMap != null) {
