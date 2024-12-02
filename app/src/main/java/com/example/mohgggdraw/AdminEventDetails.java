@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -83,7 +84,8 @@ public class AdminEventDetails extends Fragment {
         TextView eventDateView = view.findViewById(R.id.eventDate);
         TextView eventTimeView = view.findViewById(R.id.eventTime);
         TextView eventDetailsView = view.findViewById(R.id.eventRegistrationDetails);
-        Button deleteEventButton = view.findViewById(R.id.deleteEventButton);
+        Button deleteEventButton = view.findViewById(R.id.delete_event_button);
+        Button deleteQrHashButton = view.findViewById(R.id.delete_qr_code_button);
 
         // Set event details
         eventTitleView.setText(eventTitle);
@@ -102,8 +104,11 @@ public class AdminEventDetails extends Fragment {
             eventPoster.setImageResource(R.drawable.eventpage_banner_placeholder);
         }
 
-        // Set delete button action
-        deleteEventButton.setOnClickListener(v -> deleteEvent());
+        // Set delete event button action
+        deleteEventButton.setOnClickListener(v -> showDeleteEventDialog());
+
+        // Set delete QR code button action
+        deleteQrHashButton.setOnClickListener(v -> showDeleteQrConfirmationDialog());
     }
 
     private void deleteEvent() {
@@ -116,5 +121,62 @@ public class AdminEventDetails extends Fragment {
                     requireActivity().getSupportFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to delete event: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void showDeleteEventDialog() {
+        // Inflate the custom layout
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_confirmation_dialog, null);
+
+        // Build the AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Ensure rounded background and proper dimensions
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Get references to dialog buttons and texts
+        Button confirmButton = dialogView.findViewById(R.id.confirm_button);
+        TextView cancelTextView = dialogView.findViewById(R.id.cancel_text_view);
+        TextView popUpTitle = dialogView.findViewById(R.id.title_text_view);
+        TextView popUpMessage = dialogView.findViewById(R.id.message_text_view);
+
+        // Set custom text for the dialog
+        popUpTitle.setText("Delete Event?");
+        popUpMessage.setText("Are you sure you want to delete this event for good?");
+
+        // Handle confirm button click
+        confirmButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            deleteEvent(); // Trigger the deletion logic
+        });
+
+        // Handle "Nevermind" button click
+        cancelTextView.setOnClickListener(v -> dialog.dismiss());
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private void showDeleteQrConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete QR Code")
+                .setMessage("Are you sure you want to delete the QR code for this event?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteQrHash())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteQrHash() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Events")
+                .document(eventId)
+                .update("QRhash", "")
+                .addOnSuccessListener(aVoid -> Toast.makeText(requireContext(), "QR Code deleted!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Unable to delete QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

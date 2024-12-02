@@ -1,4 +1,6 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -14,62 +16,85 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:contentDescription="@string/event_poster_placeholder" />
+            android:contentDescription="Event Poster"
+            android:background="@drawable/eventpage_banner_placeholder"
+            android:layout_marginBottom="16dp" />
 
         <!-- Event Title -->
         <TextView
             android:id="@+id/eventTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textSize="20sp"
+            android:text="Event Title"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:text="Event Title" />
+            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal" />
 
         <!-- Event Location -->
         <TextView
             android:id="@+id/eventLocation"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:text="Event Location" />
+            android:text="Event Location"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal" />
 
         <!-- Event Date -->
         <TextView
             android:id="@+id/eventDate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:text="Event Date" />
+            android:text="Event Date"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal" />
 
         <!-- Event Time -->
         <TextView
             android:id="@+id/eventTime"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:text="Event Time" />
+            android:text="Event Time"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal" />
 
         <!-- Event Registration Details -->
         <TextView
             android:id="@+id/eventRegistrationDetails"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:text="Event Registration Details" />
+            android:text="Event Registration Details"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_horizontal" />
+
+        <!-- Delete QR Code Button -->
+        <Button
+            android:id="@+id/delete_qr_code_button"
+            android:layout_width="228dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FF5722"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:text="Delete QR Code"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
 
         <!-- Delete Event Button -->
         <Button
-            android:id="@+id/deleteEventButton"
-            android:layout_width="match_parent"
+            android:id="@+id/delete_event_button"
+            android:layout_width="228dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Delete Event"
-            android:backgroundTint="@android:color/holo_red_dark"
-            android:textColor="@android:color/white" />
+            android:backgroundTint="#FF5722"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:text="Delete This Event"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>

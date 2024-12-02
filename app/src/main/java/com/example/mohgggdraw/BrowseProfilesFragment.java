@@ -50,6 +50,12 @@ public class BrowseProfilesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Hide the trash icon
+        ImageView fabDelete = view.findViewById(R.id.fab_delete);
+        if (fabDelete != null) {
+            fabDelete.setVisibility(View.GONE);
+        }
+
         facilitiesTab = view.findViewById(R.id.tab_facilities);
         usersTab = view.findViewById(R.id.tab_users);
         imagesTab = view.findViewById(R.id.tab_images);
