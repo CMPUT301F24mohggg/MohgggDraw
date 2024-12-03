@@ -1,6 +1,11 @@
 package com.example.mohgggdraw;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /***
  * Fragment to display Array of lists
@@ -71,6 +77,7 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
 
         // Initialize dataList
         dataList = new ArrayList<>();
+        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         // Initialize ListView
         eventList = view.findViewById(R.id.eventList);
@@ -78,7 +85,7 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         // Determine data fetching method
         if (deviceID != null) {
             // If deviceID is set, use UserDB to query list
-            new UserDB().queryList("waitList", this, deviceID);
+            new UserDB().queryAllListFromUser(deviceID,this);
         } else {
             // Otherwise, use WaitinglistDB to query all events
             dataList = new WaitinglistDB().queryAllWithWaitingList(this);
@@ -105,22 +112,6 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
     }
 
 
-    /**
-     * Updates the list data and refreshes the adapter.
-     */
-    public void dataChange() {
-        if (getContext() == null || eventList == null) {
-            Log.e("EventListDisplayFragment", "Context or eventList is null, skipping dataChange()");
-            return;
-        }
-
-        if (eventAdapter == null) {
-            eventAdapter = new EventAdapter(requireContext(), dataList);
-            eventList.setAdapter(eventAdapter);
-        } else {
-            eventAdapter.notifyDataSetChanged();
-        }
-    }
 
     /**
      * Sets the event list data and triggers a UI update.
@@ -133,6 +124,22 @@ public class EventListDisplayFragment extends Fragment implements EventListView 
         eventAdapter = new EventAdapter(requireContext(), dataList);
         eventList.setAdapter(eventAdapter);
         dataChange();
+
+
+    }
+
+
+    //updates list when data is changed
+    public void dataChange(){
+
+
+        Collections.sort(dataList, (n1, n2) -> n2.getFlag().compareTo(n1.getFlag()));
+
+        eventAdapter = new EventAdapter(this.getContext(), dataList);
+
+        eventList.setAdapter(eventAdapter);
+
+
     }
 
     /**

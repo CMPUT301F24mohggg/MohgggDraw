@@ -1,118 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="16dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="0dp"
+    android:background="@android:color/white">
 
-    <!-- Registered Section Title -->
-
-
-    <!-- Registered Event Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/registeredCard"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <!-- Event Image -->
-
-            <!-- Event Details Row (Date and Title) -->
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/eventImage"
-                android:layout_width="374dp"
-                android:layout_height="175dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_background"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.4"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/SpecificCornerRounded" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/eventDetailsContainer"
-                android:layout_width="0dp"
+            <!-- Top Title -->
+            <TextView
+                android:id="@+id/registeredTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:padding="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/eventImage">
+                android:layout_gravity="start"
+                android:layout_marginBottom="8dp"
+                android:text="Title!"
+                android:textColor="#433C3C"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingTop="8dp"/>
 
-                <!-- Date Background -->
+        </LinearLayout>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/eventImage"
+            android:layout_width="match_parent"
+            android:layout_height="175dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            app:shapeAppearanceOverlay="@style/SpecificCornerRounded" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="16dp"
+            android:visibility="invisible"/>
+
+        <!-- Event Details -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Date -->
+            <LinearLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:backgroundTint="#F4F6F7"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@drawable/rounded_corner_background"
+                android:padding="4dp">
+
                 <TextView
                     android:id="@+id/eventDate"
                     android:layout_width="66dp"
                     android:layout_height="53dp"
                     android:background="@drawable/rounded_date_background"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="MM DD"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="7dp"
+                    android:text="MM    DD"
                     android:textColor="@color/purple_500"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-                <!-- Event Title -->
-                <TextView
-                    android:id="@+id/eventTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Event Title"
-                    android:textColor="@color/purple_500"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@id/eventDate"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Event Time and Description -->
-
-            <TextView
-                android:id="@+id/eventDetails"
+            <!-- Event Info -->
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Date and Time - Time"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/eventDetailsContainer"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/eventDetailsContainer" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:paddingTop="5dp">
 
-            <TextView
-                android:id="@+id/eventDescription"
-                android:layout_width="381dp"
-                android:layout_height="27dp"
-                android:layout_marginTop="4dp"
-                android:text="Event Details......."
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/eventDetails" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/eventTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Title"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp" />
+                <TextView
+                    android:id="@+id/eventDetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event_Details"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:paddingBottom="2dp"/>
 
-    <!-- Waiting List Section Title -->
+                <TextView
+                    android:id="@+id/eventDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event_Description"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray" />
+            </LinearLayout>
+        </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

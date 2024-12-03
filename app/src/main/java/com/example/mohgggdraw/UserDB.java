@@ -129,4 +129,24 @@ public class UserDB {
 
     }
 
+    public void queryAllListFromUser(String id, EventListView frag){
+        myDoc = waitlistRef.document((String.valueOf(id)));
+        Task<DocumentSnapshot> query = myDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Map data = documentSnapshot.getData();
+                if(data!= null) {
+                    ArrayList<String> waitList = (ArrayList) data.get("waitList");
+                    ArrayList<String> createList = (ArrayList) data.get("createdList");
+                    ArrayList<String> entrantList = (ArrayList) data.get("entrantList");
+                    new WaitinglistDB().setAllUserLists(frag, waitList,createList,entrantList);
+                }
+
+
+            }
+        });
+
+
+    }
+
 }

@@ -104,160 +104,190 @@ public class WaitlistFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize view components
-        initializeViews(view);
-
-        // Set event details
-        setEventDetails();
-
-        // Load event image
-        loadEventImage();
-
-        // Set up join/leave button logic
-        setupJoinButton();
-    }
-
-    /**
-     * Initializes the views in the layout.
-     *
-     * @param view The root view of the fragment.
-     */
-    private void initializeViews(View view) {
         name = view.findViewById(R.id.eventtitle);
         time = view.findViewById(R.id.eventInfoTime);
         day = view.findViewById(R.id.eventInfoDay);
         capacity = view.findViewById(R.id.eventInfoPeople);
         location = view.findViewById(R.id.eventInfoLocation);
-        iv = view.findViewById(R.id.eventimage);
-        joinButton = view.findViewById(R.id.eventInfoButton);
-        sendNotificationButton = view.findViewById(R.id.send_notification_button);
+        initializeViews(view);
+
+        if (event != null) {
+            name.setText(event.getTitle());
+            time.setText(event.getStartTime().toString());
+            day.setText(event.getDate());
+            capacity.setText(String.valueOf(event.getMaxCapacity()));
+            location.setText(event.getLocation());
+
+
+
+            // Pulling and creating image
+            iv = view.findViewById(R.id.eventimage);
+            if (iv != null) {
+                StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+                try {
+                    File eventImage = File.createTempFile(event.getTitle(), ".png");
+                    myImage.getFile(eventImage).addOnSuccessListener(taskSnapshot -> {
+                        Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
+                        iv.setImageBitmap(bitmap);
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // Log or handle the case where ImageView is null
+                System.err.println("ImageView is null, make sure the layout contains the correct ID.");
+            }
+
+            // Load event image
+            loadEventImage();
+
+            // Set up join/leave button logic
+            setupJoinButton();
+        }
     }
 
-    /**
-     * Populates the event details in the UI.
-     */
-    private void setEventDetails() {
-        name.setText(event.getTitle());
-        time.setText(event.getTime());
-        day.setText(event.getDate());
-        capacity.setText(String.valueOf(event.getMaxCapacity()));
-        location.setText(event.getLocation());
-    }
+        /**
+         * Initializes the views in the layout.
+         *
+         * @param view The root view of the fragment.
+         */
+        private void initializeViews (View view){
+            name = view.findViewById(R.id.eventtitle);
+            time = view.findViewById(R.id.eventInfoTime);
+            day = view.findViewById(R.id.eventInfoDay);
+            capacity = view.findViewById(R.id.eventInfoPeople);
+            location = view.findViewById(R.id.eventInfoLocation);
+            iv = view.findViewById(R.id.eventimage);
+            joinButton = view.findViewById(R.id.eventInfoButton);
+            sendNotificationButton = view.findViewById(R.id.send_notification_button);
+        }
+
+        /**
+         * Populates the event details in the UI.
+         */
+        private void setEventDetails () {
+            name.setText(event.getTitle());
+            time.setText(event.getTime());
+            day.setText(event.getDate());
+            capacity.setText(String.valueOf(event.getMaxCapacity()));
+            location.setText(event.getLocation());
+        }
 
 
-    /**
-     * Downloads and displays the event's poster image if available.
-     */
-    private void loadEventImage() {
-        if (event.getPosterUrl() != null) {
-            StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
-            try {
-                File eventImage = File.createTempFile(event.getTitle(), ".png");
-                myImage.getFile(eventImage)
-                        .addOnSuccessListener(taskSnapshot -> {
-                            Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
-                            iv.setImageBitmap(bitmap);
-                        });
-            } catch (IOException e) {
-                e.printStackTrace();
+        /**
+         * Downloads and displays the event's poster image if available.
+         */
+        private void loadEventImage () {
+            if (event.getPosterUrl() != null) {
+                StorageReference myImage = new WaitinglistDB().getImage(event.getPosterUrl());
+                try {
+                    File eventImage = File.createTempFile(event.getTitle(), ".png");
+                    myImage.getFile(eventImage)
+                            .addOnSuccessListener(taskSnapshot -> {
+                                Bitmap bitmap = BitmapFactory.decodeFile(eventImage.getAbsolutePath());
+                                iv.setImageBitmap(bitmap);
+                            });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        /**
+         * Sets up the join/leave button logic based on the user's role and event status.
+         */
+        private void setupJoinButton () {
+            if (Objects.equals(event.getOrgID(), deviceId)) {
+                // If organizer, view waitlist
+                setupOrganizerButton();
+            } else {
+                updateJoinButton();
             }
         }
-    }
 
-    /**
-     * Sets up the join/leave button logic based on the user's role and event status.
-     */
-    private void setupJoinButton() {
-        if (Objects.equals(event.getOrgID(), deviceId)) {
-            // If organizer, view waitlist
-            setupOrganizerButton();
-        } else {
+        /**
+         * Configures the button for organizers to view the waitlist and send notifications.
+         */
+        private void setupOrganizerButton () {
+            joinButton.setText("View waitlist");
+            joinButton.setOnClickListener(v -> {
+                if (home != null) home.goToWaitlistView(event);
+            });
+
+            if (sendNotificationButton != null) {
+                sendNotificationButton.setVisibility(View.VISIBLE);
+                sendNotificationButton.setOnClickListener(v -> {
+                    if (home != null) home.goToSendNotificationView(event);
+                });
+            }
+        }
+
+        /**
+         * Updates the join button text and functionality for regular users.
+         */
+        private void updateJoinButton () {
+            if (event.getWaitingList().contains(user.getUid())) {
+                // If in event, leave waitlist
+                joinButton.setText("Leave event");
+                joinButton.setOnClickListener(v ->
+                        new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join")
+                );
+            } else {
+                // If not in waitlist, join
+                joinButton.setText("Join event");
+                joinButton.setOnClickListener(v -> {
+                    // Logic for geolocation
+                    if (event.isGeolocation()) {
+                        new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
+                    } else {
+                        new WaitinglistController(event).addUser(user);
+                        new UserDB().addEventToUserList(event.getEventId(), deviceId);
+                        onDialogueFinished();
+                    }
+                });
+            }
+        }
+
+        /**
+         * Refreshes the page after an action to update the join button state.
+         */
+        public void onDialogueFinished () {
+            // Refresh page after dialogue to update the buttons
             updateJoinButton();
         }
-    }
 
-    /**
-     * Configures the button for organizers to view the waitlist and send notifications.
-     */
-    private void setupOrganizerButton() {
-        joinButton.setText("View waitlist");
-        joinButton.setOnClickListener(v -> {
-            if (home != null) home.goToWaitlistView(event);
-        });
+        // Utility methods for testing and configuration
 
-        if (sendNotificationButton != null) {
-            sendNotificationButton.setVisibility(View.VISIBLE);
-            sendNotificationButton.setOnClickListener(v -> {
-                if (home != null) home.goToSendNotificationView(event);
-            });
+        /**
+         * Sets the event and home fragment for navigation and data.
+         *
+         * @param event The event object.
+         * @param home  The home fragment.
+         */
+        public void setImportant (Event event, HomeFragment home){
+            this.event = event;
+            this.home = home;
+        }
+
+        public void setDeviceId (String deviceId){
+            this.deviceId = deviceId;
+        }
+
+        /**
+         * Retrieves the associated event.
+         *
+         * @return The event object.
+         */
+        public Event getEvent () {
+            return event;
+        }
+        /**
+         * Retrieves the user object.
+         *
+         * @return The user object.
+         */
+        public User getUser () {
+            return user;
         }
     }
-
-    /**
-     * Updates the join button text and functionality for regular users.
-     */
-    private void updateJoinButton() {
-        if (event.getWaitingList().contains(user.getUid())) {
-            // If in event, leave waitlist
-            joinButton.setText("Leave event");
-            joinButton.setOnClickListener(v ->
-                    new leaveEventButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join")
-            );
-        } else {
-            // If not in waitlist, join
-            joinButton.setText("Join event");
-            joinButton.setOnClickListener(v -> {
-                // Logic for geolocation
-                if (event.isGeolocation()) {
-                    new JoinWaitlistButton(event, user, this).show(getActivity().getSupportFragmentManager(), "join");
-                } else {
-                    new WaitinglistController(event).addUser(user);
-                    new UserDB().addEventToUserList(event.getEventId(), deviceId);
-                    onDialogueFinished();
-                }
-            });
-        }
-    }
-
-    /**
-     * Refreshes the page after an action to update the join button state.
-     */
-    public void onDialogueFinished() {
-        // Refresh page after dialogue to update the buttons
-        updateJoinButton();
-    }
-
-    // Utility methods for testing and configuration
-
-    /**
-     * Sets the event and home fragment for navigation and data.
-     *
-     * @param event The event object.
-     * @param home  The home fragment.
-     */
-    public void setImportant(Event event, HomeFragment home) {
-        this.event = event;
-        this.home = home;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    /**
-     * Retrieves the associated event.
-     *
-     * @return The event object.
-     */
-    public Event getEvent() {
-        return event;
-    }
-    /**
-     * Retrieves the user object.
-     *
-     * @return The user object.
-     */
-    public User getUser() {
-        return user;
-    }
-}

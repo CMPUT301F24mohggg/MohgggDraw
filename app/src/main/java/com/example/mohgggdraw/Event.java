@@ -24,6 +24,7 @@ public class Event{
     private boolean geolocation = false;
     private ArrayList<String> waitingList = new ArrayList<>();
     private String orgID = "dasf";
+    private Integer flag=-1;
 
     private ArrayList<String> selectedList = new ArrayList<>();
 
@@ -59,6 +60,14 @@ public class Event{
         this.participationSettings = participationSettings;
 
 
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public Integer getFlag(){
+        return flag;
     }
 
     public String getDate() {

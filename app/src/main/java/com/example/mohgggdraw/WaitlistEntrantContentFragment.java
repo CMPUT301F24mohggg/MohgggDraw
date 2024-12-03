@@ -52,10 +52,9 @@ public class WaitlistEntrantContentFragment extends Fragment implements SetListV
         // Populate entrant list dynamically
         if(event!=null) {
             dataList = event.getWaitingList();
+            new WaitinglistDB().setListFromDB("EventWaitinglist", this, event);
             WaitlistEntrantContentAdapter adapter = new WaitlistEntrantContentAdapter(getContext(),dataList,this);
             updateList(adapter);
-        }else{
-            new WaitinglistDB().setListFromDB("EventWaitinglist", this, event);
         }
         mapButton.setOnClickListener(v->{
             if(waitlistViewEntrantsFragment!=null){

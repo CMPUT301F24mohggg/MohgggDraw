@@ -126,7 +126,6 @@ public class ReviewFragment extends Fragment {
                 sharedViewModel.getEventStartTime().getValue() == null ||
                 sharedViewModel.getEventEndTime().getValue() == null ||
                 sharedViewModel.getMaxPoolingSample().getValue() == null ||
-                sharedViewModel.getMaxEntrants().getValue() == null ||
                 sharedViewModel.getImageUrl().getValue() == null) {
 
             Toast.makeText(getContext(), "Please ensure all fields are filled before creating the event.", Toast.LENGTH_LONG).show();
